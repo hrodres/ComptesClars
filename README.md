@@ -36,7 +36,7 @@ excursio-6e/
 ├── index.html      # L'aplicació completa (HTML + CSS + JS)
 ├── vercel.json     # Configuració de Vercel
 ├── README.md       # Aquest fitxer
-└── README.md       # Registre de canvis i versions
+└── CHANGELOG.md    # Registre de canvis i versions
 ```
 
 ## ✨ Funcionalitats
