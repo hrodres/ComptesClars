@@ -35,7 +35,8 @@ Cada `git push` a la branca `main` re-deploya automàticament. Cap configuració
 excursio-6e/
 ├── index.html      # L'aplicació completa (HTML + CSS + JS)
 ├── vercel.json     # Configuració de Vercel
-└── README.md       # Aquest fitxer
+├── README.md       # Aquest fitxer
+└── README.md       # Registre de canvis i versions
 ```
 
 ## ✨ Funcionalitats
