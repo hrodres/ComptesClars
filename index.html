@@ -654,7 +654,7 @@ function saveValues() {
     if (!hasConsent()) return;
     const data = {};
     FIELDS.forEach(f => { data[f.id] = readVal(f.id); });
-    data._titol = document.getElementById('titolActivitat').textContent.trim();
+    data._titol = (document.getElementById('titolActivitat').innerText || '').trim();
     setCookie(COOKIE_DATA_KEY, JSON.stringify(data), COOKIE_DAYS);
 }
 
@@ -785,11 +785,15 @@ window.addEventListener('DOMContentLoaded', () => {
 
     // Listeners del títol editable
     const titol = document.getElementById('titolActivitat');
-    titol.addEventListener('input', () => {
-        const text = titol.textContent.trim();
+
+    function syncTitol() {
+        const text = (titol.innerText || '').trim();
         document.title = text ? text + ' · Càlcul de costos' : 'Càlcul de costos';
         saveValues();
-    });
+    }
+
+    titol.addEventListener('input', syncTitol);
+    titol.addEventListener('blur',  syncTitol);
     titol.addEventListener('keydown', e => {
         if (e.key === 'Enter') { e.preventDefault(); titol.blur(); }
     });
