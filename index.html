@@ -478,7 +478,7 @@
                 <i data-lucide="party-popper" style="width:20px;height:20px;color:var(--green);flex-shrink:0;margin-top:2px;"></i>
                 <div>
                     <p class="alert-title">Excés de recaptació 🎉</p>
-                    <p class="alert-body">Cada alumne té <strong id="excendentPerFamilia">0,00 €</strong> a favor. Es pot descomptar del 2n pagament o retornar.</p>
+                    <p class="alert-body">Cada alumne té <strong id="excedentPerFamilia">0,00 €</strong> a favor. Es pot descomptar del 2n pagament o retornar.</p>
                 </div>
             </div>
         </section>
@@ -589,7 +589,7 @@ const COOKIE_DAYS        = 365;
 
 function setCookie(name, value, days) {
     const expires = new Date(Date.now() + days * 864e5).toUTCString();
-    document.cookie = `${name}=${encodeURIComponent(value)};expires=${expires};path=/;SameSite=Lax`;
+    document.cookie = `${name}=${encodeURIComponent(value)};expires=${expires};path=/;SameSite=Lax;Secure`;
 }
 
 function getCookie(name) {
@@ -611,7 +611,7 @@ function acceptCookies() {
 }
 
 function declineCookies() {
-    setCookie(COOKIE_CONSENT_KEY, 'no', COOKIE_DAYS);
+    setCookie(COOKIE_CONSENT_KEY, 'no', 90);
     hideCookieBanner();
     showCookieSettingsBtn();
 }
@@ -703,7 +703,7 @@ function updateAll() {
         aviso.classList.add('show');
         cardPago.classList.add('surplus');
         cardPago.style.borderLeftColor = 'var(--green)';
-        document.getElementById('excendentPerFamilia').textContent = fmt(Math.abs(p2)) + ' €';
+        document.getElementById('excedentPerFamilia').textContent = fmt(Math.abs(p2)) + ' €';
         document.getElementById('segundoPago').style.color = 'var(--green)';
     } else {
         aviso.classList.remove('show');
