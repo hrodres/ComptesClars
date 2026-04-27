@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Excursió 6è 2026 · Càlcul de costos</title>
+    <title>Càlcul de costos</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800;900&family=DM+Mono:wght@500&display=swap" rel="stylesheet">
@@ -270,6 +270,24 @@
         }
         #cookieSettingsBtn:hover { background: rgba(0,0,0,0.1); }
 
+        /* === TÍTOL EDITABLE === */
+        #titolActivitat {
+            outline: none;
+            border-radius: 8px;
+            padding: 2px 4px;
+            margin: -2px -4px;
+            transition: background 0.15s;
+            cursor: text;
+            min-width: 40px;
+        }
+        #titolActivitat:hover { background: rgba(0,0,0,0.04); }
+        #titolActivitat:focus { background: rgba(0,122,255,0.06); box-shadow: 0 0 0 3px rgba(0,122,255,0.18); cursor: text; }
+        #titolActivitat:empty::before {
+            content: "Nom de l'activitat";
+            color: rgba(28,28,30,0.25);
+            pointer-events: none;
+        }
+
         /* === SMART INPUT: oculta el tipus number per evitar el punt de milers als navegadors === */
         .num-input[type="text"] {
             -webkit-appearance: none;
@@ -295,7 +313,9 @@
     <!-- HEADER -->
     <header style="padding: 52px 0 24px; display: flex; justify-content: space-between; align-items: flex-start;">
         <div>
-            <h1 style="font-size: 30px; font-weight: 900; letter-spacing: -0.5px; line-height: 1.1;">Excursió 6è 2026</h1>
+            <h1 id="titolActivitat" contenteditable="true" spellcheck="false"
+                style="font-size: 30px; font-weight: 900; letter-spacing: -0.5px; line-height: 1.1;"
+                aria-label="Nom de l'activitat"></h1>
             <p style="font-size: 12px; color: var(--text-secondary); margin-top: 4px; font-weight: 500;">Càlcul en temps real</p>
         </div>
         <button onclick="resetToDefaults()" aria-label="Reiniciar valors"
@@ -632,9 +652,9 @@ function showCookieSettingsBtn() {
 
 function saveValues() {
     if (!hasConsent()) return;
-    // Desa els valors numèrics purs (no el format visual)
     const data = {};
     FIELDS.forEach(f => { data[f.id] = readVal(f.id); });
+    data._titol = document.getElementById('titolActivitat').textContent.trim();
     setCookie(COOKIE_DATA_KEY, JSON.stringify(data), COOKIE_DAYS);
 }
 
@@ -647,11 +667,14 @@ function loadSavedValues() {
             const v = d[f.id];
             if (v !== undefined && v !== 0) {
                 const el = document.getElementById(f.id);
-                // Desa el valor numèric; el formatField l'aplicarà
                 el.value = v;
                 formatField(el, f.type);
             }
         });
+        if (d._titol) {
+            document.getElementById('titolActivitat').textContent = d._titol;
+            document.title = d._titol + ' · Càlcul de costos';
+        }
         return true;
     } catch(e) { return false; }
 }
@@ -726,6 +749,8 @@ function resetToDefaults() {
     FIELDS.forEach(f => {
         document.getElementById(f.id).value = '';
     });
+    document.getElementById('titolActivitat').textContent = '';
+    document.title = 'Càlcul de costos';
     updateAll();
 }
 
@@ -756,6 +781,17 @@ window.addEventListener('DOMContentLoaded', () => {
         el.addEventListener('keydown', e => {
             if (e.key === 'Enter') el.blur();
         });
+    });
+
+    // Listeners del títol editable
+    const titol = document.getElementById('titolActivitat');
+    titol.addEventListener('input', () => {
+        const text = titol.textContent.trim();
+        document.title = text ? text + ' · Càlcul de costos' : 'Càlcul de costos';
+        saveValues();
+    });
+    titol.addEventListener('keydown', e => {
+        if (e.key === 'Enter') { e.preventDefault(); titol.blur(); }
     });
 
     // Gestió de cookies
