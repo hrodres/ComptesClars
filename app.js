@@ -579,6 +579,21 @@ function updateAll() {
 // ============================================================
 // COPIAR RESUM
 // ============================================================
+function _copyToClipboard(text) {
+    if (navigator.clipboard && window.isSecureContext) {
+        return navigator.clipboard.writeText(text);
+    }
+    // Fallback: execCommand (HTTP, Firefox, Safari antics)
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.cssText = 'position:fixed;top:0;left:0;opacity:0;pointer-events:none;';
+    document.body.appendChild(ta);
+    ta.focus(); ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    return Promise.resolve();
+}
+
 function copiarResum() {
     const titol   = (document.getElementById('titolActivitat').innerText || '').trim() || 'Activitat';
     const n       = Math.max(1, Math.round(readVal('numNinos')) || 1);
@@ -588,30 +603,39 @@ function copiarResum() {
     const pagat   = getPaymentTotal();
     const pendent = Math.max(0, net - pagat);
 
-    const lines = [titol, '─'.repeat(Math.min(titol.length + 4, 32)), ''];
-    lines.push(`Preu per alumne:   ${fmt(net)} €`);
-    if (total > 0) {
-        lines.push(`  Cost brut:      ${fmt(total / n)} €`);
-        if (rec > 0) lines.push(`  Estalvi:        ${fmt(rec / n)} €`);
-    }
+    const lines = [];
+
+    // Capçalera
+    lines.push(`*${titol}*`);
+    lines.push(`👥 ${n} alumne${n !== 1 ? 's' : ''}`);
+    lines.push('');
+
+    // Preu principal
+    lines.push(`💶 *A pagar per alumne: ${fmt(net)} €*`);
+    if (rec > 0) lines.push(`Cost brut ${fmt(total / n)} € − ${fmt(rec / n)} € de recaptació`);
+    lines.push('');
+
+    // Pagaments
     if (payments.length > 0) {
-        lines.push('', 'Pagaments:');
-        payments.forEach(p => lines.push(`  · ${p.name || '—'}: ${fmt(p.amount)} €`));
-        lines.push(`  Total planificat: ${fmt(pagat)} €`);
-        lines.push(`  Pendent:          ${fmt(pendent)} €`);
-    }
-    if (revenues.length > 0 && revenues.some(r => r.name)) {
-        lines.push('', 'Recaptació:');
-        revenues.forEach(r => {
-            const net = r.income - r.expense;
-            lines.push(`  · ${r.name || '—'}: ${fmt(net)} €`);
-        });
+        lines.push('📅 *Pagaments planificats:*');
+        payments.forEach(p => lines.push(`▸ ${p.name || 'Pagament'}: ${fmt(p.amount)} €`));
+        if (pendent > 0) lines.push(`▸ Pendent: ${fmt(pendent)} €`);
     }
 
-    navigator.clipboard.writeText(lines.join('\n')).then(() => {
+    // Recaptació (només si hi ha conceptes amb nom)
+    const recNamed = revenues.filter(r => r.name.trim() && (r.income > 0 || r.expense > 0));
+    if (recNamed.length > 0) {
+        lines.push('');
+        lines.push('🎯 *Recaptació:*');
+        recNamed.forEach(r => lines.push(`▸ ${r.name}: ${fmt(r.income - r.expense)} €`));
+        lines.push(`Total: ${fmt(rec)} €`);
+    }
+
+    _copyToClipboard(lines.join('\n')).then(() => {
         const btn = document.getElementById('btnCopiar');
         btn.innerHTML = '<i data-lucide="check" style="width:15px;height:15px;"></i>';
-        btn.style.cssText += ';background:rgba(52,199,89,0.12);color:var(--green);';
+        btn.style.background = 'rgba(52,199,89,0.12)';
+        btn.style.color = 'var(--green)';
         lucide.createIcons();
         setTimeout(() => {
             btn.innerHTML = '<i data-lucide="share-2" style="width:15px;height:15px;"></i>';
