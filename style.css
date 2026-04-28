@@ -104,6 +104,14 @@ body {
     color: var(--text);
     line-height: 1;
 }
+.big-num-col {
+    font-family: 'DM Mono', monospace;
+    font-size: clamp(28px, 8vw, 40px);
+    font-weight: 700;
+    letter-spacing: -1.5px;
+    color: var(--text);
+    line-height: 1;
+}
 
 /* === BADGE === */
 .badge {

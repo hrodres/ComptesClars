@@ -545,32 +545,30 @@ function updateAll() {
     const numNinosEl = document.getElementById('numNinos');
     numNinosEl.classList.toggle('invalid', !!numNinosEl.dataset.dirty && readVal('numNinos') === 0);
 
-    document.getElementById('totalFinal').textContent   = fmt(Math.max(0, net));
-    document.getElementById('preuReal').textContent     = fmt(total / n) + ' €';
-    document.getElementById('estalviTotal').textContent = fmt(rec / n) + ' €';
-    document.getElementById('totalPagat').textContent   = fmt(pagat);
-    document.getElementById('segundoPago').textContent  = fmt(Math.abs(pendent)) + ' €';
-    document.getElementById('totalBrut').textContent    = fmt(total);
-    document.getElementById('totalRecNet').textContent  = fmt(rec);
+    document.getElementById('totalFinal').textContent    = fmt(Math.max(0, net));
+    document.getElementById('preuReal').textContent      = fmt(total / n) + ' €';
+    document.getElementById('estalviTotal').textContent  = fmt(rec / n) + ' €';
+    document.getElementById('totalPagat').textContent    = fmt(pagat);
+    document.getElementById('totalBrut').textContent     = fmt(total);
+    document.getElementById('totalRecNet').textContent   = fmt(rec);
+
+    const heroPendentEl = document.getElementById('heroPendent');
+    heroPendentEl.textContent = fmt(Math.max(0, pendent));
+    heroPendentEl.style.color = pendent <= 0 ? 'var(--green)' : 'var(--blue)';
+    document.getElementById('heroPlanificat').textContent = fmt(pagat) + ' €';
 
     updateDistBar();
 
-    const percRec = total > 0 ? Math.min(100, (rec / total) * 100) : 0;
-    document.getElementById('barRecaudado').style.width  = percRec + '%';
-    document.getElementById('percRecaptat').textContent  = percRec.toFixed(1).replace('.', ',') + '%';
-    document.getElementById('percPendent').textContent   = (100 - percRec).toFixed(1).replace('.', ',') + '%';
+    const brut = total / n;
+    const percEstalvi = brut > 0 ? Math.min(100, (rec / n) / brut * 100) : 0;
+    document.getElementById('barEstalvi').style.width = percEstalvi + '%';
 
-    const aviso    = document.getElementById('avisoExcedente');
-    const cardPago = document.getElementById('cardSegundoPago');
+    const aviso = document.getElementById('avisoExcedente');
     if (pendent < 0) {
-        aviso.classList.add('show'); cardPago.classList.add('surplus');
-        cardPago.style.borderLeftColor = 'var(--green)';
+        aviso.classList.add('show');
         document.getElementById('excedentPerFamilia').textContent = fmt(Math.abs(pendent)) + ' €';
-        document.getElementById('segundoPago').style.color = 'var(--green)';
     } else {
-        aviso.classList.remove('show'); cardPago.classList.remove('surplus');
-        cardPago.style.borderLeftColor = 'var(--blue)';
-        document.getElementById('segundoPago').style.color = 'var(--blue)';
+        aviso.classList.remove('show');
     }
 
     saveValues();
