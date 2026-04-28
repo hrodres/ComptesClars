@@ -3,6 +3,7 @@
 // ============================================================
 /** @typedef {{ id:string, icon:string, name:string, amount:number }} Cost */
 /** @typedef {{ id:string, icon:string, name:string, income:number, expense:number }} Revenue */
+/** @typedef {{ id:string, name:string, amount:number }} Payment */
 
 const ICONS = [
     // Allotjament / espai
@@ -33,6 +34,7 @@ const COST_COLORS = ['#FF9500','#AF52DE','#007AFF','#FF3B30','#34C759','#FF6B35'
 // ============================================================
 /** @type {Cost[]}    */ let costs    = [];
 /** @type {Revenue[]} */ let revenues = [];
+/** @type {Payment[]} */ let payments = [];
 let pickerTarget  = null;
 let _deletedEntry = null; // { type:'cost'|'rev', item, idx }
 let _undoTimer    = null;
@@ -41,7 +43,6 @@ function uid() { return 'u' + (++_uid); }
 
 const FIELDS = [
     { id: 'numNinos', type: 'int' },
-    { id: 'pago1',    type: 'dec' },
 ];
 
 // ============================================================
@@ -333,9 +334,90 @@ function undoDelete() {
     document.getElementById('undoToast').classList.remove('show');
     const { type, item, idx } = _deletedEntry;
     _deletedEntry = null;
-    if (type === 'cost') { costs.splice(idx, 0, item); rerenderCostRows(); }
-    else                 { revenues.splice(idx, 0, item); rerenderRevenueRows(); }
+    if (type === 'cost')      { costs.splice(idx, 0, item);    rerenderCostRows(); }
+    else if (type === 'rev')  { revenues.splice(idx, 0, item); rerenderRevenueRows(); }
+    else                      { payments.splice(idx, 0, item); rerenderPaymentRows(); }
     updateAll();
+}
+
+// ============================================================
+// PAGAMENTS DINÀMICS
+// ============================================================
+function getPaymentTotal() { return payments.reduce((s, p) => s + p.amount, 0); }
+
+function addPaymentRow(data = {}, skipUpdate = false) {
+    if (!skipUpdate && payments.length > 0 && !payments[payments.length - 1].name.trim()) {
+        document.querySelector(`.payment-row[data-pay-id="${payments[payments.length-1].id}"] .concept-name`)?.focus();
+        return;
+    }
+    const item = { id: uid(), name: data.name || '', amount: data.amount || 0 };
+    payments.push(item);
+    renderPaymentRow(item);
+    if (!skipUpdate) {
+        updateAll();
+        document.querySelector(`.payment-row[data-pay-id="${item.id}"] .concept-name`)?.focus();
+    }
+}
+
+function deletePaymentRow(id) {
+    const idx = payments.findIndex(p => p.id === id);
+    if (idx === -1) return;
+    _deletedEntry = { type: 'pay', item: { ...payments[idx] }, idx };
+    payments.splice(idx, 1);
+    document.querySelector(`[data-pay-id="${id}"]`)?.remove();
+    updateAll();
+    _showUndoToast('Pagament');
+}
+
+function updatePaymentName(id, value) {
+    const item = payments.find(p => p.id === id);
+    if (item) { item.name = value; saveValues(); }
+}
+
+function updatePaymentAmount(id, rawValue) {
+    const item = payments.find(p => p.id === id);
+    if (item) { item.amount = parseInput(rawValue); updateAll(); }
+}
+
+function blurPaymentAmount(input, id) {
+    formatField(input, 'dec');
+    updatePaymentAmount(id, input.value);
+}
+
+function rerenderPaymentRows() {
+    document.getElementById('paymentsRows').innerHTML = '';
+    payments.forEach(p => renderPaymentRow(p));
+}
+
+function renderPaymentRow(item) {
+    const div = document.createElement('div');
+    div.className = 'input-row payment-row';
+    div.dataset.payId = item.id;
+    div.draggable = true;
+    div.innerHTML = `
+        <button class="btn-drag" aria-label="Arrossegar per reordenar">
+            <i data-lucide="grip-vertical" style="width:14px;height:14px;"></i>
+        </button>
+        <input type="text" class="concept-name" placeholder="Nom del pagament"
+               value="${escHtml(item.name)}"
+               oninput="updatePaymentName('${item.id}',this.value)"
+               aria-label="Nom del pagament">
+        <div class="field-wrap">
+            <input type="text" class="num-input" placeholder="0,00"
+                   value="${item.amount ? fmt(item.amount,2) : ''}"
+                   inputmode="decimal" aria-label="Import"
+                   onfocus="focusField(this)"
+                   oninput="updatePaymentAmount('${item.id}',this.value)"
+                   onblur="blurPaymentAmount(this,'${item.id}')"
+                   onkeydown="if(event.key==='Enter')this.blur()">
+            <span class="euro">€</span>
+        </div>
+        <button class="btn-del" onclick="deletePaymentRow('${item.id}')" aria-label="Eliminar">
+            <i data-lucide="x" style="width:13px;height:13px;"></i>
+        </button>`;
+    _attachDragDrop(div, item.id, payments, rerenderPaymentRows);
+    document.getElementById('paymentsRows').appendChild(div);
+    lucide.createIcons();
 }
 
 // ============================================================
@@ -428,6 +510,7 @@ function saveValues() {
     data._titol    = (document.getElementById('titolActivitat').innerText || '').trim();
     data._costs    = costs.map(c => ({ icon: c.icon, name: c.name, amount: c.amount }));
     data._revenues = revenues.map(r => ({ icon: r.icon, name: r.name, income: r.income, expense: r.expense }));
+    data._payments = payments.map(p => ({ name: p.name, amount: p.amount }));
     setCookie(COOKIE_DATA_KEY, JSON.stringify(data), COOKIE_DAYS);
 }
 
@@ -443,6 +526,7 @@ function loadSavedValues() {
         if (d._titol) { document.getElementById('titolActivitat').textContent = d._titol; document.title = d._titol + ' · Càlcul de costos'; }
         if (Array.isArray(d._costs)    && d._costs.length    > 0) { document.getElementById('costsRows').innerHTML    = ''; costs    = []; d._costs.forEach(c => addCostRow(c, true)); }
         if (Array.isArray(d._revenues) && d._revenues.length > 0) { document.getElementById('revenuesRows').innerHTML = ''; revenues = []; d._revenues.forEach(r => addRevenueRow(r, true)); }
+        if (Array.isArray(d._payments) && d._payments.length > 0) { document.getElementById('paymentsRows').innerHTML = ''; payments = []; d._payments.forEach(p => addPaymentRow(p, true)); }
         return true;
     } catch(e) { return false; }
 }
@@ -451,12 +535,12 @@ function loadSavedValues() {
 // CÀLCUL PRINCIPAL
 // ============================================================
 function updateAll() {
-    const n      = Math.max(1, Math.round(readVal('numNinos')) || 1);
-    const rec    = getRevenueNetTotal();
-    const p1     = readVal('pago1');
-    const total  = getCostTotal();
-    const net    = (total - rec) / n;
-    const p2     = net - p1;
+    const n        = Math.max(1, Math.round(readVal('numNinos')) || 1);
+    const rec      = getRevenueNetTotal();
+    const total    = getCostTotal();
+    const net      = (total - rec) / n;
+    const pagat    = getPaymentTotal();
+    const pendent  = net - pagat;
 
     const numNinosEl = document.getElementById('numNinos');
     numNinosEl.classList.toggle('invalid', !!numNinosEl.dataset.dirty && readVal('numNinos') === 0);
@@ -464,7 +548,8 @@ function updateAll() {
     document.getElementById('totalFinal').textContent   = fmt(Math.max(0, net));
     document.getElementById('preuReal').textContent     = fmt(total / n) + ' €';
     document.getElementById('estalviTotal').textContent = fmt(rec / n) + ' €';
-    document.getElementById('segundoPago').textContent  = fmt(Math.abs(p2)) + ' €';
+    document.getElementById('totalPagat').textContent   = fmt(pagat);
+    document.getElementById('segundoPago').textContent  = fmt(Math.abs(pendent)) + ' €';
     document.getElementById('totalBrut').textContent    = fmt(total);
     document.getElementById('totalRecNet').textContent  = fmt(rec);
 
@@ -477,10 +562,10 @@ function updateAll() {
 
     const aviso    = document.getElementById('avisoExcedente');
     const cardPago = document.getElementById('cardSegundoPago');
-    if (p2 < 0) {
+    if (pendent < 0) {
         aviso.classList.add('show'); cardPago.classList.add('surplus');
         cardPago.style.borderLeftColor = 'var(--green)';
-        document.getElementById('excedentPerFamilia').textContent = fmt(Math.abs(p2)) + ' €';
+        document.getElementById('excedentPerFamilia').textContent = fmt(Math.abs(pendent)) + ' €';
         document.getElementById('segundoPago').style.color = 'var(--green)';
     } else {
         aviso.classList.remove('show'); cardPago.classList.remove('surplus');
@@ -500,6 +585,7 @@ function resetToDefaults() {
     document.title = 'Càlcul de costos';
     document.getElementById('costsRows').innerHTML    = ''; costs    = []; addCostRow({}, true);
     document.getElementById('revenuesRows').innerHTML = ''; revenues = []; addRevenueRow({}, true);
+    document.getElementById('paymentsRows').innerHTML = ''; payments = []; addPaymentRow({}, true);
     updateAll();
 }
 
@@ -546,5 +632,6 @@ window.addEventListener('DOMContentLoaded', () => {
 
     if (costs.length    === 0) addCostRow({}, true);
     if (revenues.length === 0) addRevenueRow({}, true);
+    if (payments.length === 0) addPaymentRow({}, true);
     updateAll();
 });
