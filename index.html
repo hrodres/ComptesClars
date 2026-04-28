@@ -288,6 +288,94 @@
             pointer-events: none;
         }
 
+        /* === FILES DE COST DINÀMIQUES === */
+        .cost-row {
+            justify-content: flex-start;
+            gap: 6px;
+            padding: 0 12px 0 6px;
+        }
+        .btn-del {
+            width: 26px; height: 26px;
+            border: none; background: transparent; cursor: pointer;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            color: var(--text-secondary);
+            flex-shrink: 0;
+            transition: background 0.15s, color 0.15s;
+            padding: 0;
+        }
+        .btn-del:hover { background: rgba(255,59,48,0.1); color: var(--red); }
+
+        .btn-icon-pick {
+            width: 30px; height: 30px;
+            border: none; background: rgba(0,0,0,0.04); cursor: pointer;
+            border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            color: var(--text-secondary);
+            flex-shrink: 0;
+            transition: background 0.15s, color 0.15s;
+            padding: 0;
+        }
+        .btn-icon-pick:hover { background: rgba(0,122,255,0.08); color: var(--blue); }
+
+        .concept-name {
+            flex: 1; min-width: 0;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 15px; font-weight: 600; color: var(--text);
+            border: none; outline: none; background: transparent;
+            padding: 2px 4px; border-radius: 6px;
+            transition: background 0.15s;
+        }
+        .concept-name::placeholder { color: rgba(28,28,30,0.25); font-weight: 500; }
+        .concept-name:focus { background: rgba(0,122,255,0.05); }
+
+        /* === BOTÓ AFEGIR CONCEPTE === */
+        .btn-add-row {
+            width: 100%; margin-top: 8px;
+            background: transparent;
+            border: 1.5px dashed rgba(0,0,0,0.14);
+            border-radius: 14px; padding: 11px 16px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 13px; font-weight: 700; color: var(--text-secondary);
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center; gap: 7px;
+            transition: all 0.15s;
+        }
+        .btn-add-row:hover { background: rgba(0,122,255,0.04); border-color: rgba(0,122,255,0.35); color: var(--blue); }
+
+        /* === SELECTOR D'ICONES === */
+        #iconPickerBackdrop {
+            display: none; position: fixed; inset: 0; z-index: 499;
+            background: rgba(0,0,0,0.15);
+        }
+        #iconPicker {
+            display: none; position: fixed; z-index: 500;
+            top: 50%; left: 50%; transform: translate(-50%, -50%);
+            background: #fff; border-radius: 20px;
+            border: 1px solid var(--border);
+            box-shadow: 0 8px 40px rgba(0,0,0,0.16);
+            padding: 16px;
+            width: min(276px, calc(100vw - 40px));
+        }
+        #iconPickerTitle {
+            font-size: 11px; font-weight: 800; text-transform: uppercase;
+            letter-spacing: 0.1em; color: var(--text-secondary);
+            margin-bottom: 10px; display: block;
+        }
+        #iconGrid {
+            display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px;
+        }
+        .icon-opt {
+            width: 44px; height: 44px; border: none;
+            background: transparent; border-radius: 12px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            color: var(--text-secondary);
+            transition: background 0.1s, color 0.1s;
+            padding: 0;
+        }
+        .icon-opt:hover { background: rgba(0,122,255,0.08); color: var(--blue); }
+        .icon-opt.selected { background: rgba(0,122,255,0.12); color: var(--blue); }
+
         /* === SMART INPUT: oculta el tipus number per evitar el punt de milers als navegadors === */
         .num-input[type="text"] {
             -webkit-appearance: none;
@@ -367,22 +455,8 @@
         <!-- DISTRIBUCIÓ DE COSTOS -->
         <section class="card" style="padding: 18px 20px;">
             <p class="section-label" style="text-align: center; display: block; margin-bottom: 12px;">Distribució dels costos</p>
-            <div class="dist-bar">
-                <div id="segEst" class="dist-seg" style="background: var(--orange); width: 0%;"></div>
-                <div id="segMon" class="dist-seg" style="background: var(--purple); width: 0%;"></div>
-                <div id="segBus" class="dist-seg" style="background: var(--blue); width: 0%;"></div>
-            </div>
-            <div style="display: flex; justify-content: space-around; margin-top: 10px;">
-                <span style="font-size: 10px; font-weight: 700; color: var(--text-secondary); display: flex; align-items: center; gap: 5px; text-transform: uppercase;">
-                    <span style="width:10px;height:10px;border-radius:50%;background:var(--orange);display:inline-block;"></span> Allotjament
-                </span>
-                <span style="font-size: 10px; font-weight: 700; color: var(--text-secondary); display: flex; align-items: center; gap: 5px; text-transform: uppercase;">
-                    <span style="width:10px;height:10px;border-radius:50%;background:var(--purple);display:inline-block;"></span> Monitors
-                </span>
-                <span style="font-size: 10px; font-weight: 700; color: var(--text-secondary); display: flex; align-items: center; gap: 5px; text-transform: uppercase;">
-                    <span style="width:10px;height:10px;border-radius:50%;background:var(--blue);display:inline-block;"></span> Transport
-                </span>
-            </div>
+            <div class="dist-bar" id="distBar"></div>
+            <div id="distLegend" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 10px;"></div>
         </section>
 
         <!-- ALUMNES -->
@@ -418,48 +492,13 @@
 
         <!-- COSTOS DE SERVEIS -->
         <section>
-            <p class="section-label" style="display: block; margin-bottom: 8px;">Costos de serveis</p>
+            <p class="section-label" style="display: block; margin-bottom: 8px;">Costos</p>
             <div class="card">
-                <div class="input-row">
-                    <label for="cEst" class="row-label">
-                        <i data-lucide="hotel" style="width:16px;height:16px;" class="icon"></i>
-                        Allotjament
-                    </label>
-                    <div class="field-wrap">
-                        <input type="text" id="cEst" value="" placeholder="0,00"
-                               aria-label="Cost allotjament en euros" inputmode="decimal"
-                               class="num-input">
-                        <span class="euro">€</span>
-                    </div>
-                </div>
-                <div class="input-row">
-                    <label for="cMon" class="row-label">
-                        <i data-lucide="users-2" style="width:16px;height:16px;" class="icon"></i>
-                        Monitors
-                    </label>
-                    <div class="field-wrap">
-                        <input type="text" id="cMon" value="" placeholder="0,00"
-                               aria-label="Cost monitors en euros" inputmode="decimal"
-                               class="num-input">
-                        <span class="euro">€</span>
-                    </div>
-                </div>
-                <div class="input-row">
-                    <label for="cBus" class="row-label">
-                        <i data-lucide="bus" style="width:16px;height:16px;" class="icon"></i>
-                        Transport
-                    </label>
-                    <div class="field-wrap">
-                        <input type="text" id="cBus" value="" placeholder="0,00"
-                               aria-label="Cost transport en euros" inputmode="decimal"
-                               class="num-input">
-                        <span class="euro">€</span>
-                    </div>
-                </div>
+                <div id="costsRows"></div>
                 <div class="input-row" style="background: rgba(0,122,255,0.03); border-top: 0.5px solid var(--separator);">
                     <div class="row-label" style="color: var(--text-secondary); font-size: 13px;">
                         <i data-lucide="sigma" style="width:15px;height:15px;color:var(--blue);"></i>
-                        <span style="color: var(--blue); font-weight: 700;">Total costos bruts</span>
+                        <span style="color: var(--blue); font-weight: 700;">Total costos</span>
                     </div>
                     <div class="field-wrap">
                         <span id="totalBrut" style="font-family:'DM Mono',monospace; font-size:16px; font-weight:700; color:var(--blue);">0,00</span>
@@ -467,6 +506,9 @@
                     </div>
                 </div>
             </div>
+            <button class="btn-add-row" onclick="addCostRow()" aria-label="Afegir cost">
+                <i data-lucide="plus" style="width:14px;height:14px;"></i> Afegir cost
+            </button>
         </section>
         <section>
             <p class="section-label" style="display: block; margin-bottom: 8px;">Planificació de pagaments</p>
@@ -507,6 +549,13 @@
     </main>
 </div>
 
+<!-- SELECTOR D'ICONES -->
+<div id="iconPickerBackdrop" onclick="closeIconPicker()"></div>
+<div id="iconPicker" role="dialog" aria-label="Tria una icona">
+    <span id="iconPickerTitle">Tria una icona</span>
+    <div id="iconGrid"></div>
+</div>
+
 <!-- COOKIE BANNER -->
 <div id="cookieBanner">
     <p class="cookie-text">
@@ -526,15 +575,36 @@
 
 <script>
 // ============================================================
-// CONFIGURACIÓ DELS CAMPS
-// IDs dels inputs i si són enters (int) o decimals (dec)
+// ICONES I COLORS DISPONIBLES
+// ============================================================
+const ICONS = [
+    'hotel','bus','train','plane','ship',
+    'users','users-2','music','film','ticket',
+    'gift','pizza','coffee','camera','shopping-bag',
+    'scissors','palette','pencil','book-open','star',
+    'sparkles','trophy','heart','map-pin','circle-dot',
+];
+const COST_COLORS = ['#FF9500','#AF52DE','#007AFF','#FF3B30','#34C759','#FF6B35','#5856D6','#FF2D55'];
+
+function safeIcon(icon) { return ICONS.includes(icon) ? icon : 'circle-dot'; }
+function escHtml(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ============================================================
+// ESTAT DINÀMIC
+// ============================================================
+let costs = [];
+let pickerTarget = null;
+let _uid = 0;
+function uid() { return 'u' + (++_uid); }
+
+// ============================================================
+// CONFIGURACIÓ DELS CAMPS FIXOS
 // ============================================================
 const FIELDS = [
     { id: 'numNinos', type: 'int' },
     { id: 'recTot',   type: 'dec' },
-    { id: 'cEst',     type: 'dec' },
-    { id: 'cMon',     type: 'dec' },
-    { id: 'cBus',     type: 'dec' },
     { id: 'pago1',    type: 'dec' },
 ];
 
@@ -602,6 +672,128 @@ function focusField(input) {
 }
 
 // ============================================================
+// COSTOS DINÀMICS
+// ============================================================
+function getCostTotal() {
+    return costs.reduce((sum, c) => sum + c.amount, 0);
+}
+
+function addCostRow(data = {}, skipUpdate = false) {
+    const item = { id: uid(), icon: safeIcon(data.icon || 'circle-dot'), name: data.name || '', amount: data.amount || 0 };
+    costs.push(item);
+    renderCostRow(item);
+    if (!skipUpdate) updateAll();
+}
+
+function deleteCostRow(id) {
+    costs = costs.filter(c => c.id !== id);
+    const row = document.querySelector(`[data-cost-id="${id}"]`);
+    if (row) row.remove();
+    updateAll();
+}
+
+function updateCostName(id, value) {
+    const item = costs.find(c => c.id === id);
+    if (item) { item.name = value; saveValues(); }
+}
+
+function updateCostAmount(id, rawValue) {
+    const item = costs.find(c => c.id === id);
+    if (item) { item.amount = parseInput(rawValue); updateAll(); }
+}
+
+function blurCostAmount(input, id) {
+    formatField(input, 'dec');
+    updateCostAmount(id, input.value);
+}
+
+function renderCostRow(item) {
+    const container = document.getElementById('costsRows');
+    const div = document.createElement('div');
+    div.className = 'input-row cost-row';
+    div.dataset.costId = item.id;
+    div.innerHTML = `
+        <button class="btn-del" onclick="deleteCostRow('${item.id}')" aria-label="Eliminar">
+            <i data-lucide="x" style="width:13px;height:13px;"></i>
+        </button>
+        <button class="btn-icon-pick" onclick="openIconPicker('${item.id}',this)" aria-label="Canviar icona">
+            <i data-lucide="${item.icon}" style="width:16px;height:16px;"></i>
+        </button>
+        <input type="text" class="concept-name" placeholder="Nom del cost"
+               value="${escHtml(item.name)}"
+               oninput="updateCostName('${item.id}',this.value)"
+               aria-label="Nom del cost">
+        <div class="field-wrap">
+            <input type="text" class="num-input" placeholder="0,00"
+                   value="${item.amount ? fmt(item.amount,2) : ''}"
+                   inputmode="decimal" aria-label="Import"
+                   onfocus="focusField(this)"
+                   oninput="updateCostAmount('${item.id}',this.value)"
+                   onblur="blurCostAmount(this,'${item.id}')"
+                   onkeydown="if(event.key==='Enter')this.blur()">
+            <span class="euro">€</span>
+        </div>`;
+    container.appendChild(div);
+    lucide.createIcons();
+}
+
+// ============================================================
+// DISTRIBUCIÓ DE COSTOS DINÀMICA
+// ============================================================
+function updateDistBar() {
+    const total = getCostTotal();
+    const bar    = document.getElementById('distBar');
+    const legend = document.getElementById('distLegend');
+    const active = costs.filter(c => c.amount > 0);
+    if (total > 0 && active.length > 0) {
+        bar.innerHTML = active.map((c, i) =>
+            `<div class="dist-seg" style="width:${c.amount/total*100}%;background:${COST_COLORS[i%COST_COLORS.length]};"></div>`
+        ).join('');
+        legend.innerHTML = active.map((c, i) =>
+            `<span style="font-size:10px;font-weight:700;color:var(--text-secondary);display:flex;align-items:center;gap:5px;text-transform:uppercase;">
+                <span style="width:10px;height:10px;border-radius:50%;background:${COST_COLORS[i%COST_COLORS.length]};display:inline-block;flex-shrink:0;"></span>
+                ${escHtml(c.name || '—')}
+            </span>`
+        ).join('');
+    } else {
+        bar.innerHTML = '';
+        legend.innerHTML = '<span style="font-size:10px;color:var(--text-secondary);">Sense dades</span>';
+    }
+}
+
+// ============================================================
+// SELECTOR D'ICONES
+// ============================================================
+function openIconPicker(id) {
+    pickerTarget = id;
+    const item = costs.find(c => c.id === id);
+    const current = item ? item.icon : 'circle-dot';
+    document.querySelectorAll('.icon-opt').forEach(b => {
+        b.classList.toggle('selected', b.dataset.icon === current);
+    });
+    document.getElementById('iconPickerBackdrop').style.display = 'block';
+    document.getElementById('iconPicker').style.display = 'block';
+}
+
+function selectIcon(icon) {
+    if (!pickerTarget) return;
+    const item = costs.find(c => c.id === pickerTarget);
+    if (item) {
+        item.icon = safeIcon(icon);
+        const btn = document.querySelector(`[data-cost-id="${pickerTarget}"] .btn-icon-pick`);
+        if (btn) { btn.innerHTML = `<i data-lucide="${item.icon}" style="width:16px;height:16px;"></i>`; lucide.createIcons(); }
+    }
+    closeIconPicker();
+    saveValues();
+}
+
+function closeIconPicker() {
+    document.getElementById('iconPickerBackdrop').style.display = 'none';
+    document.getElementById('iconPicker').style.display = 'none';
+    pickerTarget = null;
+}
+
+// ============================================================
 // COOKIES
 // ============================================================
 const COOKIE_CONSENT_KEY = 'excursio6_consent';
@@ -655,6 +847,7 @@ function saveValues() {
     const data = {};
     FIELDS.forEach(f => { data[f.id] = readVal(f.id); });
     data._titol = (document.getElementById('titolActivitat').innerText || '').trim();
+    data._costs = costs.map(c => ({ icon: c.icon, name: c.name, amount: c.amount }));
     setCookie(COOKIE_DATA_KEY, JSON.stringify(data), COOKIE_DAYS);
 }
 
@@ -675,6 +868,11 @@ function loadSavedValues() {
             document.getElementById('titolActivitat').textContent = d._titol;
             document.title = d._titol + ' · Càlcul de costos';
         }
+        if (Array.isArray(d._costs) && d._costs.length > 0) {
+            document.getElementById('costsRows').innerHTML = '';
+            costs = [];
+            d._costs.forEach(c => addCostRow(c, true));
+        }
         return true;
     } catch(e) { return false; }
 }
@@ -685,15 +883,12 @@ function loadSavedValues() {
 function updateAll() {
     const n   = Math.max(1, Math.round(readVal('numNinos')) || 1);
     const rec = readVal('recTot');
-    const cE  = readVal('cEst');
-    const cM  = readVal('cMon');
-    const cB  = readVal('cBus');
     const p1  = readVal('pago1');
 
     const numNinosEl = document.getElementById('numNinos');
     numNinosEl.classList.toggle('invalid', !!numNinosEl.dataset.dirty && readVal('numNinos') === 0);
 
-    const total    = cE + cM + cB;
+    const total    = getCostTotal();
     const preuReal = total / n;
     const net      = (total - rec) / n;
     const estalvi  = rec / n;
@@ -706,22 +901,14 @@ function updateAll() {
     document.getElementById('segundoPago').textContent   = fmt(Math.abs(p2)) + ' €';
     document.getElementById('totalBrut').textContent     = fmt(total);
 
+    // Distribució dinàmica
+    updateDistBar();
+
     // Barra de progrés recaptació
     const percRec = total > 0 ? Math.min(100, (rec / total) * 100) : 0;
     document.getElementById('barRecaudado').style.width  = percRec + '%';
     document.getElementById('percRecaptat').textContent  = percRec.toFixed(1).replace('.', ',') + '%';
     document.getElementById('percPendent').textContent   = (100 - percRec).toFixed(1).replace('.', ',') + '%';
-
-    // Barres de distribució de costos
-    if (total > 0) {
-        document.getElementById('segEst').style.width = (cE / total * 100) + '%';
-        document.getElementById('segMon').style.width = (cM / total * 100) + '%';
-        document.getElementById('segBus').style.width = (cB / total * 100) + '%';
-    } else {
-        ['segEst','segMon','segBus'].forEach(id => {
-            document.getElementById(id).style.width = '0%';
-        });
-    }
 
     // Excedent / 2n pagament
     const aviso    = document.getElementById('avisoExcedente');
@@ -746,11 +933,12 @@ function updateAll() {
 // REINICIAR
 // ============================================================
 function resetToDefaults() {
-    FIELDS.forEach(f => {
-        document.getElementById(f.id).value = '';
-    });
+    FIELDS.forEach(f => { document.getElementById(f.id).value = ''; });
     document.getElementById('titolActivitat').textContent = '';
     document.title = 'Càlcul de costos';
+    document.getElementById('costsRows').innerHTML = '';
+    costs = [];
+    addCostRow({}, true);
     updateAll();
 }
 
@@ -758,6 +946,18 @@ function resetToDefaults() {
 // INICI
 // ============================================================
 window.addEventListener('DOMContentLoaded', () => {
+    // Construeix la graella del selector d'icones
+    const grid = document.getElementById('iconGrid');
+    ICONS.forEach(icon => {
+        const btn = document.createElement('button');
+        btn.className = 'icon-opt';
+        btn.dataset.icon = icon;
+        btn.setAttribute('aria-label', icon);
+        btn.onclick = () => selectIcon(icon);
+        btn.innerHTML = `<i data-lucide="${icon}" style="width:18px;height:18px;"></i>`;
+        grid.appendChild(btn);
+    });
+
     lucide.createIcons();
 
     // Registra listeners per a cada camp
@@ -807,6 +1007,9 @@ window.addEventListener('DOMContentLoaded', () => {
         showCookieSettingsBtn();
         if (consent === 'yes') loadSavedValues();
     }
+
+    // Inicialitza amb una fila buida si no s'han carregat dades
+    if (costs.length === 0) addCostRow({}, true);
 
     updateAll();
 });
