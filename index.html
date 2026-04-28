@@ -304,7 +304,6 @@
             color: var(--text-secondary); flex-shrink: 0; padding: 0;
             opacity: 0.35; transition: opacity 0.15s;
         }
-        .cost-row:hover .btn-drag { opacity: 1; }
         .btn-drag:active { cursor: grabbing; }
 
         .btn-del {
@@ -317,9 +316,12 @@
             transition: opacity 0.15s, background 0.15s, color 0.15s;
             padding: 0;
         }
-        .cost-row:hover .btn-del,
         .cost-row:focus-within .btn-del { opacity: 1; pointer-events: auto; }
-        .btn-del:hover { background: rgba(255,59,48,0.1); color: var(--red); }
+        @media (hover: hover) {
+            .cost-row:hover .btn-del { opacity: 1; pointer-events: auto; }
+            .btn-del:hover { background: rgba(255,59,48,0.1); color: var(--red); }
+            .cost-row:hover .btn-drag { opacity: 1; }
+        }
 
         /* === UNDO TOAST === */
         #undoToast {
