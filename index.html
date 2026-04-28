@@ -41,7 +41,13 @@
                     <span class="badge">Per alumne</span>
                     <span style="font-size: 11px; font-weight: 800; color: var(--blue); text-transform: uppercase; letter-spacing: 0.08em;">A pagar</span>
                 </div>
-                <i data-lucide="wallet" style="width:20px;height:20px;color:var(--blue);"></i>
+                <i data-lucide="wallet" style="width:18px;height:18px;color:var(--blue);opacity:0.6;"></i>
+                <button id="btnCopiar" onclick="copiarResum()" aria-label="Copiar resum"
+                    style="width:30px;height:30px;border:none;background:rgba(0,122,255,0.08);border-radius:8px;
+                           cursor:pointer;display:flex;align-items:center;justify-content:center;
+                           color:var(--blue);transition:background 0.15s,color 0.15s;padding:0;margin-left:2px;">
+                    <i data-lucide="share-2" style="width:15px;height:15px;"></i>
+                </button>
             </div>
 
             <div style="display: flex; align-items: baseline; gap: 6px; margin: 8px 0 4px;">

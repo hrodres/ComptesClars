@@ -577,6 +577,52 @@ function updateAll() {
 }
 
 // ============================================================
+// COPIAR RESUM
+// ============================================================
+function copiarResum() {
+    const titol   = (document.getElementById('titolActivitat').innerText || '').trim() || 'Activitat';
+    const n       = Math.max(1, Math.round(readVal('numNinos')) || 1);
+    const rec     = getRevenueNetTotal();
+    const total   = getCostTotal();
+    const net     = (total - rec) / n;
+    const pagat   = getPaymentTotal();
+    const pendent = Math.max(0, net - pagat);
+
+    const lines = [titol, '─'.repeat(Math.min(titol.length + 4, 32)), ''];
+    lines.push(`Preu per alumne:   ${fmt(net)} €`);
+    if (total > 0) {
+        lines.push(`  Cost brut:      ${fmt(total / n)} €`);
+        if (rec > 0) lines.push(`  Estalvi:        ${fmt(rec / n)} €`);
+    }
+    if (payments.length > 0) {
+        lines.push('', 'Pagaments:');
+        payments.forEach(p => lines.push(`  · ${p.name || '—'}: ${fmt(p.amount)} €`));
+        lines.push(`  Total planificat: ${fmt(pagat)} €`);
+        lines.push(`  Pendent:          ${fmt(pendent)} €`);
+    }
+    if (revenues.length > 0 && revenues.some(r => r.name)) {
+        lines.push('', 'Recaptació:');
+        revenues.forEach(r => {
+            const net = r.income - r.expense;
+            lines.push(`  · ${r.name || '—'}: ${fmt(net)} €`);
+        });
+    }
+
+    navigator.clipboard.writeText(lines.join('\n')).then(() => {
+        const btn = document.getElementById('btnCopiar');
+        btn.innerHTML = '<i data-lucide="check" style="width:15px;height:15px;"></i>';
+        btn.style.cssText += ';background:rgba(52,199,89,0.12);color:var(--green);';
+        lucide.createIcons();
+        setTimeout(() => {
+            btn.innerHTML = '<i data-lucide="share-2" style="width:15px;height:15px;"></i>';
+            btn.style.background = 'rgba(0,122,255,0.08)';
+            btn.style.color = 'var(--blue)';
+            lucide.createIcons();
+        }, 2000);
+    });
+}
+
+// ============================================================
 // REINICIAR
 // ============================================================
 function resetToDefaults() {
