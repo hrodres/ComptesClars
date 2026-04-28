@@ -631,6 +631,15 @@ function copiarResum() {
         lines.push(`Total: ${fmt(rec)} €`);
     }
 
+    // Costos
+    const costsNamed = costs.filter(c => c.amount > 0);
+    if (costsNamed.length > 0) {
+        lines.push('');
+        lines.push('📦 *Costos:*');
+        costsNamed.forEach(c => lines.push(`▸ ${c.name || '—'}: ${fmt(c.amount)} €`));
+        lines.push(`Total: ${fmt(total)} €`);
+    }
+
     _copyToClipboard(lines.join('\n')).then(() => {
         const btn = document.getElementById('btnCopiar');
         btn.innerHTML = '<i data-lucide="check" style="width:15px;height:15px;"></i>';
