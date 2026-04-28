@@ -365,6 +365,37 @@
         .concept-name::placeholder { color: rgba(28,28,30,0.25); font-weight: 500; }
         .concept-name:focus { background: rgba(0,122,255,0.05); }
 
+        /* === FILES DE RECAPTACIÓ === */
+        .revenue-row {
+            flex-direction: column;
+            align-items: stretch;
+            padding: 10px 8px 10px 6px;
+            min-height: auto;
+            gap: 6px;
+        }
+        .rev-top {
+            display: flex; align-items: center; gap: 6px;
+        }
+        .rev-bottom {
+            display: flex; align-items: center; gap: 6px;
+            padding-left: 26px; flex-wrap: nowrap;
+        }
+        .rev-bottom .num-input { width: 85px; }
+        .btn-add-expense {
+            font-size: 11px; font-weight: 700; color: var(--text-secondary);
+            background: transparent; border: 1px dashed rgba(0,0,0,0.15);
+            border-radius: 6px; cursor: pointer; padding: 2px 7px;
+            white-space: nowrap; font-family: 'DM Sans', sans-serif;
+            transition: color 0.15s, border-color 0.15s, background 0.15s;
+        }
+        .btn-add-expense:hover { color: var(--green); border-color: var(--green); background: rgba(52,199,89,0.05); }
+        .exp-sep { font-size: 13px; font-weight: 700; color: var(--text-secondary); flex-shrink: 0; }
+        .rev-net {
+            font-family: 'DM Mono', monospace; font-size: 13px; font-weight: 700;
+            color: var(--green); white-space: nowrap; margin-left: auto;
+        }
+        .rev-net.negative { color: var(--red); }
+
         /* === BOTÓ AFEGIR CONCEPTE === */
         .btn-add-row {
             width: 100%; margin-top: 8px;
@@ -511,19 +542,25 @@
         </section>
 
         <!-- RECAPTACIÓ -->
-        <section class="card">
-            <div class="input-row" style="background: rgba(52,199,89,0.04);">
-                <label for="recTot" class="row-label">
-                    <i data-lucide="piggy-bank" style="width:18px;height:18px;color:var(--green);"></i>
-                    <span style="color: #1A7A3A; font-weight: 700;">Total Recaptat</span>
-                </label>
-                <div class="field-wrap">
-                    <input type="text" id="recTot" value="" placeholder="0,00"
-                           aria-label="Total recaptat en euros" inputmode="decimal"
-                           class="num-input green">
-                    <span class="euro" style="color: var(--green);">€</span>
+        <section>
+            <p class="section-label" style="display: block; margin-bottom: 8px;">Recaptació</p>
+            <div class="card">
+                <div id="revenuesRows"></div>
+                <div class="input-row" style="background: rgba(52,199,89,0.03); border-top: 0.5px solid var(--separator);">
+                    <div class="row-label" style="font-size: 13px;">
+                        <i data-lucide="sigma" style="width:15px;height:15px;color:var(--green);"></i>
+                        <span style="color: var(--green); font-weight: 700;">Total recaptat net</span>
+                    </div>
+                    <div class="field-wrap">
+                        <span id="totalRecNet" style="font-family:'DM Mono',monospace; font-size:16px; font-weight:700; color:var(--green);">0,00</span>
+                        <span class="euro" style="color:var(--green);">€</span>
+                    </div>
                 </div>
             </div>
+            <button class="btn-add-row" onclick="addRevenueRow()" aria-label="Afegir recaptació"
+                    style="border-color: rgba(52,199,89,0.3);">
+                <i data-lucide="plus" style="width:14px;height:14px;"></i> Afegir recaptació
+            </button>
         </section>
 
         <!-- COSTOS DE SERVEIS -->
@@ -594,7 +631,7 @@
 
 <!-- UNDO TOAST -->
 <div id="undoToast">
-    <span>Cost eliminat</span>
+    <span id="undoToastLabel">Element eliminat</span>
     <button class="btn-undo" onclick="undoDelete()">Desfer</button>
 </div>
 
@@ -636,8 +673,11 @@ function escHtml(s) {
 // ============================================================
 // ESTAT DINÀMIC
 // ============================================================
-let costs = [];
-let pickerTarget = null;
+let costs    = [];
+let revenues = [];
+let pickerTarget  = null;
+let _deletedEntry = null;
+let _undoTimer    = null;
 let _uid = 0;
 function uid() { return 'u' + (++_uid); }
 
@@ -646,7 +686,6 @@ function uid() { return 'u' + (++_uid); }
 // ============================================================
 const FIELDS = [
     { id: 'numNinos', type: 'int' },
-    { id: 'recTot',   type: 'dec' },
     { id: 'pago1',    type: 'dec' },
 ];
 
@@ -727,33 +766,39 @@ function addCostRow(data = {}, skipUpdate = false) {
     if (!skipUpdate) updateAll();
 }
 
-// Undo delete state
-let _deletedItem = null, _deletedIdx = null, _undoTimer = null;
+function _showUndoToast(label) {
+    clearTimeout(_undoTimer);
+    document.getElementById('undoToastLabel').textContent = label + ' eliminat';
+    document.getElementById('undoToast').classList.add('show');
+    _undoTimer = setTimeout(() => {
+        document.getElementById('undoToast').classList.remove('show');
+        _deletedEntry = null;
+    }, 4000);
+}
 
 function deleteCostRow(id) {
     const idx = costs.findIndex(c => c.id === id);
     if (idx === -1) return;
-    _deletedItem = { ...costs[idx] };
-    _deletedIdx  = idx;
+    _deletedEntry = { type: 'cost', item: { ...costs[idx] }, idx };
     costs.splice(idx, 1);
     document.querySelector(`[data-cost-id="${id}"]`)?.remove();
     updateAll();
-    // Show undo toast
-    clearTimeout(_undoTimer);
-    document.getElementById('undoToast').classList.add('show');
-    _undoTimer = setTimeout(() => {
-        document.getElementById('undoToast').classList.remove('show');
-        _deletedItem = null; _deletedIdx = null;
-    }, 4000);
+    _showUndoToast('Cost');
 }
 
 function undoDelete() {
-    if (!_deletedItem) return;
+    if (!_deletedEntry) return;
     clearTimeout(_undoTimer);
     document.getElementById('undoToast').classList.remove('show');
-    costs.splice(_deletedIdx, 0, _deletedItem);
-    _deletedItem = null; _deletedIdx = null;
-    rerenderCostRows();
+    const { type, item, idx } = _deletedEntry;
+    _deletedEntry = null;
+    if (type === 'cost') {
+        costs.splice(idx, 0, item);
+        rerenderCostRows();
+    } else {
+        revenues.splice(idx, 0, item);
+        rerenderRevenueRows();
+    }
     updateAll();
 }
 
@@ -842,6 +887,177 @@ function renderCostRow(item) {
 }
 
 // ============================================================
+// RECAPTACIÓ DINÀMICA
+// ============================================================
+function getRevenueNetTotal() {
+    return revenues.reduce((sum, r) => sum + r.income - r.expense, 0);
+}
+
+function addRevenueRow(data = {}, skipUpdate = false) {
+    const item = { id: uid(), icon: safeIcon(data.icon || 'piggy-bank'), name: data.name || '', income: data.income || 0, expense: data.expense || 0 };
+    revenues.push(item);
+    renderRevenueRow(item);
+    if (!skipUpdate) updateAll();
+}
+
+function deleteRevenueRow(id) {
+    const idx = revenues.findIndex(r => r.id === id);
+    if (idx === -1) return;
+    _deletedEntry = { type: 'rev', item: { ...revenues[idx] }, idx };
+    revenues.splice(idx, 1);
+    document.querySelector(`[data-rev-id="${id}"]`)?.remove();
+    updateAll();
+    _showUndoToast('Recaptació');
+}
+
+function updateRevName(id, value) {
+    const item = revenues.find(r => r.id === id);
+    if (item) { item.name = value; saveValues(); }
+}
+
+function updateRevIncome(id, raw) {
+    const item = revenues.find(r => r.id === id);
+    if (item) { item.income = parseInput(raw); refreshRevNet(id); updateAll(); }
+}
+
+function blurRevIncome(input, id) {
+    formatField(input, 'dec');
+    updateRevIncome(id, input.value);
+}
+
+function updateRevExpense(id, raw) {
+    const item = revenues.find(r => r.id === id);
+    if (item) { item.expense = parseInput(raw); refreshRevNet(id); updateAll(); }
+}
+
+function blurRevExpense(input, id) {
+    formatField(input, 'dec');
+    const item = revenues.find(r => r.id === id);
+    if (item) {
+        item.expense = parseInput(input.value);
+        if (item.expense === 0) collapseExpense(id);
+        refreshRevNet(id);
+        updateAll();
+    }
+}
+
+function refreshRevNet(id) {
+    const item = revenues.find(r => r.id === id);
+    const el   = document.getElementById('revNet_' + id);
+    if (!item || !el) return;
+    const net = item.income - item.expense;
+    el.textContent = fmt(net) + ' €';
+    el.classList.toggle('negative', net < 0);
+}
+
+function expandExpense(id) {
+    const item = revenues.find(r => r.id === id);
+    const wrap = document.getElementById('expWrap_' + id);
+    if (!wrap || !item) return;
+    wrap.innerHTML = `
+        <span class="exp-sep">−</span>
+        <input type="text" class="num-input" placeholder="0,00"
+               value="${item.expense ? fmt(item.expense,2) : ''}"
+               inputmode="decimal" aria-label="Despeses"
+               style="width:85px;"
+               onfocus="focusField(this)"
+               oninput="updateRevExpense('${id}',this.value)"
+               onblur="blurRevExpense(this,'${id}')"
+               onkeydown="if(event.key==='Enter')this.blur()">
+        <span class="euro">€</span>`;
+}
+
+function collapseExpense(id) {
+    const wrap = document.getElementById('expWrap_' + id);
+    if (!wrap) return;
+    wrap.innerHTML = `<button class="btn-add-expense" onclick="expandExpense('${id}')">+ despeses</button>`;
+}
+
+function rerenderRevenueRows() {
+    document.getElementById('revenuesRows').innerHTML = '';
+    revenues.forEach(r => renderRevenueRow(r));
+}
+
+function renderRevenueRow(item) {
+    const container = document.getElementById('revenuesRows');
+    const div = document.createElement('div');
+    div.className = 'input-row revenue-row';
+    div.dataset.revId = item.id;
+    div.draggable = true;
+    const expHtml = item.expense > 0
+        ? `<span class="exp-sep">−</span>
+           <input type="text" class="num-input" placeholder="0,00"
+                  value="${fmt(item.expense,2)}" inputmode="decimal"
+                  style="width:85px;" aria-label="Despeses"
+                  onfocus="focusField(this)"
+                  oninput="updateRevExpense('${item.id}',this.value)"
+                  onblur="blurRevExpense(this,'${item.id}')"
+                  onkeydown="if(event.key==='Enter')this.blur()">
+           <span class="euro">€</span>`
+        : `<button class="btn-add-expense" onclick="expandExpense('${item.id}')">+ despeses</button>`;
+    const net = item.income - item.expense;
+    div.innerHTML = `
+        <div class="rev-top">
+            <button class="btn-drag" aria-label="Arrossegar">
+                <i data-lucide="grip-vertical" style="width:14px;height:14px;"></i>
+            </button>
+            <button class="btn-icon-pick" onclick="openIconPicker('${item.id}',this)" aria-label="Canviar icona">
+                <i data-lucide="${item.icon}" style="width:16px;height:16px;"></i>
+            </button>
+            <input type="text" class="concept-name" placeholder="Nom de la recaptació"
+                   value="${escHtml(item.name)}"
+                   oninput="updateRevName('${item.id}',this.value)"
+                   aria-label="Nom de la recaptació">
+            <button class="btn-del" onclick="deleteRevenueRow('${item.id}')" aria-label="Eliminar">
+                <i data-lucide="x" style="width:13px;height:13px;"></i>
+            </button>
+        </div>
+        <div class="rev-bottom">
+            <input type="text" class="num-input green" placeholder="0,00"
+                   value="${item.income ? fmt(item.income,2) : ''}"
+                   inputmode="decimal" aria-label="Ingressos"
+                   onfocus="focusField(this)"
+                   oninput="updateRevIncome('${item.id}',this.value)"
+                   onblur="blurRevIncome(this,'${item.id}')"
+                   onkeydown="if(event.key==='Enter')this.blur()">
+            <span class="euro" style="color:var(--green);">€</span>
+            <div id="expWrap_${item.id}" style="display:contents;">${expHtml}</div>
+            <span class="rev-net${net < 0 ? ' negative' : ''}" id="revNet_${item.id}">${fmt(net)} €</span>
+        </div>`;
+    // Drag & Drop (same pattern as costs)
+    div.addEventListener('dragstart', e => {
+        e.dataTransfer.setData('text/plain', item.id);
+        e.dataTransfer.effectAllowed = 'move';
+        setTimeout(() => div.classList.add('dragging'), 0);
+    });
+    div.addEventListener('dragend', () => {
+        div.classList.remove('dragging');
+        document.querySelectorAll('.revenue-row').forEach(r => r.classList.remove('drag-over'));
+    });
+    div.addEventListener('dragover', e => {
+        e.preventDefault();
+        document.querySelectorAll('.revenue-row').forEach(r => r.classList.remove('drag-over'));
+        div.classList.add('drag-over');
+    });
+    div.addEventListener('dragleave', () => div.classList.remove('drag-over'));
+    div.addEventListener('drop', e => {
+        e.preventDefault();
+        div.classList.remove('drag-over');
+        const fromId = e.dataTransfer.getData('text/plain');
+        if (fromId === item.id) return;
+        const fromIdx = revenues.findIndex(r => r.id === fromId);
+        const toIdx   = revenues.findIndex(r => r.id === item.id);
+        if (fromIdx === -1 || toIdx === -1) return;
+        const [moved] = revenues.splice(fromIdx, 1);
+        revenues.splice(toIdx, 0, moved);
+        rerenderRevenueRows();
+        saveValues();
+    });
+    container.appendChild(div);
+    lucide.createIcons();
+}
+
+// ============================================================
 // DISTRIBUCIÓ DE COSTOS DINÀMICA
 // ============================================================
 function updateDistBar() {
@@ -881,10 +1097,12 @@ function openIconPicker(id) {
 
 function selectIcon(icon) {
     if (!pickerTarget) return;
-    const item = costs.find(c => c.id === pickerTarget);
+    let item = costs.find(c => c.id === pickerTarget);
+    let sel  = `[data-cost-id="${pickerTarget}"]`;
+    if (!item) { item = revenues.find(r => r.id === pickerTarget); sel = `[data-rev-id="${pickerTarget}"]`; }
     if (item) {
         item.icon = safeIcon(icon);
-        const btn = document.querySelector(`[data-cost-id="${pickerTarget}"] .btn-icon-pick`);
+        const btn = document.querySelector(`${sel} .btn-icon-pick`);
         if (btn) { btn.innerHTML = `<i data-lucide="${item.icon}" style="width:16px;height:16px;"></i>`; lucide.createIcons(); }
     }
     closeIconPicker();
@@ -951,7 +1169,8 @@ function saveValues() {
     const data = {};
     FIELDS.forEach(f => { data[f.id] = readVal(f.id); });
     data._titol = (document.getElementById('titolActivitat').innerText || '').trim();
-    data._costs = costs.map(c => ({ icon: c.icon, name: c.name, amount: c.amount }));
+    data._costs    = costs.map(c => ({ icon: c.icon, name: c.name, amount: c.amount }));
+    data._revenues = revenues.map(r => ({ icon: r.icon, name: r.name, income: r.income, expense: r.expense }));
     setCookie(COOKIE_DATA_KEY, JSON.stringify(data), COOKIE_DAYS);
 }
 
@@ -977,6 +1196,11 @@ function loadSavedValues() {
             costs = [];
             d._costs.forEach(c => addCostRow(c, true));
         }
+        if (Array.isArray(d._revenues) && d._revenues.length > 0) {
+            document.getElementById('revenuesRows').innerHTML = '';
+            revenues = [];
+            d._revenues.forEach(r => addRevenueRow(r, true));
+        }
         return true;
     } catch(e) { return false; }
 }
@@ -986,7 +1210,7 @@ function loadSavedValues() {
 // ============================================================
 function updateAll() {
     const n   = Math.max(1, Math.round(readVal('numNinos')) || 1);
-    const rec = readVal('recTot');
+    const rec = getRevenueNetTotal();
     const p1  = readVal('pago1');
 
     const numNinosEl = document.getElementById('numNinos');
@@ -1004,6 +1228,7 @@ function updateAll() {
     document.getElementById('estalviTotal').textContent  = fmt(estalvi) + ' €';
     document.getElementById('segundoPago').textContent   = fmt(Math.abs(p2)) + ' €';
     document.getElementById('totalBrut').textContent     = fmt(total);
+    document.getElementById('totalRecNet').textContent   = fmt(rec);
 
     // Distribució dinàmica
     updateDistBar();
@@ -1043,6 +1268,9 @@ function resetToDefaults() {
     document.getElementById('costsRows').innerHTML = '';
     costs = [];
     addCostRow({}, true);
+    document.getElementById('revenuesRows').innerHTML = '';
+    revenues = [];
+    addRevenueRow({}, true);
     updateAll();
 }
 
@@ -1113,7 +1341,8 @@ window.addEventListener('DOMContentLoaded', () => {
     }
 
     // Inicialitza amb una fila buida si no s'han carregat dades
-    if (costs.length === 0) addCostRow({}, true);
+    if (costs.length    === 0) addCostRow({}, true);
+    if (revenues.length === 0) addRevenueRow({}, true);
 
     updateAll();
 });
