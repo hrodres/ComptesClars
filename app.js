@@ -17,14 +17,14 @@ const ICONS = [
     'mountain','trees','leaf','sun','flame',
     // Art / música
     'music','mic','film','palette','paintbrush',
-    // Activitat esportiva
-    'trophy','dumbbell','scissors','camera','ticket',
-    // Celebració / flora
+    // Activitat / esport
+    'trophy','dumbbell','camera','ticket','scissors',
+    // Flora / festa
     'flower','flower-2','sparkles','party-popper','umbrella',
     // Escola / ciència
     'book','book-open','microscope','flag','star',
-    // Compres / misc
-    'shopping-cart','car','zap','map-pin','circle-dot',
+    // Diners / misc
+    'coins','tag','shopping-cart','map-pin','circle-dot',
 ];
 const COST_COLORS = ['#FF9500','#AF52DE','#007AFF','#FF3B30','#34C759','#FF6B35','#5856D6','#FF2D55'];
 
@@ -94,7 +94,7 @@ function addCostRow(data = {}, skipUpdate = false) {
         document.querySelector(`.cost-row[data-cost-id="${costs[costs.length-1].id}"] .concept-name`)?.focus();
         return;
     }
-    const item = { id: uid(), icon: safeIcon(data.icon || 'circle-dot'), name: data.name || '', amount: data.amount || 0 };
+    const item = { id: uid(), icon: safeIcon(data.icon || 'tag'), name: data.name || '', amount: data.amount || 0 };
     costs.push(item);
     renderCostRow(item);
     if (!skipUpdate) {
@@ -177,7 +177,7 @@ function addRevenueRow(data = {}, skipUpdate = false) {
         document.querySelector(`.revenue-row[data-rev-id="${revenues[revenues.length-1].id}"] .concept-name`)?.focus();
         return;
     }
-    const item = { id: uid(), icon: safeIcon(data.icon || 'circle-dot'), name: data.name || '', income: data.income || 0, expense: data.expense || 0 };
+    const item = { id: uid(), icon: safeIcon(data.icon || 'coins'), name: data.name || '', income: data.income || 0, expense: data.expense || 0 };
     revenues.push(item);
     renderRevenueRow(item);
     if (!skipUpdate) {
