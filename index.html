@@ -219,11 +219,6 @@
         }
         .btn-section-add:hover { background: rgba(0,122,255,0.1); color: var(--blue); }
 
-        /* === COST PER ALUMNE (per concepte) === */
-        .cost-ps {
-            font-size: 11px; font-weight: 700;
-            color: var(--text-secondary); white-space: nowrap; flex-shrink: 0;
-        }
 
         /* === COOKIE BANNER === */
         #cookieBanner {
@@ -885,7 +880,6 @@ function renderCostRow(item) {
                    onkeydown="if(event.key==='Enter')this.blur()">
             <span class="euro">€</span>
         </div>
-        <span class="cost-ps" id="costPS_${item.id}"></span>
         <button class="btn-del" onclick="deleteCostRow('${item.id}')" aria-label="Eliminar">
             <i data-lucide="x" style="width:13px;height:13px;"></i>
         </button>`;
@@ -1249,11 +1243,6 @@ function updateAll() {
     document.getElementById('totalBrut').textContent     = fmt(total);
     document.getElementById('totalRecNet').textContent   = fmt(rec);
 
-    // Cost per alumne per concepte (only meaningful when n > 1)
-    costs.forEach(c => {
-        const el = document.getElementById('costPS_' + c.id);
-        if (el) el.textContent = c.amount > 0 && n > 1 ? fmt(c.amount / n) + ' €/al.' : '';
-    });
 
     // Distribució dinàmica
     updateDistBar();
