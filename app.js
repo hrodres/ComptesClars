@@ -553,8 +553,10 @@ function updateAll() {
     document.getElementById('totalRecNet').textContent   = fmt(rec);
 
     const heroPendentEl = document.getElementById('heroPendent');
+    const pendentColor = pendent <= 0 ? 'var(--green)' : 'var(--blue)';
     heroPendentEl.textContent = fmt(Math.max(0, pendent));
-    heroPendentEl.style.color = pendent <= 0 ? 'var(--green)' : 'var(--blue)';
+    heroPendentEl.style.color = pendentColor;
+    document.getElementById('heroPendentEuro').style.color = pendentColor;
     document.getElementById('heroPlanificat').textContent = fmt(pagat) + ' €';
 
     updateDistBar();

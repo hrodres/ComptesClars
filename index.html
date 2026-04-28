@@ -50,20 +50,20 @@
 
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px 16px; margin-bottom: 18px;">
                 <div>
-                    <p style="font-size:11px;font-weight:800;color:var(--blue);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;">A pagar</p>
+                    <p style="font-size:11px;font-weight:800;color:var(--text);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;">A pagar</p>
                     <div style="display:flex;align-items:baseline;gap:4px;">
                         <span id="totalFinal" class="big-num-col">0,00</span>
-                        <span style="font-size:18px;font-weight:700;">€</span>
+                        <span style="font-size:18px;font-weight:700;color:var(--text);">€</span>
                     </div>
                     <p style="font-size:11px;font-weight:700;color:var(--text-secondary);margin-top:5px;">
                         Preu real: <span id="preuReal" style="color:var(--text);">0,00 €</span>
                     </p>
                 </div>
                 <div>
-                    <p style="font-size:11px;font-weight:800;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;">Pendent</p>
+                    <p style="font-size:11px;font-weight:800;color:var(--blue);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;">Pendent</p>
                     <div style="display:flex;align-items:baseline;gap:4px;">
                         <span id="heroPendent" class="big-num-col" style="color:var(--blue);">0,00</span>
-                        <span style="font-size:18px;font-weight:700;">€</span>
+                        <span id="heroPendentEuro" style="font-size:18px;font-weight:700;color:var(--blue);">€</span>
                     </div>
                     <p style="font-size:11px;font-weight:700;color:var(--text-secondary);margin-top:5px;">
                         <span id="heroPlanificat">0,00 €</span> planificats
@@ -99,6 +99,37 @@
                     <input type="text" id="numNinos" value="" placeholder="0"
                            aria-label="Nombre d'alumnes" inputmode="numeric"
                            class="num-input">
+                </div>
+            </div>
+        </section>
+
+        <!-- PAGAMENTS -->
+        <section>
+            <div class="section-header">
+                <p class="section-label">Planificació de pagaments</p>
+                <button class="btn-section-add" onclick="addPaymentRow()" aria-label="Afegir pagament">
+                    <i data-lucide="plus" style="width:14px;height:14px;"></i>
+                </button>
+            </div>
+            <div class="card" style="margin-bottom: 12px;">
+                <div id="paymentsRows"></div>
+                <div class="input-row" style="background: rgba(0,0,0,0.02); border-top: 0.5px solid var(--separator);">
+                    <div class="row-label" style="font-size: 13px; color: var(--text-secondary);">
+                        <i data-lucide="sigma" style="width:15px;height:15px;"></i>
+                        <span style="font-weight: 700;">Total planificat</span>
+                    </div>
+                    <div class="field-wrap">
+                        <span id="totalPagat" style="font-family:'DM Mono',monospace; font-size:16px; font-weight:700; color:var(--text-secondary);">0,00</span>
+                        <span class="euro">€</span>
+                    </div>
+                </div>
+            </div>
+
+            <div id="avisoExcedente" class="alert alert-surplus card" style="border: 1px solid rgba(52,199,89,0.2); border-left: 4px solid var(--green);">
+                <i data-lucide="party-popper" style="width:20px;height:20px;color:var(--green);flex-shrink:0;margin-top:2px;"></i>
+                <div>
+                    <p class="alert-title">Pagaments coberts 🎉</p>
+                    <p class="alert-body">Els pagaments planificats cobreixen el cost. Cada alumne té <strong id="excedentPerFamilia">0,00 €</strong> a favor.</p>
                 </div>
             </div>
         </section>
@@ -145,37 +176,6 @@
                         <span id="totalBrut" style="font-family:'DM Mono',monospace; font-size:16px; font-weight:700; color:var(--blue);">0,00</span>
                         <span class="euro" style="color:var(--blue);">€</span>
                     </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- PAGAMENTS -->
-        <section>
-            <div class="section-header">
-                <p class="section-label">Planificació de pagaments</p>
-                <button class="btn-section-add" onclick="addPaymentRow()" aria-label="Afegir pagament">
-                    <i data-lucide="plus" style="width:14px;height:14px;"></i>
-                </button>
-            </div>
-            <div class="card" style="margin-bottom: 12px;">
-                <div id="paymentsRows"></div>
-                <div class="input-row" style="background: rgba(0,0,0,0.02); border-top: 0.5px solid var(--separator);">
-                    <div class="row-label" style="font-size: 13px; color: var(--text-secondary);">
-                        <i data-lucide="sigma" style="width:15px;height:15px;"></i>
-                        <span style="font-weight: 700;">Total planificat</span>
-                    </div>
-                    <div class="field-wrap">
-                        <span id="totalPagat" style="font-family:'DM Mono',monospace; font-size:16px; font-weight:700; color:var(--text-secondary);">0,00</span>
-                        <span class="euro">€</span>
-                    </div>
-                </div>
-            </div>
-
-<div id="avisoExcedente" class="alert alert-surplus card" style="border: 1px solid rgba(52,199,89,0.2); border-left: 4px solid var(--green);">
-                <i data-lucide="party-popper" style="width:20px;height:20px;color:var(--green);flex-shrink:0;margin-top:2px;"></i>
-                <div>
-                    <p class="alert-title">Pagaments coberts 🎉</p>
-                    <p class="alert-body">Els pagaments planificats cobreixen el cost. Cada alumne té <strong id="excedentPerFamilia">0,00 €</strong> a favor.</p>
                 </div>
             </div>
         </section>
