@@ -292,19 +292,51 @@
         .cost-row {
             justify-content: flex-start;
             gap: 6px;
-            padding: 0 12px 0 6px;
+            padding: 0 8px 0 6px;
         }
+        .cost-row.dragging { opacity: 0.35; }
+        .cost-row.drag-over { background: rgba(0,122,255,0.06); box-shadow: inset 0 2px 0 var(--blue); }
+
+        .btn-drag {
+            width: 20px; height: 28px;
+            border: none; background: transparent; cursor: grab;
+            display: flex; align-items: center; justify-content: center;
+            color: var(--text-secondary); flex-shrink: 0; padding: 0;
+            opacity: 0.35; transition: opacity 0.15s;
+        }
+        .cost-row:hover .btn-drag { opacity: 1; }
+        .btn-drag:active { cursor: grabbing; }
+
         .btn-del {
             width: 26px; height: 26px;
             border: none; background: transparent; cursor: pointer;
             border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
-            color: var(--text-secondary);
-            flex-shrink: 0;
-            transition: background 0.15s, color 0.15s;
+            color: var(--text-secondary); flex-shrink: 0;
+            opacity: 0; transition: opacity 0.15s, background 0.15s, color 0.15s;
             padding: 0;
         }
+        .cost-row:hover .btn-del { opacity: 1; }
         .btn-del:hover { background: rgba(255,59,48,0.1); color: var(--red); }
+
+        /* === UNDO TOAST === */
+        #undoToast {
+            position: fixed; bottom: 24px; left: 50%;
+            transform: translateX(-50%) translateY(80px);
+            background: #1C1C1E; color: #fff;
+            border-radius: 14px; padding: 12px 18px;
+            display: flex; align-items: center; gap: 14px;
+            font-size: 14px; font-weight: 600; z-index: 600;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.28);
+            transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
+            white-space: nowrap; pointer-events: none;
+        }
+        #undoToast.show { transform: translateX(-50%) translateY(0); pointer-events: auto; }
+        #undoToast .btn-undo {
+            color: var(--amber); font-weight: 800; font-size: 14px;
+            border: none; background: transparent; cursor: pointer; padding: 0;
+            font-family: 'DM Sans', sans-serif;
+        }
 
         .btn-icon-pick {
             width: 30px; height: 30px;
@@ -556,6 +588,12 @@
     <div id="iconGrid"></div>
 </div>
 
+<!-- UNDO TOAST -->
+<div id="undoToast">
+    <span>Cost eliminat</span>
+    <button class="btn-undo" onclick="undoDelete()">Desfer</button>
+</div>
+
 <!-- COOKIE BANNER -->
 <div id="cookieBanner">
     <p class="cookie-text">
@@ -578,11 +616,11 @@
 // ICONES I COLORS DISPONIBLES
 // ============================================================
 const ICONS = [
-    'hotel','bus','train','plane','ship',
-    'users','users-2','music','film','ticket',
-    'gift','pizza','coffee','camera','shopping-bag',
-    'scissors','palette','pencil','book-open','star',
-    'sparkles','trophy','heart','map-pin','circle-dot',
+    'bed','house','hotel','building-2','tent',
+    'bus','train','plane','ship','car',
+    'users','graduation-cap','music','ticket','camera',
+    'utensils','coffee','pizza','shopping-cart','gift',
+    'mountain','trees','sun','map-pin','circle-dot',
 ];
 const COST_COLORS = ['#FF9500','#AF52DE','#007AFF','#FF3B30','#34C759','#FF6B35','#5856D6','#FF2D55'];
 
@@ -685,10 +723,33 @@ function addCostRow(data = {}, skipUpdate = false) {
     if (!skipUpdate) updateAll();
 }
 
+// Undo delete state
+let _deletedItem = null, _deletedIdx = null, _undoTimer = null;
+
 function deleteCostRow(id) {
-    costs = costs.filter(c => c.id !== id);
-    const row = document.querySelector(`[data-cost-id="${id}"]`);
-    if (row) row.remove();
+    const idx = costs.findIndex(c => c.id === id);
+    if (idx === -1) return;
+    _deletedItem = { ...costs[idx] };
+    _deletedIdx  = idx;
+    costs.splice(idx, 1);
+    document.querySelector(`[data-cost-id="${id}"]`)?.remove();
+    updateAll();
+    // Show undo toast
+    clearTimeout(_undoTimer);
+    document.getElementById('undoToast').classList.add('show');
+    _undoTimer = setTimeout(() => {
+        document.getElementById('undoToast').classList.remove('show');
+        _deletedItem = null; _deletedIdx = null;
+    }, 4000);
+}
+
+function undoDelete() {
+    if (!_deletedItem) return;
+    clearTimeout(_undoTimer);
+    document.getElementById('undoToast').classList.remove('show');
+    costs.splice(_deletedIdx, 0, _deletedItem);
+    _deletedItem = null; _deletedIdx = null;
+    rerenderCostRows();
     updateAll();
 }
 
@@ -707,14 +768,20 @@ function blurCostAmount(input, id) {
     updateCostAmount(id, input.value);
 }
 
+function rerenderCostRows() {
+    document.getElementById('costsRows').innerHTML = '';
+    costs.forEach(c => renderCostRow(c));
+}
+
 function renderCostRow(item) {
     const container = document.getElementById('costsRows');
     const div = document.createElement('div');
     div.className = 'input-row cost-row';
     div.dataset.costId = item.id;
+    div.draggable = true;
     div.innerHTML = `
-        <button class="btn-del" onclick="deleteCostRow('${item.id}')" aria-label="Eliminar">
-            <i data-lucide="x" style="width:13px;height:13px;"></i>
+        <button class="btn-drag" aria-label="Arrossegar per reordenar">
+            <i data-lucide="grip-vertical" style="width:14px;height:14px;"></i>
         </button>
         <button class="btn-icon-pick" onclick="openIconPicker('${item.id}',this)" aria-label="Canviar icona">
             <i data-lucide="${item.icon}" style="width:16px;height:16px;"></i>
@@ -732,7 +799,40 @@ function renderCostRow(item) {
                    onblur="blurCostAmount(this,'${item.id}')"
                    onkeydown="if(event.key==='Enter')this.blur()">
             <span class="euro">€</span>
-        </div>`;
+        </div>
+        <button class="btn-del" onclick="deleteCostRow('${item.id}')" aria-label="Eliminar">
+            <i data-lucide="x" style="width:13px;height:13px;"></i>
+        </button>`;
+    // Drag & Drop
+    div.addEventListener('dragstart', e => {
+        e.dataTransfer.setData('text/plain', item.id);
+        e.dataTransfer.effectAllowed = 'move';
+        setTimeout(() => div.classList.add('dragging'), 0);
+    });
+    div.addEventListener('dragend', () => {
+        div.classList.remove('dragging');
+        document.querySelectorAll('.cost-row').forEach(r => r.classList.remove('drag-over'));
+    });
+    div.addEventListener('dragover', e => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        document.querySelectorAll('.cost-row').forEach(r => r.classList.remove('drag-over'));
+        div.classList.add('drag-over');
+    });
+    div.addEventListener('dragleave', () => div.classList.remove('drag-over'));
+    div.addEventListener('drop', e => {
+        e.preventDefault();
+        div.classList.remove('drag-over');
+        const fromId = e.dataTransfer.getData('text/plain');
+        if (fromId === item.id) return;
+        const fromIdx = costs.findIndex(c => c.id === fromId);
+        const toIdx   = costs.findIndex(c => c.id === item.id);
+        if (fromIdx === -1 || toIdx === -1) return;
+        const [moved] = costs.splice(fromIdx, 1);
+        costs.splice(toIdx, 0, moved);
+        rerenderCostRows();
+        saveValues();
+    });
     container.appendChild(div);
     lucide.createIcons();
 }
