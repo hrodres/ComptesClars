@@ -205,6 +205,27 @@
             color: var(--text-secondary);
             padding: 0 4px;
         }
+        .section-header {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 8px;
+        }
+        .section-header .section-label { margin-bottom: 0; }
+        .btn-section-add {
+            width: 28px; height: 28px; border: none; cursor: pointer;
+            background: rgba(0,0,0,0.05); border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            color: var(--text-secondary); flex-shrink: 0;
+            transition: background 0.15s, color 0.15s; padding: 0;
+        }
+        .btn-section-add:hover { background: rgba(0,122,255,0.1); color: var(--blue); }
+
+        /* === COST PER ALUMNE (per concepte) === */
+        .cost-ps {
+            font-family: 'DM Mono', monospace;
+            font-size: 15px; font-weight: 700;
+            color: var(--blue); white-space: nowrap;
+            margin-left: auto; flex-shrink: 0;
+        }
 
         /* === COOKIE BANNER === */
         #cookieBanner {
@@ -399,20 +420,6 @@
         }
         .rev-net.negative { color: var(--red); }
 
-        /* === BOTÓ AFEGIR CONCEPTE === */
-        .btn-add-row {
-            width: 100%; margin-top: 8px;
-            background: transparent;
-            border: 1.5px dashed rgba(0,0,0,0.14);
-            border-radius: 14px; padding: 11px 16px;
-            font-family: 'DM Sans', sans-serif;
-            font-size: 13px; font-weight: 700; color: var(--text-secondary);
-            cursor: pointer;
-            display: flex; align-items: center; justify-content: center; gap: 7px;
-            transition: all 0.15s;
-        }
-        .btn-add-row:hover { background: rgba(0,122,255,0.04); border-color: rgba(0,122,255,0.35); color: var(--blue); }
-
         /* === SELECTOR D'ICONES === */
         #iconPickerBackdrop {
             display: none; position: fixed; inset: 0; z-index: 499;
@@ -547,7 +554,12 @@
 
         <!-- RECAPTACIÓ -->
         <section>
-            <p class="section-label" style="display: block; margin-bottom: 8px;">Recaptació</p>
+            <div class="section-header">
+                <p class="section-label">Recaptació</p>
+                <button class="btn-section-add" onclick="addRevenueRow()" aria-label="Afegir recaptació">
+                    <i data-lucide="plus" style="width:14px;height:14px;"></i>
+                </button>
+            </div>
             <div class="card">
                 <div id="revenuesRows"></div>
                 <div class="input-row" style="background: rgba(52,199,89,0.03); border-top: 0.5px solid var(--separator);">
@@ -561,15 +573,16 @@
                     </div>
                 </div>
             </div>
-            <button class="btn-add-row" onclick="addRevenueRow()" aria-label="Afegir recaptació"
-                    style="border-color: rgba(52,199,89,0.3);">
-                <i data-lucide="plus" style="width:14px;height:14px;"></i> Afegir recaptació
-            </button>
         </section>
 
         <!-- COSTOS DE SERVEIS -->
         <section>
-            <p class="section-label" style="display: block; margin-bottom: 8px;">Costos</p>
+            <div class="section-header">
+                <p class="section-label">Costos</p>
+                <button class="btn-section-add" onclick="addCostRow()" aria-label="Afegir cost">
+                    <i data-lucide="plus" style="width:14px;height:14px;"></i>
+                </button>
+            </div>
             <div class="card">
                 <div id="costsRows"></div>
                 <div class="input-row" style="background: rgba(0,122,255,0.03); border-top: 0.5px solid var(--separator);">
@@ -583,9 +596,6 @@
                     </div>
                 </div>
             </div>
-            <button class="btn-add-row" onclick="addCostRow()" aria-label="Afegir cost">
-                <i data-lucide="plus" style="width:14px;height:14px;"></i> Afegir cost
-            </button>
         </section>
         <section>
             <p class="section-label" style="display: block; margin-bottom: 8px;">Planificació de pagaments</p>
@@ -661,11 +671,26 @@
 // ICONES I COLORS DISPONIBLES
 // ============================================================
 const ICONS = [
+    // Allotjament / espai
     'bed','house','hotel','building-2','tent',
-    'bus','train','plane','ship','car',
-    'users','graduation-cap','music','ticket','camera',
-    'utensils','coffee','pizza','shopping-cart','gift',
-    'mountain','trees','sun','map-pin','circle-dot',
+    // Transport
+    'bus','train','plane','ship','bicycle',
+    // Persones
+    'users','graduation-cap','baby','smile','heart',
+    // Menjar
+    'utensils','coffee','pizza','apple','gift',
+    // Natura
+    'mountain','trees','leaf','sun','flame',
+    // Art / música
+    'music','mic','film','palette','paintbrush',
+    // Activitat esportiva
+    'trophy','dumbbell','scissors','camera','ticket',
+    // Celebració / flora
+    'flower-2','sparkles','party-popper','umbrella','anchor',
+    // Escola / ciència
+    'book','book-open','microscope','flag','star',
+    // Compres / misc
+    'shopping-cart','car','zap','map-pin','circle-dot',
 ];
 const COST_COLORS = ['#FF9500','#AF52DE','#007AFF','#FF3B30','#34C759','#FF6B35','#5856D6','#FF2D55'];
 
@@ -764,10 +789,18 @@ function getCostTotal() {
 }
 
 function addCostRow(data = {}, skipUpdate = false) {
+    if (!skipUpdate && costs.length > 0 && !costs[costs.length - 1].name.trim()) {
+        const lastInput = document.querySelector(`.cost-row[data-cost-id="${costs[costs.length-1].id}"] .concept-name`);
+        if (lastInput) { lastInput.focus(); return; }
+    }
     const item = { id: uid(), icon: safeIcon(data.icon || 'circle-dot'), name: data.name || '', amount: data.amount || 0 };
     costs.push(item);
     renderCostRow(item);
-    if (!skipUpdate) updateAll();
+    if (!skipUpdate) {
+        updateAll();
+        const newInput = document.querySelector(`.cost-row[data-cost-id="${item.id}"] .concept-name`);
+        if (newInput) newInput.focus();
+    }
 }
 
 function _showUndoToast(label) {
@@ -853,6 +886,7 @@ function renderCostRow(item) {
                    onkeydown="if(event.key==='Enter')this.blur()">
             <span class="euro">€</span>
         </div>
+        <span class="cost-ps" id="costPS_${item.id}"></span>
         <button class="btn-del" onclick="deleteCostRow('${item.id}')" aria-label="Eliminar">
             <i data-lucide="x" style="width:13px;height:13px;"></i>
         </button>`;
@@ -898,10 +932,18 @@ function getRevenueNetTotal() {
 }
 
 function addRevenueRow(data = {}, skipUpdate = false) {
-    const item = { id: uid(), icon: safeIcon(data.icon || 'piggy-bank'), name: data.name || '', income: data.income || 0, expense: data.expense || 0 };
+    if (!skipUpdate && revenues.length > 0 && !revenues[revenues.length - 1].name.trim()) {
+        const lastInput = document.querySelector(`.revenue-row[data-rev-id="${revenues[revenues.length-1].id}"] .concept-name`);
+        if (lastInput) { lastInput.focus(); return; }
+    }
+    const item = { id: uid(), icon: safeIcon(data.icon || 'star'), name: data.name || '', income: data.income || 0, expense: data.expense || 0 };
     revenues.push(item);
     renderRevenueRow(item);
-    if (!skipUpdate) updateAll();
+    if (!skipUpdate) {
+        updateAll();
+        const newInput = document.querySelector(`.revenue-row[data-rev-id="${item.id}"] .concept-name`);
+        if (newInput) newInput.focus();
+    }
 }
 
 function deleteRevenueRow(id) {
@@ -1207,6 +1249,12 @@ function updateAll() {
     document.getElementById('segundoPago').textContent   = fmt(Math.abs(p2)) + ' €';
     document.getElementById('totalBrut').textContent     = fmt(total);
     document.getElementById('totalRecNet').textContent   = fmt(rec);
+
+    // Cost per alumne per concepte
+    costs.forEach(c => {
+        const el = document.getElementById('costPS_' + c.id);
+        if (el) el.textContent = c.amount > 0 ? fmt(c.amount / n) + ' €' : '';
+    });
 
     // Distribució dinàmica
     updateDistBar();
