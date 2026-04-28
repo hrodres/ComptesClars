@@ -97,6 +97,10 @@
         }
         .num-input.green { color: #1DB954; }
         .num-input.green:focus { background: rgba(29,185,84,0.06); box-shadow: 0 0 0 3px rgba(29,185,84,0.18); }
+        .num-input.green::placeholder { color: rgba(29,185,84,0.35); }
+        .num-input.expense { color: var(--red); }
+        .num-input.expense:focus { background: rgba(255,59,48,0.06); box-shadow: 0 0 0 3px rgba(255,59,48,0.18); }
+        .num-input.expense::placeholder { color: rgba(255,59,48,0.3); }
         .num-input.invalid { color: var(--red); background: rgba(255,59,48,0.06); }
         .euro { font-weight: 700; font-size: 13px; color: var(--text-secondary); }
 
@@ -316,11 +320,14 @@
             transition: opacity 0.15s, background 0.15s, color 0.15s;
             padding: 0;
         }
-        .cost-row:focus-within .btn-del { opacity: 1; pointer-events: auto; }
+        .cost-row:focus-within .btn-del,
+        .revenue-row:focus-within .btn-del { opacity: 1; pointer-events: auto; }
         @media (hover: hover) {
-            .cost-row:hover .btn-del { opacity: 1; pointer-events: auto; }
+            .cost-row:hover .btn-del,
+            .revenue-row:hover .btn-del { opacity: 1; pointer-events: auto; }
             .btn-del:hover { background: rgba(255,59,48,0.1); color: var(--red); }
-            .cost-row:hover .btn-drag { opacity: 1; }
+            .cost-row:hover .btn-drag,
+            .revenue-row:hover .btn-drag { opacity: 1; }
         }
 
         /* === UNDO TOAST === */
@@ -381,15 +388,11 @@
             padding-left: 26px; flex-wrap: nowrap;
         }
         .rev-bottom .num-input { width: 85px; }
-        .btn-add-expense {
-            font-size: 11px; font-weight: 700; color: var(--text-secondary);
-            background: transparent; border: 1px dashed rgba(0,0,0,0.15);
-            border-radius: 6px; cursor: pointer; padding: 2px 7px;
-            white-space: nowrap; font-family: 'DM Sans', sans-serif;
-            transition: color 0.15s, border-color 0.15s, background 0.15s;
+        .field-sign {
+            font-size: 13px; font-weight: 800; flex-shrink: 0; line-height: 1;
         }
-        .btn-add-expense:hover { color: var(--green); border-color: var(--green); background: rgba(52,199,89,0.05); }
-        .exp-sep { font-size: 13px; font-weight: 700; color: var(--text-secondary); flex-shrink: 0; }
+        .field-sign.pos { color: var(--green); }
+        .field-sign.neg { color: var(--red); }
         .rev-net {
             font-family: 'DM Mono', monospace; font-size: 13px; font-weight: 700;
             color: var(--green); white-space: nowrap; margin-left: auto;
@@ -452,6 +455,7 @@
         .num-input.green::placeholder { color: rgba(29,185,84,0.35); }
         @media (max-width: 380px) {
             .num-input { width: 100px; font-size: 15px; }
+            .rev-bottom { flex-wrap: wrap; row-gap: 6px; }
         }
         @media (min-width: 520px) {
             #cookieBanner { flex-direction: row; align-items: center; max-width: 560px; margin: 0 auto; left: 50%; right: auto; transform: translateX(-50%); border-radius: 18px 18px 0 0; }
@@ -935,7 +939,6 @@ function blurRevExpense(input, id) {
     const item = revenues.find(r => r.id === id);
     if (item) {
         item.expense = parseInput(input.value);
-        if (item.expense === 0) collapseExpense(id);
         refreshRevNet(id);
         updateAll();
     }
@@ -950,29 +953,6 @@ function refreshRevNet(id) {
     el.classList.toggle('negative', net < 0);
 }
 
-function expandExpense(id) {
-    const item = revenues.find(r => r.id === id);
-    const wrap = document.getElementById('expWrap_' + id);
-    if (!wrap || !item) return;
-    wrap.innerHTML = `
-        <span class="exp-sep">−</span>
-        <input type="text" class="num-input" placeholder="0,00"
-               value="${item.expense ? fmt(item.expense,2) : ''}"
-               inputmode="decimal" aria-label="Despeses"
-               style="width:85px;"
-               onfocus="focusField(this)"
-               oninput="updateRevExpense('${id}',this.value)"
-               onblur="blurRevExpense(this,'${id}')"
-               onkeydown="if(event.key==='Enter')this.blur()">
-        <span class="euro">€</span>`;
-}
-
-function collapseExpense(id) {
-    const wrap = document.getElementById('expWrap_' + id);
-    if (!wrap) return;
-    wrap.innerHTML = `<button class="btn-add-expense" onclick="expandExpense('${id}')">+ despeses</button>`;
-}
-
 function rerenderRevenueRows() {
     document.getElementById('revenuesRows').innerHTML = '';
     revenues.forEach(r => renderRevenueRow(r));
@@ -984,17 +964,6 @@ function renderRevenueRow(item) {
     div.className = 'input-row revenue-row';
     div.dataset.revId = item.id;
     div.draggable = true;
-    const expHtml = item.expense > 0
-        ? `<span class="exp-sep">−</span>
-           <input type="text" class="num-input" placeholder="0,00"
-                  value="${fmt(item.expense,2)}" inputmode="decimal"
-                  style="width:85px;" aria-label="Despeses"
-                  onfocus="focusField(this)"
-                  oninput="updateRevExpense('${item.id}',this.value)"
-                  onblur="blurRevExpense(this,'${item.id}')"
-                  onkeydown="if(event.key==='Enter')this.blur()">
-           <span class="euro">€</span>`
-        : `<button class="btn-add-expense" onclick="expandExpense('${item.id}')">+ despeses</button>`;
     const net = item.income - item.expense;
     div.innerHTML = `
         <div class="rev-top">
@@ -1013,6 +982,7 @@ function renderRevenueRow(item) {
             </button>
         </div>
         <div class="rev-bottom">
+            <span class="field-sign pos">+</span>
             <input type="text" class="num-input green" placeholder="0,00"
                    value="${item.income ? fmt(item.income,2) : ''}"
                    inputmode="decimal" aria-label="Ingressos"
@@ -1021,7 +991,15 @@ function renderRevenueRow(item) {
                    onblur="blurRevIncome(this,'${item.id}')"
                    onkeydown="if(event.key==='Enter')this.blur()">
             <span class="euro" style="color:var(--green);">€</span>
-            <div id="expWrap_${item.id}" style="display:contents;">${expHtml}</div>
+            <span class="field-sign neg">−</span>
+            <input type="text" class="num-input expense" placeholder="0,00"
+                   value="${item.expense ? fmt(item.expense,2) : ''}"
+                   inputmode="decimal" aria-label="Despeses"
+                   onfocus="focusField(this)"
+                   oninput="updateRevExpense('${item.id}',this.value)"
+                   onblur="blurRevExpense(this,'${item.id}')"
+                   onkeydown="if(event.key==='Enter')this.blur()">
+            <span class="euro">€</span>
             <span class="rev-net${net < 0 ? ' negative' : ''}" id="revNet_${item.id}">${fmt(net)} €</span>
         </div>`;
     // Drag & Drop (same pattern as costs)
