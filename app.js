@@ -662,9 +662,9 @@ function resetToDefaults() {
     FIELDS.forEach(f => { document.getElementById(f.id).value = ''; });
     document.getElementById('titolActivitat').textContent = '';
     document.title = 'ComptesClars';
-    document.getElementById('costsRows').innerHTML    = ''; costs    = []; addCostRow({}, true);
-    document.getElementById('revenuesRows').innerHTML = ''; revenues = []; addRevenueRow({}, true);
-    document.getElementById('paymentsRows').innerHTML = ''; payments = []; addPaymentRow({}, true);
+    document.getElementById('costsRows').innerHTML    = ''; costs    = [];
+    document.getElementById('revenuesRows').innerHTML = ''; revenues = [];
+    document.getElementById('paymentsRows').innerHTML = ''; payments = [];
     updateAll();
 }
 
@@ -709,8 +709,5 @@ window.addEventListener('DOMContentLoaded', () => {
         if (consent === 'yes') loadSavedValues();
     }
 
-    if (costs.length    === 0) addCostRow({}, true);
-    if (revenues.length === 0) addRevenueRow({}, true);
-    if (payments.length === 0) addPaymentRow({}, true);
     updateAll();
 });
