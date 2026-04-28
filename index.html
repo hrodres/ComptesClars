@@ -221,10 +221,8 @@
 
         /* === COST PER ALUMNE (per concepte) === */
         .cost-ps {
-            font-family: 'DM Mono', monospace;
-            font-size: 15px; font-weight: 700;
-            color: var(--blue); white-space: nowrap;
-            margin-left: auto; flex-shrink: 0;
+            font-size: 11px; font-weight: 700;
+            color: var(--text-secondary); white-space: nowrap; flex-shrink: 0;
         }
 
         /* === COOKIE BANNER === */
@@ -319,6 +317,7 @@
             gap: 6px;
             padding: 0 8px 0 6px;
         }
+        .cost-row .num-input { width: 90px; }
         .cost-row.dragging { opacity: 0.35; }
         .cost-row.drag-over { background: rgba(0,122,255,0.06); box-shadow: inset 0 2px 0 var(--blue); }
 
@@ -405,18 +404,18 @@
             display: flex; align-items: center; gap: 6px;
         }
         .rev-bottom {
-            display: flex; align-items: center; gap: 6px;
+            display: flex; align-items: center; gap: 5px;
             padding-left: 26px; flex-wrap: nowrap;
         }
-        .rev-bottom .num-input { width: 85px; }
+        .rev-bottom .num-input { width: 72px; font-size: 14px; }
         .field-sign {
-            font-size: 13px; font-weight: 800; flex-shrink: 0; line-height: 1;
+            font-size: 12px; font-weight: 800; flex-shrink: 0; line-height: 1;
         }
         .field-sign.pos { color: var(--green); }
         .field-sign.neg { color: var(--red); }
         .rev-net {
-            font-family: 'DM Mono', monospace; font-size: 13px; font-weight: 700;
-            color: var(--green); white-space: nowrap; margin-left: auto;
+            font-family: 'DM Mono', monospace; font-size: 16px; font-weight: 800;
+            color: var(--green); white-space: nowrap; margin-left: auto; letter-spacing: -0.02em;
         }
         .rev-net.negative { color: var(--red); }
 
@@ -1250,10 +1249,10 @@ function updateAll() {
     document.getElementById('totalBrut').textContent     = fmt(total);
     document.getElementById('totalRecNet').textContent   = fmt(rec);
 
-    // Cost per alumne per concepte
+    // Cost per alumne per concepte (only meaningful when n > 1)
     costs.forEach(c => {
         const el = document.getElementById('costPS_' + c.id);
-        if (el) el.textContent = c.amount > 0 ? fmt(c.amount / n) + ' €' : '';
+        if (el) el.textContent = c.amount > 0 && n > 1 ? fmt(c.amount / n) + ' €/al.' : '';
     });
 
     // Distribució dinàmica
