@@ -523,7 +523,7 @@ function loadSavedValues() {
             const v = d[f.id];
             if (v !== undefined && v !== 0) { const el = document.getElementById(f.id); el.value = v; formatField(el, f.type); }
         });
-        if (d._titol) { document.getElementById('titolActivitat').textContent = d._titol; document.title = d._titol + ' · Càlcul de costos'; }
+        if (d._titol) { document.getElementById('titolActivitat').textContent = d._titol; document.title = d._titol + ' - ComptesClars'; }
         if (Array.isArray(d._costs)    && d._costs.length    > 0) { document.getElementById('costsRows').innerHTML    = ''; costs    = []; d._costs.forEach(c => addCostRow(c, true)); }
         if (Array.isArray(d._revenues) && d._revenues.length > 0) { document.getElementById('revenuesRows').innerHTML = ''; revenues = []; d._revenues.forEach(r => addRevenueRow(r, true)); }
         if (Array.isArray(d._payments) && d._payments.length > 0) { document.getElementById('paymentsRows').innerHTML = ''; payments = []; d._payments.forEach(p => addPaymentRow(p, true)); }
@@ -661,7 +661,7 @@ function copiarResum() {
 function resetToDefaults() {
     FIELDS.forEach(f => { document.getElementById(f.id).value = ''; });
     document.getElementById('titolActivitat').textContent = '';
-    document.title = 'Càlcul de costos';
+    document.title = 'ComptesClars';
     document.getElementById('costsRows').innerHTML    = ''; costs    = []; addCostRow({}, true);
     document.getElementById('revenuesRows').innerHTML = ''; revenues = []; addRevenueRow({}, true);
     document.getElementById('paymentsRows').innerHTML = ''; payments = []; addPaymentRow({}, true);
@@ -695,7 +695,7 @@ window.addEventListener('DOMContentLoaded', () => {
     const titol = document.getElementById('titolActivitat');
     function syncTitol() {
         const text = (titol.innerText || '').trim();
-        document.title = text ? text + ' · Càlcul de costos' : 'Càlcul de costos';
+        document.title = text ? text + ' - ComptesClars' : 'ComptesClars';
         saveValues();
     }
     titol.addEventListener('input',   syncTitol);
