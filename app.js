@@ -221,12 +221,14 @@ function blurRevExpense(input, id) {
 }
 
 function refreshRevNet(id) {
-    const item = revenues.find(r => r.id === id);
-    const el   = document.getElementById('revNet_' + id);
+    const item    = revenues.find(r => r.id === id);
+    const el      = document.getElementById('revNet_' + id);
+    const euroEl  = document.getElementById('revNetEuro_' + id);
     if (!item || !el) return;
     const net = item.income - item.expense;
-    el.textContent = fmt(net) + ' €';
+    el.textContent = fmt(net);
     el.classList.toggle('negative', net < 0);
+    if (euroEl) euroEl.style.color = net < 0 ? 'var(--red)' : 'var(--green)';
 }
 
 function rerenderRevenueRows() {
@@ -275,7 +277,10 @@ function renderRevenueRow(item) {
                    onblur="blurRevExpense(this,'${item.id}')"
                    onkeydown="if(event.key==='Enter')this.blur()">
             <span class="euro">€</span>
-            <span class="rev-net${net < 0 ? ' negative' : ''}" id="revNet_${item.id}">${fmt(net)} €</span>
+            <div class="field-wrap rev-net-wrap">
+                <span class="rev-net${net < 0 ? ' negative' : ''}" id="revNet_${item.id}">${fmt(net)}</span>
+                <span class="euro" id="revNetEuro_${item.id}" style="color:${net < 0 ? 'var(--red)' : 'var(--green)'};">€</span>
+            </div>
         </div>`;
     _attachDragDrop(div, item.id, revenues, rerenderRevenueRows);
     document.getElementById('revenuesRows').appendChild(div);
