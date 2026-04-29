@@ -151,14 +151,14 @@ function renderCostRow(item) {
                oninput="updateCostName('${item.id}',this.value)"
                aria-label="Nom del cost">
         <div class="field-wrap">
-            <input type="text" class="num-input" placeholder="0,00"
+            <input type="text" class="num-input red" placeholder="0,00"
                    value="${item.amount ? fmt(item.amount,2) : ''}"
                    inputmode="decimal" aria-label="Import"
                    onfocus="focusField(this)"
                    oninput="updateCostAmount('${item.id}',this.value)"
                    onblur="blurCostAmount(this,'${item.id}')"
                    onkeydown="if(event.key==='Enter')this.blur()">
-            <span class="euro">€</span>
+            <span class="euro" style="color:var(--red);">€</span>
         </div>
         <button class="btn-del" onclick="deleteCostRow('${item.id}')" aria-label="Eliminar">
             <i data-lucide="x" style="width:13px;height:13px;"></i>
@@ -403,14 +403,14 @@ function renderPaymentRow(item) {
                oninput="updatePaymentName('${item.id}',this.value)"
                aria-label="Nom del pagament">
         <div class="field-wrap">
-            <input type="text" class="num-input" placeholder="0,00"
+            <input type="text" class="num-input blue" placeholder="0,00"
                    value="${item.amount ? fmt(item.amount,2) : ''}"
                    inputmode="decimal" aria-label="Import"
                    onfocus="focusField(this)"
                    oninput="updatePaymentAmount('${item.id}',this.value)"
                    onblur="blurPaymentAmount(this,'${item.id}')"
                    onkeydown="if(event.key==='Enter')this.blur()">
-            <span class="euro">€</span>
+            <span class="euro" style="color:var(--blue);">€</span>
         </div>
         <button class="btn-del" onclick="deletePaymentRow('${item.id}')" aria-label="Eliminar">
             <i data-lucide="x" style="width:13px;height:13px;"></i>

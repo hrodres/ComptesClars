@@ -87,6 +87,14 @@ body {
 .num-input.green:focus    { background: rgba(29,185,84,0.06); box-shadow: 0 0 0 3px rgba(29,185,84,0.18); }
 .num-input.green::placeholder { color: rgba(29,185,84,0.35); }
 
+.num-input.red            { color: var(--red); }
+.num-input.red:focus      { background: rgba(255,59,48,0.06); box-shadow: 0 0 0 3px rgba(255,59,48,0.18); }
+.num-input.red::placeholder { color: rgba(255,59,48,0.3); }
+
+.num-input.blue           { color: var(--blue); }
+.num-input.blue:focus     { background: rgba(0,122,255,0.06); box-shadow: 0 0 0 3px rgba(0,122,255,0.18); }
+.num-input.blue::placeholder { color: rgba(0,122,255,0.3); }
+
 .num-input.expense          { color: var(--red); }
 .num-input.expense:focus    { background: rgba(255,59,48,0.06); box-shadow: 0 0 0 3px rgba(255,59,48,0.18); }
 .num-input.expense::placeholder { color: rgba(255,59,48,0.3); }
@@ -247,7 +255,7 @@ body {
 }
 .cost-row .num-input  { width: 90px; }
 .cost-row.dragging    { opacity: 0.35; }
-.cost-row.drag-over   { background: rgba(0,122,255,0.06); box-shadow: inset 0 2px 0 var(--blue); }
+.cost-row.drag-over   { background: rgba(255,59,48,0.06); box-shadow: inset 0 2px 0 var(--red); }
 
 .btn-drag {
     width: 20px; height: 28px; border: none; background: transparent; cursor: grab;
@@ -282,7 +290,7 @@ body {
 .payment-row          { justify-content: flex-start; gap: 6px; padding: 0 8px 0 6px; }
 .payment-row .num-input { width: 90px; }
 .payment-row.dragging  { opacity: 0.35; }
-.payment-row.drag-over { background: rgba(0,0,0,0.04); box-shadow: inset 0 2px 0 var(--text-secondary); }
+.payment-row.drag-over { background: rgba(0,122,255,0.06); box-shadow: inset 0 2px 0 var(--blue); }
 
 .btn-icon-pick {
     width: 30px; height: 30px; border: none;
