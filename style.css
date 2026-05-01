@@ -327,7 +327,7 @@ body {
 .field-sign.pos  { color: var(--green); }
 .field-sign.neg  { color: var(--red); }
 
-.rev-net-wrap     { margin-left: auto; }
+.rev-net-wrap     { margin-left: auto; padding-right: 26px; }
 .rev-net          { font-family: 'DM Mono', monospace; font-size: 16px; font-weight: 700;
                     color: var(--green); white-space: nowrap; letter-spacing: -0.02em; }
 .rev-net.negative { color: var(--red); }
