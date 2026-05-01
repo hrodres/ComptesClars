@@ -227,14 +227,13 @@ body {
 
 /* === COOKIE SETTINGS BUTTON === */
 #cookieSettingsBtn {
-    position: fixed; bottom: 24px; left: 16px;
-    background: rgba(0,0,0,0.06); border: none; border-radius: 50%;
+    background: transparent; border: none; border-radius: 50%;
     width: 32px; height: 32px; padding: 0;
     color: var(--text-secondary); cursor: pointer;
     display: none; align-items: center; justify-content: center;
-    z-index: 100; transition: background 0.15s;
+    transition: background 0.15s;
 }
-#cookieSettingsBtn:hover { background: rgba(0,0,0,0.1); }
+#cookieSettingsBtn:hover { background: rgba(0,0,0,0.06); }
 
 /* === TÍTOL EDITABLE === */
 #titolActivitat {
