@@ -705,6 +705,7 @@ function importarDades(event) {
     if (!file) return;
     const reader = new FileReader();
     reader.onload = function(e) {
+        event.target.value = '';
         try {
             const d = JSON.parse(e.target.result);
             document.getElementById('costsRows').innerHTML    = ''; costs    = [];
@@ -717,10 +718,21 @@ function importarDades(event) {
             if (Array.isArray(d.recaptacio)) d.recaptacio.forEach(r => addRevenueRow(r, true));
             if (Array.isArray(d.pagaments))  d.pagaments.forEach(p => addPaymentRow(p, true));
             updateAll(); saveValues();
-        } catch(_) {}
+            _showImportToast(true);
+        } catch(err) {
+            _showImportToast(false);
+        }
     };
+    reader.onerror = function() { event.target.value = ''; _showImportToast(false); };
     reader.readAsText(file);
-    event.target.value = '';
+}
+
+function _showImportToast(ok) {
+    const toast = document.getElementById('undoToast');
+    const label = document.getElementById('undoToastLabel');
+    label.textContent = ok ? 'Dades carregades correctament' : 'Error: fitxer no vàlid';
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 3000);
 }
 
 // REINICIAR
