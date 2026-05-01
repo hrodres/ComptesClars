@@ -7,7 +7,7 @@
     --red:            #FF3B30;
     --amber:          #FFCC00;
     --bg:             #F2F2F7;
-    --card:           rgba(255,255,255,0.92);
+    --card:           #ffffff;
     --border:         rgba(0,0,0,0.06);
     --text:           #1C1C1E;
     --text-secondary: #8E8E93;
@@ -28,8 +28,6 @@ body {
 /* === CARDS === */
 .card {
     background: var(--card);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
     border-radius: 18px;
     border: 1px solid var(--border);
     box-shadow: 0 2px 12px rgba(0,0,0,0.04), 0 1px 3px rgba(0,0,0,0.06);
