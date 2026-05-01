@@ -7,7 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800;900&family=DM+Mono:wght@500&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css?v=13">
+    <link rel="stylesheet" href="style.css?v=14">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
 </head>
@@ -26,11 +26,11 @@
             <input type="file" id="importFile" accept=".json" style="display:none" onchange="importarDades(event)">
             <button onclick="document.getElementById('importFile').click()" aria-label="Importar dades"
                 class="btn-header-icon">
-                <i data-lucide="upload" style="width:14px;height:14px;"></i>
+                <i data-lucide="file-up" style="width:14px;height:14px;"></i>
             </button>
             <button onclick="exportarDades()" aria-label="Exportar dades"
                 class="btn-header-icon">
-                <i data-lucide="download" style="width:14px;height:14px;"></i>
+                <i data-lucide="file-down" style="width:14px;height:14px;"></i>
             </button>
             <button id="btnReiniciar" onclick="confirmReset()" aria-label="Reiniciar valors"
                 style="background: rgba(255,255,255,0.8); backdrop-filter: blur(10px); border: 1px solid rgba(0,0,0,0.08);
@@ -227,6 +227,6 @@
 </div>
 
 
-<script src="app.js?v=13" defer></script>
+<script src="app.js?v=14" defer></script>
 </body>
 </html>
