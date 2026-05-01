@@ -352,7 +352,8 @@ body {
 
 .rev-net-wrap     { flex-shrink: 0; }
 .rev-net          { font-family: 'DM Mono', monospace; font-size: 16px; font-weight: 500;
-                    color: var(--green); white-space: nowrap; letter-spacing: -0.02em; }
+                    color: var(--green); white-space: nowrap; letter-spacing: -0.02em;
+                    padding: 4px 2px; }
 .rev-net.negative { color: var(--red); }
 .rev-net.zero     { color: rgba(52,199,89,0.3); font-weight: 500; }
 
