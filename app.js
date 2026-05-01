@@ -682,6 +682,30 @@ function copiarResum() {
 // ============================================================
 // REINICIAR
 // ============================================================
+let _resetTimer = null;
+function confirmReset() {
+    const btn = document.getElementById('btnReiniciar');
+    if (_resetTimer) {
+        clearTimeout(_resetTimer);
+        _resetTimer = null;
+        _resetBtnNormal(btn);
+        resetToDefaults();
+        return;
+    }
+    btn.style.background = 'rgba(255,59,48,0.1)';
+    btn.style.borderColor = 'rgba(255,59,48,0.3)';
+    btn.style.color       = 'var(--red)';
+    btn.innerHTML = '<i data-lucide="alert-triangle" style="width:14px;height:14px;"></i> Segur?';
+    lucide.createIcons();
+    _resetTimer = setTimeout(() => { _resetTimer = null; _resetBtnNormal(btn); }, 3000);
+}
+function _resetBtnNormal(btn) {
+    btn.style.background  = 'rgba(255,255,255,0.8)';
+    btn.style.borderColor = 'rgba(0,0,0,0.08)';
+    btn.style.color       = '#555';
+    btn.innerHTML = '<i data-lucide="rotate-ccw" style="width:14px;height:14px;"></i> Reiniciar';
+    lucide.createIcons();
+}
 function resetToDefaults() {
     FIELDS.forEach(f => { document.getElementById(f.id).value = ''; });
     document.getElementById('titolActivitat').textContent = '';
