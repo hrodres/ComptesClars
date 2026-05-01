@@ -680,6 +680,22 @@ function copiarResum() {
 }
 
 // ============================================================
+// MENÚ HEADER
+// ============================================================
+function toggleHeaderMenu() {
+    const menu = document.getElementById('headerMenu');
+    menu.classList.toggle('open');
+}
+function closeHeaderMenu() {
+    document.getElementById('headerMenu').classList.remove('open');
+}
+document.addEventListener('click', function(e) {
+    const menu = document.getElementById('headerMenu');
+    if (menu && menu.classList.contains('open') && !menu.parentElement.contains(e.target)) {
+        menu.classList.remove('open');
+    }
+});
+
 // EXPORTAR / IMPORTAR
 // ============================================================
 function exportarDades() {
@@ -744,21 +760,18 @@ function confirmReset() {
         clearTimeout(_resetTimer);
         _resetTimer = null;
         _resetBtnNormal(btn);
+        closeHeaderMenu();
         resetToDefaults();
         return;
     }
-    btn.style.background = 'rgba(255,59,48,0.1)';
-    btn.style.borderColor = 'rgba(255,59,48,0.3)';
-    btn.style.color       = 'var(--red)';
-    btn.innerHTML = '<i data-lucide="alert-triangle" style="width:14px;height:14px;"></i> Segur?';
+    btn.classList.add('danger');
+    btn.innerHTML = '<i data-lucide="alert-triangle" style="width:15px;height:15px;"></i> Segur?';
     lucide.createIcons();
     _resetTimer = setTimeout(() => { _resetTimer = null; _resetBtnNormal(btn); }, 3000);
 }
 function _resetBtnNormal(btn) {
-    btn.style.background  = 'rgba(255,255,255,0.8)';
-    btn.style.borderColor = 'rgba(0,0,0,0.08)';
-    btn.style.color       = '#555';
-    btn.innerHTML = '<i data-lucide="rotate-ccw" style="width:14px;height:14px;"></i> Reiniciar';
+    btn.classList.remove('danger');
+    btn.innerHTML = '<i data-lucide="rotate-ccw" style="width:15px;height:15px;"></i> Reiniciar';
     lucide.createIcons();
 }
 function resetToDefaults() {

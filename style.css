@@ -246,6 +246,26 @@ body {
 }
 .btn-header-icon:hover { background: rgba(255,255,255,1); }
 
+.header-dropdown {
+    display: none; flex-direction: column;
+    position: absolute; top: calc(100% + 8px); right: 0;
+    background: #fff; border: 1px solid rgba(0,0,0,0.08);
+    border-radius: 16px; padding: 6px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+    min-width: 160px; z-index: 200;
+}
+.header-dropdown.open { display: flex; }
+.header-dropdown-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 12px; border: none; background: transparent;
+    border-radius: 10px; cursor: pointer; width: 100%; text-align: left;
+    font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600;
+    color: var(--text); transition: background 0.12s;
+}
+.header-dropdown-item:hover { background: rgba(0,0,0,0.05); }
+.header-dropdown-item.danger { color: var(--red); }
+.header-dropdown-sep { height: 1px; background: var(--separator); margin: 4px 0; }
+
 /* === TÍTOL EDITABLE === */
 #titolActivitat {
     outline: none; border-radius: 8px;
