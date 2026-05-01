@@ -7,7 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800;900&family=DM+Mono:wght@500&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css?v=4">
+    <link rel="stylesheet" href="style.css?v=5">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
 </head>
@@ -52,21 +52,21 @@
                 <div>
                     <p style="font-size:11px;font-weight:800;color:var(--text);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;">A pagar</p>
                     <div style="display:flex;align-items:baseline;gap:4px;">
-                        <span id="totalFinal" class="big-num-col">0,00</span>
-                        <span style="font-size:18px;font-weight:700;color:var(--text);">€</span>
+                        <span id="totalFinal" class="big-num-col">—</span>
+                        <span id="heroAPagarEuro" style="font-size:18px;font-weight:700;color:var(--text);visibility:hidden;">€</span>
                     </div>
                     <p style="font-size:11px;font-weight:700;color:var(--text-secondary);margin-top:5px;">
-                        Preu real: <span id="preuReal" style="color:var(--text);">0,00 €</span>
+                        Preu real: <span id="preuReal" style="color:var(--text);">—</span>
                     </p>
                 </div>
                 <div>
                     <p style="font-size:11px;font-weight:800;color:var(--blue);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;">Pendent</p>
                     <div style="display:flex;align-items:baseline;gap:4px;">
-                        <span id="heroPendent" class="big-num-col" style="color:var(--blue);">0,00</span>
-                        <span id="heroPendentEuro" style="font-size:18px;font-weight:700;color:var(--blue);">€</span>
+                        <span id="heroPendent" class="big-num-col" style="color:var(--text-secondary);">—</span>
+                        <span id="heroPendentEuro" style="font-size:18px;font-weight:700;color:var(--blue);visibility:hidden;">€</span>
                     </div>
                     <p style="font-size:11px;font-weight:700;color:rgba(0,122,255,0.55);margin-top:5px;">
-                        <span id="heroPlanificat">0,00 €</span> planificats
+                        <span id="heroPlanificat">—</span> planificats
                     </p>
                 </div>
             </div>
@@ -213,6 +213,6 @@
     <i data-lucide="cookie" style="width:12px;height:12px;"></i> Cookies
 </button>
 
-<script src="app.js?v=4" defer></script>
+<script src="app.js?v=5" defer></script>
 </body>
 </html>

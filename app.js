@@ -552,19 +552,36 @@ function updateAll() {
     const numNinosEl = document.getElementById('numNinos');
     numNinosEl.classList.toggle('invalid', !!numNinosEl.dataset.dirty && readVal('numNinos') === 0);
 
-    document.getElementById('totalFinal').textContent    = fmt(Math.max(0, net));
-    document.getElementById('preuReal').textContent      = fmt(total / n) + ' €';
-    document.getElementById('estalviTotal').textContent  = fmt(rec / n) + ' €';
     document.getElementById('totalPagat').textContent    = fmt(pagat);
     document.getElementById('totalBrut').textContent     = fmt(total);
     document.getElementById('totalRecNet').textContent   = fmt(rec);
 
-    const heroPendentEl = document.getElementById('heroPendent');
-    const pendentColor = pendent <= 0 ? 'var(--green)' : 'var(--blue)';
-    heroPendentEl.textContent = fmt(Math.max(0, pendent));
-    heroPendentEl.style.color = pendentColor;
-    document.getElementById('heroPendentEuro').style.color = pendentColor;
-    document.getElementById('heroPlanificat').textContent = fmt(pagat) + ' €';
+    const hasData = total > 0 || rec > 0;
+    const heroAPagarEuro  = document.getElementById('heroAPagarEuro');
+    const heroPendentEl   = document.getElementById('heroPendent');
+    const heroPendentEuro = document.getElementById('heroPendentEuro');
+
+    if (!hasData) {
+        document.getElementById('totalFinal').textContent = '—';
+        document.getElementById('preuReal').textContent   = '—';
+        document.getElementById('estalviTotal').textContent = '0,00 €';
+        heroAPagarEuro.style.visibility  = 'hidden';
+        heroPendentEl.textContent        = '—';
+        heroPendentEl.style.color        = 'var(--text-secondary)';
+        heroPendentEuro.style.visibility = 'hidden';
+        document.getElementById('heroPlanificat').textContent = pagat > 0 ? fmt(pagat) + ' €' : '—';
+    } else {
+        document.getElementById('totalFinal').textContent   = fmt(Math.max(0, net));
+        document.getElementById('preuReal').textContent     = fmt(total / n) + ' €';
+        document.getElementById('estalviTotal').textContent = fmt(rec / n) + ' €';
+        heroAPagarEuro.style.visibility  = 'visible';
+        const pendentColor = (pendent <= 0 && net > 0) ? 'var(--green)' : 'var(--blue)';
+        heroPendentEl.textContent        = fmt(Math.max(0, pendent));
+        heroPendentEl.style.color        = pendentColor;
+        heroPendentEuro.style.visibility = 'visible';
+        heroPendentEuro.style.color      = pendentColor;
+        document.getElementById('heroPlanificat').textContent = fmt(pagat) + ' €';
+    }
 
     updateDistBar();
 
