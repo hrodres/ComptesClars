@@ -343,15 +343,15 @@ body {
 .revenue-row.drag-over { background: rgba(52,199,89,0.06); box-shadow: inset 0 2px 0 var(--green); }
 
 .rev-top    { display: flex; align-items: center; gap: 6px; }
-.rev-bottom { display: flex; align-items: center; gap: 5px; padding-left: 26px; flex-wrap: nowrap; }
+.rev-bottom { display: flex; align-items: center; gap: 5px; padding-left: 62px; flex-wrap: nowrap; }
 .rev-bottom .num-input { width: 72px; font-size: 14px; }
 
 .field-sign      { font-size: 12px; font-weight: 800; flex-shrink: 0; line-height: 1; }
 .field-sign.pos  { color: var(--green); }
 .field-sign.neg  { color: var(--red); }
 
-.rev-net-wrap     { margin-left: auto; padding-right: 36px; }
-.rev-net          { font-family: 'DM Mono', monospace; font-size: 16px; font-weight: 500;
+.rev-net-wrap     { flex-shrink: 0; }
+.rev-net          { font-family: 'DM Mono', monospace; font-size: 15px; font-weight: 500;
                     color: var(--green); white-space: nowrap; letter-spacing: -0.02em; }
 .rev-net.negative { color: var(--red); }
 .rev-net.zero     { color: rgba(52,199,89,0.3); font-weight: 500; }

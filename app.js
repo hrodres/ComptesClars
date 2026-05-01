@@ -256,6 +256,10 @@ function renderRevenueRow(item) {
                    value="${escHtml(item.name)}"
                    oninput="updateRevName('${item.id}',this.value)"
                    aria-label="Nom de la recaptació">
+            <div class="field-wrap rev-net-wrap">
+                <span class="rev-net${net < 0 ? ' negative' : ''}${item.income === 0 && item.expense === 0 ? ' zero' : ''}" id="revNet_${item.id}">${fmt(net)}</span>
+                <span class="euro" id="revNetEuro_${item.id}" style="color:${item.income === 0 && item.expense === 0 ? 'rgba(52,199,89,0.3)' : net < 0 ? 'var(--red)' : 'var(--green)'};">€</span>
+            </div>
             <button class="btn-del" onclick="deleteRevenueRow('${item.id}')" aria-label="Eliminar">
                 <i data-lucide="x" style="width:13px;height:13px;"></i>
             </button>
@@ -279,10 +283,6 @@ function renderRevenueRow(item) {
                    onblur="blurRevExpense(this,'${item.id}')"
                    onkeydown="if(event.key==='Enter')this.blur()">
             <span class="euro">€</span>
-            <div class="field-wrap rev-net-wrap">
-                <span class="rev-net${net < 0 ? ' negative' : ''}${item.income === 0 && item.expense === 0 ? ' zero' : ''}" id="revNet_${item.id}">${fmt(net)}</span>
-                <span class="euro" id="revNetEuro_${item.id}" style="color:${item.income === 0 && item.expense === 0 ? 'rgba(52,199,89,0.3)' : net < 0 ? 'var(--red)' : 'var(--green)'};">€</span>
-            </div>
         </div>`;
     _attachDragDrop(div, item.id, revenues, rerenderRevenueRows);
     document.getElementById('revenuesRows').appendChild(div);
