@@ -680,6 +680,49 @@ function copiarResum() {
 }
 
 // ============================================================
+// EXPORTAR / IMPORTAR
+// ============================================================
+function exportarDades() {
+    const titol = (document.getElementById('titolActivitat').innerText || '').trim();
+    const data  = {
+        titol,
+        alumnes:    readVal('numNinos') || 0,
+        costos:     costs.map(c => ({ icon: c.icon, name: c.name, amount: c.amount })),
+        recaptacio: revenues.map(r => ({ icon: r.icon, name: r.name, income: r.income, expense: r.expense })),
+        pagaments:  payments.map(p => ({ name: p.name, amount: p.amount }))
+    };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href     = url;
+    a.download = (titol || 'comptesclars').toLowerCase().replace(/\s+/g, '-') + '.json';
+    document.body.appendChild(a); a.click();
+    document.body.removeChild(a); URL.revokeObjectURL(url);
+}
+
+function importarDades(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const d = JSON.parse(e.target.result);
+            document.getElementById('costsRows').innerHTML    = ''; costs    = [];
+            document.getElementById('revenuesRows').innerHTML = ''; revenues = [];
+            document.getElementById('paymentsRows').innerHTML = ''; payments = [];
+            FIELDS.forEach(f => { document.getElementById(f.id).value = ''; });
+            if (d.titol)   { document.getElementById('titolActivitat').textContent = d.titol; document.title = d.titol + ' - ComptesClars'; }
+            if (d.alumnes) { const el = document.getElementById('numNinos'); el.value = d.alumnes; formatField(el, 'int'); }
+            if (Array.isArray(d.costos))     d.costos.forEach(c => addCostRow(c, true));
+            if (Array.isArray(d.recaptacio)) d.recaptacio.forEach(r => addRevenueRow(r, true));
+            if (Array.isArray(d.pagaments))  d.pagaments.forEach(p => addPaymentRow(p, true));
+            updateAll(); saveValues();
+        } catch(_) {}
+    };
+    reader.readAsText(file);
+    event.target.value = '';
+}
+
 // REINICIAR
 // ============================================================
 let _resetTimer = null;

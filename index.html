@@ -7,7 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800;900&family=DM+Mono:wght@500&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css?v=12">
+    <link rel="stylesheet" href="style.css?v=13">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
 </head>
@@ -22,13 +22,24 @@
                 style="font-size: 30px; font-weight: 900; letter-spacing: -0.5px; line-height: 1.1;"
                 aria-label="Nom de l'activitat"></h1>
         </div>
-        <button id="btnReiniciar" onclick="confirmReset()" aria-label="Reiniciar valors"
-            style="background: rgba(255,255,255,0.8); backdrop-filter: blur(10px); border: 1px solid rgba(0,0,0,0.08);
-                   border-radius: 20px; padding: 8px 16px; font-family: 'DM Sans',sans-serif;
-                   font-size: 13px; font-weight: 700; color: #555; cursor: pointer;
-                   display: flex; align-items: center; gap: 6px; transition: all 0.2s; box-shadow: 0 1px 4px rgba(0,0,0,0.06);">
-            <i data-lucide="rotate-ccw" style="width:14px;height:14px;"></i> Reiniciar
-        </button>
+        <div style="display:flex; align-items:center; gap:8px;">
+            <input type="file" id="importFile" accept=".json" style="display:none" onchange="importarDades(event)">
+            <button onclick="document.getElementById('importFile').click()" aria-label="Importar dades"
+                class="btn-header-icon">
+                <i data-lucide="upload" style="width:14px;height:14px;"></i>
+            </button>
+            <button onclick="exportarDades()" aria-label="Exportar dades"
+                class="btn-header-icon">
+                <i data-lucide="download" style="width:14px;height:14px;"></i>
+            </button>
+            <button id="btnReiniciar" onclick="confirmReset()" aria-label="Reiniciar valors"
+                style="background: rgba(255,255,255,0.8); backdrop-filter: blur(10px); border: 1px solid rgba(0,0,0,0.08);
+                       border-radius: 20px; padding: 8px 16px; font-family: 'DM Sans',sans-serif;
+                       font-size: 13px; font-weight: 700; color: #555; cursor: pointer;
+                       display: flex; align-items: center; gap: 6px; transition: all 0.2s; box-shadow: 0 1px 4px rgba(0,0,0,0.06);">
+                <i data-lucide="rotate-ccw" style="width:14px;height:14px;"></i> Reiniciar
+            </button>
+        </div>
     </header>
 
     <main style="display: flex; flex-direction: column; gap: 20px;">
@@ -216,6 +227,6 @@
 </div>
 
 
-<script src="app.js?v=12" defer></script>
+<script src="app.js?v=13" defer></script>
 </body>
 </html>

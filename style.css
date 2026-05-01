@@ -235,6 +235,17 @@ body {
 }
 #cookieSettingsBtn:hover { background: rgba(0,0,0,0.1); }
 
+/* === BOTONS HEADER === */
+.btn-header-icon {
+    background: rgba(255,255,255,0.8); backdrop-filter: blur(10px);
+    border: 1px solid rgba(0,0,0,0.08); border-radius: 20px;
+    width: 34px; height: 34px; padding: 0; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    color: #555; transition: background 0.15s;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06); flex-shrink: 0;
+}
+.btn-header-icon:hover { background: rgba(255,255,255,1); }
+
 /* === TÍTOL EDITABLE === */
 #titolActivitat {
     outline: none; border-radius: 8px;
