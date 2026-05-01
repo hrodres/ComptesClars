@@ -225,10 +225,12 @@ function refreshRevNet(id) {
     const el      = document.getElementById('revNet_' + id);
     const euroEl  = document.getElementById('revNetEuro_' + id);
     if (!item || !el) return;
-    const net = item.income - item.expense;
+    const net  = item.income - item.expense;
+    const zero = item.income === 0 && item.expense === 0;
     el.textContent = fmt(net);
     el.classList.toggle('negative', net < 0);
-    if (euroEl) euroEl.style.color = net < 0 ? 'var(--red)' : 'var(--green)';
+    el.classList.toggle('zero', zero);
+    if (euroEl) euroEl.style.color = zero ? 'rgba(52,199,89,0.3)' : net < 0 ? 'var(--red)' : 'var(--green)';
 }
 
 function rerenderRevenueRows() {
@@ -278,8 +280,8 @@ function renderRevenueRow(item) {
                    onkeydown="if(event.key==='Enter')this.blur()">
             <span class="euro">€</span>
             <div class="field-wrap rev-net-wrap">
-                <span class="rev-net${net < 0 ? ' negative' : ''}" id="revNet_${item.id}">${fmt(net)}</span>
-                <span class="euro" id="revNetEuro_${item.id}" style="color:${net < 0 ? 'var(--red)' : 'var(--green)'};">€</span>
+                <span class="rev-net${net < 0 ? ' negative' : ''}${item.income === 0 && item.expense === 0 ? ' zero' : ''}" id="revNet_${item.id}">${fmt(net)}</span>
+                <span class="euro" id="revNetEuro_${item.id}" style="color:${item.income === 0 && item.expense === 0 ? 'rgba(52,199,89,0.3)' : net < 0 ? 'var(--red)' : 'var(--green)'};">€</span>
             </div>
         </div>`;
     _attachDragDrop(div, item.id, revenues, rerenderRevenueRows);
