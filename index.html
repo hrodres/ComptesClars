@@ -7,7 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800;900&family=DM+Mono:wght@500&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css?v=15">
+    <link rel="stylesheet" href="style.css?v=16">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
 </head>
@@ -16,13 +16,8 @@
 <div class="max-w-lg mx-auto px-4">
 
     <!-- HEADER -->
-    <header style="padding: 52px 0 24px; display: flex; justify-content: space-between; align-items: flex-start;">
-        <div>
-            <h1 id="titolActivitat" contenteditable="true" spellcheck="false"
-                style="font-size: 30px; font-weight: 900; letter-spacing: -0.5px; line-height: 1.1;"
-                aria-label="Nom de l'activitat"></h1>
-        </div>
-        <div style="display:flex; align-items:center; gap:8px;">
+    <header style="padding: 52px 0 24px; display: flex; flex-direction: column; align-items: flex-start; gap: 12px;">
+        <div style="display:flex; align-items:center; gap:8px; align-self: flex-end;">
             <input type="file" id="importFile" accept=".json" style="display:none" onchange="importarDades(event)">
             <button onclick="document.getElementById('importFile').click()" aria-label="Importar dades"
                 class="btn-header-icon">
@@ -40,6 +35,9 @@
                 <i data-lucide="rotate-ccw" style="width:14px;height:14px;"></i> Reiniciar
             </button>
         </div>
+        <h1 id="titolActivitat" contenteditable="true" spellcheck="false"
+            style="font-size: 30px; font-weight: 900; letter-spacing: -0.5px; line-height: 1.1; width: 100%;"
+            aria-label="Nom de l'activitat"></h1>
     </header>
 
     <main style="display: flex; flex-direction: column; gap: 20px;">
@@ -227,6 +225,6 @@
 </div>
 
 
-<script src="app.js?v=15" defer></script>
+<script src="app.js?v=16" defer></script>
 </body>
 </html>
