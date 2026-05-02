@@ -337,7 +337,7 @@ body {
 
 /* === FILES DE PARTICIPANTS === */
 .participant-row           { justify-content: flex-start; gap: 6px; padding: 0 8px 0 6px; }
-.participant-row .num-input { width: 75px; }
+.participant-row .num-input { width: 90px; }
 .participant-row.dragging  { opacity: 0.35; }
 .participant-row.drag-over { background: rgba(0,122,255,0.06); box-shadow: inset 0 2px 0 var(--blue); }
 

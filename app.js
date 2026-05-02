@@ -159,6 +159,7 @@ function renderParticipantRow(item) {
                    oninput="updateParticipantCount('${item.id}',this.value)"
                    onblur="blurParticipantCount(this,'${item.id}')"
                    onkeydown="if(event.key==='Enter')this.blur()">
+            <span class="euro" style="visibility:hidden;">€</span>
         </div>
         <button class="btn-del" onclick="deleteParticipantRow('${item.id}')" aria-label="Eliminar">
             <i data-lucide="x" style="width:13px;height:13px;"></i>
