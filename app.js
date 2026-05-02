@@ -36,8 +36,9 @@ const COST_COLORS = ['#FF9500','#AF52DE','#007AFF','#FF3B30','#34C759','#FF6B35'
 /** @type {Revenue[]} */ let revenues = [];
 /** @type {Payment[]} */ let payments = [];
 let pickerTarget  = null;
-let _deletedEntry = null; // { type:'cost'|'rev', item, idx }
-let _undoTimer    = null;
+let _deletedEntry  = null;
+let _resetSnapshot = null;
+let _toastTimer    = null;
 let _uid = 0;
 function uid() { return 'u' + (++_uid); }
 
@@ -111,7 +112,7 @@ function deleteCostRow(id) {
     costs.splice(idx, 1);
     document.querySelector(`[data-cost-id="${id}"]`)?.remove();
     updateAll();
-    _showUndoToast('Cost');
+    _showToast('Cost eliminat', true);
 }
 
 function updateCostName(id, value) {
@@ -194,7 +195,7 @@ function deleteRevenueRow(id) {
     revenues.splice(idx, 1);
     document.querySelector(`[data-rev-id="${id}"]`)?.remove();
     updateAll();
-    _showUndoToast('Recaptació');
+    _showToast('Recaptació eliminada', true);
 }
 
 function updateRevName(id, value) {
@@ -323,27 +324,49 @@ function _attachDragDrop(div, id, array, rerender) {
 }
 
 // ============================================================
-// UNDO TOAST
+// TOAST
 // ============================================================
-function _showUndoToast(label) {
-    clearTimeout(_undoTimer);
-    document.getElementById('undoToastLabel').textContent = label + ' eliminat';
-    document.getElementById('undoToast').classList.add('show');
-    _undoTimer = setTimeout(() => {
-        document.getElementById('undoToast').classList.remove('show');
-        _deletedEntry = null;
-    }, 4000);
+function _showToast(msg, undo = false) {
+    clearTimeout(_toastTimer);
+    const toast  = document.getElementById('undoToast');
+    const label  = document.getElementById('undoToastLabel');
+    const btnDes = toast.querySelector('.btn-undo');
+    label.textContent        = msg;
+    btnDes.style.display     = undo ? '' : 'none';
+    toast.classList.add('show');
+    _toastTimer = setTimeout(() => {
+        toast.classList.remove('show');
+        btnDes.style.display = '';
+        if (!undo) _deletedEntry = null;
+    }, undo ? 5000 : 2500);
 }
 
 function undoDelete() {
-    if (!_deletedEntry) return;
-    clearTimeout(_undoTimer);
+    clearTimeout(_toastTimer);
     document.getElementById('undoToast').classList.remove('show');
+    document.querySelector('#undoToast .btn-undo').style.display = '';
+
+    if (_resetSnapshot) {
+        const d = _resetSnapshot; _resetSnapshot = null;
+        document.getElementById('titolActivitat').innerText = d.titol;
+        document.title = d.titol ? d.titol + ' · ComptesClars' : 'ComptesClars';
+        document.getElementById('numNinos').value = d.alumnes || '';
+        costs = []; revenues = []; payments = [];
+        document.getElementById('costsRows').innerHTML    = '';
+        document.getElementById('revenuesRows').innerHTML = '';
+        document.getElementById('paymentsRows').innerHTML = '';
+        d.costos.forEach(c => addCostRow(c, true));
+        d.recaptacio.forEach(r => addRevenueRow(r, true));
+        d.pagaments.forEach(p => addPaymentRow(p, true));
+        updateAll();
+        return;
+    }
+    if (!_deletedEntry) return;
     const { type, item, idx } = _deletedEntry;
     _deletedEntry = null;
-    if (type === 'cost')      { costs.splice(idx, 0, item);    rerenderCostRows(); }
-    else if (type === 'rev')  { revenues.splice(idx, 0, item); rerenderRevenueRows(); }
-    else                      { payments.splice(idx, 0, item); rerenderPaymentRows(); }
+    if (type === 'cost')     { costs.splice(idx, 0, item);    rerenderCostRows(); }
+    else if (type === 'rev') { revenues.splice(idx, 0, item); rerenderRevenueRows(); }
+    else                     { payments.splice(idx, 0, item); rerenderPaymentRows(); }
     updateAll();
 }
 
@@ -373,7 +396,7 @@ function deletePaymentRow(id) {
     payments.splice(idx, 1);
     document.querySelector(`[data-pay-id="${id}"]`)?.remove();
     updateAll();
-    _showUndoToast('Pagament');
+    _showToast('Pagament eliminat', true);
 }
 
 function updatePaymentName(id, value) {
@@ -665,6 +688,7 @@ function copiarResum() {
     }
 
     _copyToClipboard(lines.join('\n')).then(() => {
+        _showToast('✓ Resum copiat');
         const btn = document.getElementById('btnCopiar');
         btn.innerHTML = '<i data-lucide="check" style="width:15px;height:15px;"></i>';
         btn.style.background = 'rgba(52,199,89,0.12)';
@@ -691,6 +715,7 @@ function compartirLink() {
     const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(data))));
     const url = location.origin + location.pathname + '?d=' + encoded;
     _copyToClipboard(url).then(() => {
+        _showToast('✓ Enllaç copiat');
         const btn = document.getElementById('btnCompartirLink');
         btn.innerHTML = '<i data-lucide="check" style="width:15px;height:15px;"></i>';
         btn.style.background = 'rgba(52,199,89,0.12)';
@@ -740,6 +765,7 @@ function exportarDades() {
     a.download = (titol || 'comptesclars').toLowerCase().replace(/\s+/g, '-') + '.json';
     document.body.appendChild(a); a.click();
     document.body.removeChild(a); URL.revokeObjectURL(url);
+    _showToast('✓ Exportat');
 }
 
 function importarDades(event) {
@@ -760,52 +786,26 @@ function importarDades(event) {
             if (Array.isArray(d.recaptacio)) d.recaptacio.forEach(r => addRevenueRow(r, true));
             if (Array.isArray(d.pagaments))  d.pagaments.forEach(p => addPaymentRow(p, true));
             updateAll(); saveValues();
-            _showImportToast(true);
+            _showToast('✓ Importat');
         } catch(err) {
-            _showImportToast(false);
+            _showToast('Error: fitxer no vàlid');
         }
     };
-    reader.onerror = function() { event.target.value = ''; _showImportToast(false); };
+    reader.onerror = function() { event.target.value = ''; _showToast('Error: fitxer no vàlid'); };
     reader.readAsText(file);
-}
-
-function _showImportToast(ok) {
-    const toast  = document.getElementById('undoToast');
-    const label  = document.getElementById('undoToastLabel');
-    const btnDes = toast.querySelector('.btn-undo');
-    label.textContent   = ok ? '✓ Importat correctament' : 'Error: fitxer no vàlid';
-    btnDes.style.display = 'none';
-    toast.classList.add('show');
-    setTimeout(() => {
-        toast.classList.remove('show');
-        btnDes.style.display = '';
-    }, 3000);
 }
 
 // REINICIAR
 // ============================================================
-let _resetTimer = null;
 function confirmReset() {
-    const btn = document.getElementById('btnReiniciar');
-    if (_resetTimer) {
-        clearTimeout(_resetTimer);
-        _resetTimer = null;
-        _resetBtnNormal(btn);
-        closeHeaderMenu();
-        resetToDefaults();
-        return;
-    }
-    btn.classList.add('danger');
-    btn.innerHTML = '<i data-lucide="alert-triangle" style="width:15px;height:15px;"></i> Segur?';
-    lucide.createIcons();
-    _resetTimer = setTimeout(() => { _resetTimer = null; _resetBtnNormal(btn); }, 3000);
-}
-function _resetBtnNormal(btn) {
-    btn.classList.remove('danger');
-    btn.innerHTML = '<i data-lucide="rotate-ccw" style="width:15px;height:15px;"></i> Reiniciar';
-    lucide.createIcons();
-}
-function resetToDefaults() {
+    closeHeaderMenu();
+    _resetSnapshot = {
+        titol:      document.getElementById('titolActivitat').innerText,
+        alumnes:    readVal('numNinos'),
+        costos:     costs.map(c => ({ ...c })),
+        recaptacio: revenues.map(r => ({ ...r })),
+        pagaments:  payments.map(p => ({ ...p }))
+    };
     FIELDS.forEach(f => { document.getElementById(f.id).value = ''; });
     document.getElementById('titolActivitat').textContent = '';
     document.title = 'ComptesClars';
@@ -813,6 +813,7 @@ function resetToDefaults() {
     document.getElementById('revenuesRows').innerHTML = ''; revenues = [];
     document.getElementById('paymentsRows').innerHTML = ''; payments = [];
     updateAll();
+    _showToast('Reiniciat', true);
 }
 
 // ============================================================
