@@ -759,6 +759,8 @@ function copiarResum() {
     // Capçalera
     lines.push(`*${titol}*`);
     lines.push(`👥 ${n} participant${n !== 1 ? 's' : ''}`);
+    const namedParts = participants.filter(p => p.name.trim() && p.count > 0);
+    if (namedParts.length > 0) namedParts.forEach(p => lines.push(`▸ ${p.name}: ${fmt(p.count, 0)}`));
     lines.push('');
 
     // Preu principal
