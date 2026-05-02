@@ -841,7 +841,7 @@ function compartirLink() {
         recaptacio: revenues.map(r => ({ icon: r.icon, name: r.name, income: r.income, expense: r.expense })),
         pagaments:  payments.map(p => ({ name: p.name, amount: p.amount }))
     };
-    const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(data))));
+    const encoded = LZString.compressToEncodedURIComponent(JSON.stringify(data));
     const url = location.origin + location.pathname + '?d=' + encoded;
     _copyToClipboard(url).then(() => {
         _showToast('✓ Enllaç copiat');
@@ -993,7 +993,9 @@ window.addEventListener('DOMContentLoaded', () => {
     const urlParam = new URLSearchParams(location.search).get('d');
     if (urlParam) {
         try {
-            const d = JSON.parse(decodeURIComponent(escape(atob(urlParam))));
+            let jsonStr = LZString.decompressFromEncodedURIComponent(urlParam);
+        if (!jsonStr) jsonStr = decodeURIComponent(escape(atob(urlParam)));
+        const d = JSON.parse(jsonStr);
             history.replaceState(null, '', location.pathname);
             if (d.titol) document.getElementById('titolActivitat').innerText = d.titol;
             costs = []; revenues = []; payments = []; participants = [];
