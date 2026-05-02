@@ -7,7 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800;900&family=DM+Mono:wght@500&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css?v=30">
+    <link rel="stylesheet" href="style.css?v=31">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
 </head>
@@ -89,11 +89,11 @@
             </div>
 
             <div>
-                <div style="display:flex;justify-content:space-between;font-size:11px;font-weight:700;color:var(--text-secondary);margin-bottom:6px;">
-                    <span>Estalvi: <span id="estalviTotal" style="color:var(--green);">0,00 €</span></span>
-                </div>
-                <div class="progress-bar">
-                    <div id="barEstalvi" class="progress-fill" style="width:0%;"></div>
+                <div id="heroSegBar" class="dist-bar" style="margin-bottom:10px;"></div>
+                <div style="display:flex;gap:14px;flex-wrap:wrap;font-size:11px;font-weight:700;">
+                    <span style="color:var(--text);">● Pagat: <span id="heroPagat">—</span></span>
+                    <span style="color:var(--blue);">● Pendent: <span id="heroPendentLeg">—</span></span>
+                    <span style="color:var(--green);">● Estalvi: <span id="estalviTotal">—</span></span>
                 </div>
             </div>
         </section>
@@ -234,6 +234,6 @@
 </div>
 
 
-<script src="app.js?v=28" defer></script>
+<script src="app.js?v=31" defer></script>
 </body>
 </html>

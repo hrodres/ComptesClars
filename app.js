@@ -474,6 +474,19 @@ function updateDistBar() {
     }
 }
 
+function updateHeroBar(total, rec, pagat, pendent, n) {
+    const bar    = document.getElementById('heroSegBar');
+    const preuReal = total / n;
+    if (preuReal <= 0) { bar.innerHTML = ''; return; }
+    const pPagat   = Math.max(0, Math.min(100, pagat / preuReal * 100));
+    const pPendent = Math.max(0, Math.min(100, Math.max(0, pendent) / preuReal * 100));
+    const pEstalvi = Math.max(0, Math.min(100, (rec / n) / preuReal * 100));
+    bar.innerHTML =
+        `<div class="dist-seg" style="width:${pPagat}%;background:var(--text);"></div>` +
+        `<div class="dist-seg" style="width:${pPendent}%;background:var(--blue);"></div>` +
+        `<div class="dist-seg" style="width:${pEstalvi}%;background:var(--green);"></div>`;
+}
+
 // ============================================================
 // SELECTOR D'ICONES
 // ============================================================
@@ -585,18 +598,22 @@ function updateAll() {
     const heroPendentEuro = document.getElementById('heroPendentEuro');
 
     if (!hasData) {
-        document.getElementById('totalFinal').textContent = '—';
-        document.getElementById('preuReal').textContent   = '—';
-        document.getElementById('estalviTotal').textContent = '0,00 €';
+        document.getElementById('totalFinal').textContent   = '—';
+        document.getElementById('preuReal').textContent     = '—';
+        document.getElementById('estalviTotal').textContent = '—';
+        document.getElementById('heroPagat').textContent    = '—';
+        document.getElementById('heroPendentLeg').textContent = '—';
         heroAPagarEuro.style.visibility  = 'hidden';
         heroPendentEl.textContent        = '—';
         heroPendentEl.style.color        = 'var(--text-secondary)';
         heroPendentEuro.style.visibility = 'hidden';
         document.getElementById('heroPlanificat').textContent = pagat > 0 ? fmt(pagat) + ' €' : '—';
     } else {
-        document.getElementById('totalFinal').textContent   = fmt(Math.max(0, net));
-        document.getElementById('preuReal').textContent     = fmt(total / n) + ' €';
-        document.getElementById('estalviTotal').textContent = fmt(rec / n) + ' €';
+        document.getElementById('totalFinal').textContent     = fmt(Math.max(0, net));
+        document.getElementById('preuReal').textContent       = fmt(total / n) + ' €';
+        document.getElementById('estalviTotal').textContent   = fmt(rec / n) + ' €';
+        document.getElementById('heroPagat').textContent      = fmt(pagat) + ' €';
+        document.getElementById('heroPendentLeg').textContent = fmt(Math.max(0, pendent)) + ' €';
         heroAPagarEuro.style.visibility  = 'visible';
         const pendentColor = (pendent <= 0 && net > 0) ? 'var(--green)' : 'var(--blue)';
         heroPendentEl.textContent        = fmt(Math.max(0, pendent));
@@ -607,10 +624,7 @@ function updateAll() {
     }
 
     updateDistBar();
-
-    const brut = total / n;
-    const percEstalvi = brut > 0 ? Math.min(100, (rec / n) / brut * 100) : 0;
-    document.getElementById('barEstalvi').style.width = percEstalvi + '%';
+    updateHeroBar(total, rec, pagat, pendent, n);
 
     const aviso = document.getElementById('avisoExcedente');
     if (pendent < 0) {
