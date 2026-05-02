@@ -841,7 +841,10 @@ function compartirLink() {
         recaptacio: revenues.map(r => ({ icon: r.icon, name: r.name, income: r.income, expense: r.expense })),
         pagaments:  payments.map(p => ({ name: p.name, amount: p.amount }))
     };
-    const encoded = LZString.compressToEncodedURIComponent(JSON.stringify(data));
+    const json = JSON.stringify(data);
+    let encoded;
+    try { encoded = LZString.compressToEncodedURIComponent(json); } catch(_) {}
+    if (!encoded) encoded = btoa(unescape(encodeURIComponent(json)));
     const url = location.origin + location.pathname + '?d=' + encoded;
     _copyToClipboard(url).then(() => {
         _showToast('✓ Enllaç copiat');
