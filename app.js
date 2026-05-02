@@ -618,16 +618,9 @@ function closeIconPicker() {
 }
 
 // ============================================================
-// COOKIES
+// EMMAGATZEMATGE LOCAL
 // ============================================================
-const COOKIE_CONSENT_KEY = 'excursio6_consent';
-const COOKIE_DATA_KEY    = 'excursio6_data';
-const COOKIE_DAYS        = 365;
-
-function setCookie(name, value, days) {
-    const expires = new Date(Date.now() + days * 864e5).toUTCString();
-    document.cookie = `${name}=${encodeURIComponent(value)};expires=${expires};path=/;SameSite=Lax;Secure`;
-}
+const STORAGE_KEY = 'excursio6_data';
 
 function getCookie(name) {
     return document.cookie.split('; ').reduce((acc, c) => {
@@ -636,16 +629,7 @@ function getCookie(name) {
     }, null);
 }
 
-function hasConsent() { return getCookie(COOKIE_CONSENT_KEY) === 'yes'; }
-
-function acceptCookies() { setCookie(COOKIE_CONSENT_KEY, 'yes', COOKIE_DAYS); hideCookieBanner(); showCookieSettingsBtn(); saveValues(); }
-function declineCookies() { setCookie(COOKIE_CONSENT_KEY, 'no', 90); hideCookieBanner(); showCookieSettingsBtn(); }
-function hideCookieBanner()     { document.getElementById('cookieBanner').classList.add('hidden-banner'); }
-function showCookieBanner()     { document.getElementById('cookieBanner').classList.remove('hidden-banner'); document.getElementById('cookieSettingsBtn').style.display = 'none'; }
-function showCookieSettingsBtn(){ document.getElementById('cookieSettingsBtn').style.display = 'flex'; }
-
 function saveValues() {
-    if (!hasConsent()) return;
     const data = {
         _titol:        (document.getElementById('titolActivitat').innerText || '').trim(),
         _participants: participants.map(p => ({ icon: p.icon, name: p.name, count: p.count })),
@@ -653,11 +637,12 @@ function saveValues() {
         _revenues:     revenues.map(r => ({ icon: r.icon, name: r.name, income: r.income, expense: r.expense })),
         _payments:     payments.map(p => ({ name: p.name, amount: p.amount })),
     };
-    setCookie(COOKIE_DATA_KEY, JSON.stringify(data), COOKIE_DAYS);
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch(_) {}
 }
 
 function loadSavedValues() {
-    const raw = getCookie(COOKIE_DATA_KEY);
+    let raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) raw = getCookie('excursio6_data'); // migració des de cookies antigues
     if (!raw) return false;
     try {
         const d = JSON.parse(raw);
@@ -1027,15 +1012,9 @@ window.addEventListener('DOMContentLoaded', () => {
             if (Array.isArray(d.recaptacio)) d.recaptacio.forEach(r => addRevenueRow(r, true));
             if (Array.isArray(d.pagaments))  d.pagaments.forEach(p => addPaymentRow(p, true));
         } catch(_) {}
-        hideCookieBanner();
-        showCookieSettingsBtn();
+        saveValues();
     } else {
-        const consent = getCookie(COOKIE_CONSENT_KEY);
-        if (consent !== null) {
-            hideCookieBanner();
-            showCookieSettingsBtn();
-            if (consent === 'yes') loadSavedValues();
-        }
+        loadSavedValues();
     }
 
     updateAll();

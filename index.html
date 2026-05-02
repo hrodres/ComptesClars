@@ -7,7 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800;900&family=DM+Mono:wght@500&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css?v=64">
+    <link rel="stylesheet" href="style.css?v=65">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/lz-string@1.5.0/libs/lz-string.min.js"></script>
@@ -223,10 +223,7 @@
         </section>
 
         <div style="padding: 20px 4px 40px; display:flex; align-items:center;">
-            <button id="cookieSettingsBtn" onclick="showCookieBanner()" aria-label="Configuració de cookies"
-                class="btn-header-icon">
-                <i data-lucide="cookie" style="width:14px;height:14px;"></i>
-            </button>
+            <div style="width:30px;"></div>
             <span style="font-size:13px;font-weight:600;color:var(--text-secondary);flex:1;text-align:center;">ComptesClars · by hrodres · 2026</span>
             <button onclick="openAbout()" aria-label="Sobre ComptesClars" class="btn-header-icon">
                 <i data-lucide="info" style="width:14px;height:14px;"></i>
@@ -258,19 +255,7 @@
     <button class="btn-undo" onclick="undoDelete()">Desfer</button>
 </div>
 
-<!-- COOKIE BANNER -->
-<div id="cookieBanner">
-    <p class="cookie-text">
-        <strong>Cookies de preferències</strong><br>
-        Aquesta eina guarda els valors que introdueixes (alumnes, costos, pagaments) a les cookies del teu navegador per no haver-los de tornar a escriure. <strong>No es comparteix cap dada</strong> amb tercers ni servidors externs.
-    </p>
-    <div class="cookie-actions">
-        <button class="btn-decline" onclick="declineCookies()">No, gràcies</button>
-        <button class="btn-accept" onclick="acceptCookies()">Acceptar i desar</button>
-    </div>
-</div>
 
-
-<script src="app.js?v=64" defer></script>
+<script src="app.js?v=65" defer></script>
 </body>
 </html>
