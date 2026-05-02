@@ -7,7 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800;900&family=DM+Mono:wght@500&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css?v=49">
+    <link rel="stylesheet" href="style.css?v=50">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
 </head>
@@ -47,7 +47,7 @@
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
                 <div style="display: flex; align-items: center; gap: 8px;">
                     <i data-lucide="wallet" style="width:18px;height:18px;color:var(--text-secondary);"></i>
-                    <span class="badge">Per alumne</span>
+                    <span class="badge">Per participant</span>
                 </div>
                 <div style="display:flex;gap:6px;">
                 <button id="btnCopiar" onclick="copiarResum()" aria-label="Copiar resum"
@@ -108,18 +108,24 @@
             <div id="distLegend" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 10px;"></div>
         </section>
 
-        <!-- ALUMNES -->
-        <section class="card">
-            <div class="input-row">
-                <label for="numNinos" class="row-label">
-                    <i data-lucide="users" style="width:18px;height:18px;" class="icon"></i>
-                    Alumnes del grup
-                </label>
-                <div class="field-wrap">
-                    <input type="text" id="numNinos" value="" placeholder="0"
-                           aria-label="Nombre d'alumnes" inputmode="numeric"
-                           class="num-input" style="font-weight:700;">
-                    <span class="euro" style="visibility:hidden;">€</span>
+        <!-- PARTICIPANTS -->
+        <section>
+            <div class="section-header">
+                <p class="section-label">Participants</p>
+                <button class="btn-section-add" onclick="addParticipantRow()" aria-label="Afegir participants">
+                    <i data-lucide="plus" style="width:14px;height:14px;"></i>
+                </button>
+            </div>
+            <div class="card">
+                <div id="participantsRows"></div>
+                <div class="input-row" style="background: rgba(0,122,255,0.03); border-top: 0.5px solid var(--separator);">
+                    <div class="row-label" style="font-size: 13px;">
+                        <i data-lucide="sigma" style="width:15px;height:15px;color:var(--blue);"></i>
+                        <span style="font-weight: 700; color:var(--blue);">Total participants</span>
+                    </div>
+                    <div class="field-wrap">
+                        <span id="totalParticipants" style="font-family:'DM Mono',monospace; font-size:16px; font-weight:700; color:var(--blue);">0</span>
+                    </div>
                 </div>
             </div>
         </section>
@@ -238,6 +244,6 @@
 </div>
 
 
-<script src="app.js?v=49" defer></script>
+<script src="app.js?v=50" defer></script>
 </body>
 </html>

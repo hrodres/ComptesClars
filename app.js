@@ -4,6 +4,7 @@
 /** @typedef {{ id:string, icon:string, name:string, amount:number }} Cost */
 /** @typedef {{ id:string, icon:string, name:string, income:number, expense:number }} Revenue */
 /** @typedef {{ id:string, name:string, amount:number }} Payment */
+/** @typedef {{ id:string, icon:string, name:string, count:number }} Participant */
 
 const ICONS = [
     // Allotjament / espai
@@ -32,19 +33,18 @@ const COST_COLORS = ['#FF9500','#AF52DE','#007AFF','#FF3B30','#34C759','#FF6B35'
 // ============================================================
 // ESTAT
 // ============================================================
-/** @type {Cost[]}    */ let costs    = [];
-/** @type {Revenue[]} */ let revenues = [];
-/** @type {Payment[]} */ let payments = [];
-let pickerTarget  = null;
+/** @type {Cost[]}        */ let costs        = [];
+/** @type {Revenue[]}     */ let revenues     = [];
+/** @type {Payment[]}     */ let payments     = [];
+/** @type {Participant[]} */ let participants = [];
+let pickerTarget   = null;
 let _deletedEntry  = null;
 let _resetSnapshot = null;
 let _toastTimer    = null;
 let _uid = 0;
 function uid() { return 'u' + (++_uid); }
 
-const FIELDS = [
-    { id: 'numNinos', type: 'int' },
-];
+const FIELDS = [];
 
 // ============================================================
 // FORMAT CATALÀ (3.125,48)
@@ -84,6 +84,88 @@ function safeIcon(icon) { return ICONS.includes(icon) ? icon : 'circle-dot'; }
 
 function escHtml(s) {
     return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ============================================================
+// PARTICIPANTS
+// ============================================================
+function getParticipantTotal() { return participants.reduce((s, p) => s + (p.count || 0), 0); }
+
+function addParticipantRow(data = {}, skipUpdate = false) {
+    if (!skipUpdate && participants.length > 0 && !participants[participants.length - 1].name.trim()) {
+        document.querySelector(`.participant-row[data-part-id="${participants[participants.length-1].id}"] .concept-name`)?.focus();
+        return;
+    }
+    const item = { id: uid(), icon: safeIcon(data.icon || 'users'), name: data.name || '', count: data.count || 0 };
+    participants.push(item);
+    renderParticipantRow(item);
+    if (!skipUpdate) {
+        updateAll();
+        document.querySelector(`.participant-row[data-part-id="${item.id}"] .concept-name`)?.focus();
+    }
+}
+
+function deleteParticipantRow(id) {
+    const idx = participants.findIndex(p => p.id === id);
+    if (idx === -1) return;
+    _deletedEntry = { type: 'part', item: { ...participants[idx] }, idx };
+    participants.splice(idx, 1);
+    document.querySelector(`[data-part-id="${id}"]`)?.remove();
+    updateAll();
+    _showToast('Participant eliminat', true);
+}
+
+function updateParticipantName(id, value) {
+    const item = participants.find(p => p.id === id);
+    if (item) { item.name = value; saveValues(); }
+}
+
+function updateParticipantCount(id, rawValue) {
+    const item = participants.find(p => p.id === id);
+    if (item) { item.count = Math.round(parseInput(rawValue)); updateAll(); }
+}
+
+function blurParticipantCount(input, id) {
+    formatField(input, 'int');
+    updateParticipantCount(id, input.value);
+}
+
+function rerenderParticipantRows() {
+    document.getElementById('participantsRows').innerHTML = '';
+    participants.forEach(p => renderParticipantRow(p));
+}
+
+function renderParticipantRow(item) {
+    const div = document.createElement('div');
+    div.className = 'input-row participant-row';
+    div.dataset.partId = item.id;
+    div.draggable = true;
+    div.innerHTML = `
+        <button class="btn-drag" aria-label="Arrossegar per reordenar">
+            <i data-lucide="grip-vertical" style="width:14px;height:14px;"></i>
+        </button>
+        <button class="btn-icon-pick" onclick="openIconPicker('${item.id}')" aria-label="Canviar icona">
+            <i data-lucide="${item.icon}" style="width:16px;height:16px;"></i>
+        </button>
+        <input type="text" class="concept-name" placeholder="Nom del grup"
+               value="${escHtml(item.name)}"
+               oninput="updateParticipantName('${item.id}',this.value)"
+               aria-label="Nom del grup">
+        <div class="field-wrap">
+            <input type="text" class="num-input blue" placeholder="0"
+                   value="${item.count ? fmt(item.count, 0) : ''}"
+                   inputmode="numeric" aria-label="Nombre de participants"
+                   onfocus="focusField(this)"
+                   oninput="updateParticipantCount('${item.id}',this.value)"
+                   onblur="blurParticipantCount(this,'${item.id}')"
+                   onkeydown="if(event.key==='Enter')this.blur()">
+        </div>
+        <button class="btn-del" onclick="deleteParticipantRow('${item.id}')" aria-label="Eliminar">
+            <i data-lucide="x" style="width:13px;height:13px;"></i>
+        </button>`;
+    _attachDragDrop(div, item.id, participants, rerenderParticipantRows);
+    document.getElementById('participantsRows').appendChild(div);
+    lucide.createIcons();
 }
 
 // ============================================================
@@ -291,7 +373,7 @@ function renderRevenueRow(item) {
 }
 
 // ============================================================
-// DRAG & DROP (compartit entre costos i recaptació)
+// DRAG & DROP (compartit entre totes les seccions)
 // ============================================================
 function _attachDragDrop(div, id, array, rerender) {
     div.addEventListener('dragstart', e => {
@@ -350,11 +432,12 @@ function undoDelete() {
         const d = _resetSnapshot; _resetSnapshot = null;
         document.getElementById('titolActivitat').innerText = d.titol;
         document.title = d.titol ? d.titol + ' · ComptesClars' : 'ComptesClars';
-        document.getElementById('numNinos').value = d.alumnes || '';
-        costs = []; revenues = []; payments = [];
-        document.getElementById('costsRows').innerHTML    = '';
-        document.getElementById('revenuesRows').innerHTML = '';
-        document.getElementById('paymentsRows').innerHTML = '';
+        costs = []; revenues = []; payments = []; participants = [];
+        document.getElementById('costsRows').innerHTML        = '';
+        document.getElementById('revenuesRows').innerHTML     = '';
+        document.getElementById('paymentsRows').innerHTML     = '';
+        document.getElementById('participantsRows').innerHTML = '';
+        d.participants.forEach(p => addParticipantRow(p, true));
         d.costos.forEach(c => addCostRow(c, true));
         d.recaptacio.forEach(r => addRevenueRow(r, true));
         d.pagaments.forEach(p => addPaymentRow(p, true));
@@ -364,9 +447,10 @@ function undoDelete() {
     if (!_deletedEntry) return;
     const { type, item, idx } = _deletedEntry;
     _deletedEntry = null;
-    if (type === 'cost')     { costs.splice(idx, 0, item);    rerenderCostRows(); }
-    else if (type === 'rev') { revenues.splice(idx, 0, item); rerenderRevenueRows(); }
-    else                     { payments.splice(idx, 0, item); rerenderPaymentRows(); }
+    if      (type === 'cost') { costs.splice(idx, 0, item);        rerenderCostRows(); }
+    else if (type === 'rev')  { revenues.splice(idx, 0, item);     rerenderRevenueRows(); }
+    else if (type === 'pay')  { payments.splice(idx, 0, item);     rerenderPaymentRows(); }
+    else if (type === 'part') { participants.splice(idx, 0, item); rerenderParticipantRows(); }
     updateAll();
 }
 
@@ -492,7 +576,7 @@ function updateHeroBar(total, rec, pagat, pendent, n) {
 // ============================================================
 function openIconPicker(id) {
     pickerTarget = id;
-    const item    = costs.find(c => c.id === id) || revenues.find(r => r.id === id);
+    const item    = costs.find(c => c.id === id) || revenues.find(r => r.id === id) || participants.find(p => p.id === id);
     const current = item?.icon ?? 'circle-dot';
     document.querySelectorAll('.icon-opt').forEach(b => b.classList.toggle('selected', b.dataset.icon === current));
     document.getElementById('iconPickerBackdrop').style.display = 'block';
@@ -502,8 +586,12 @@ function openIconPicker(id) {
 function selectIcon(icon) {
     if (!pickerTarget) return;
     const isCost = costs.find(c => c.id === pickerTarget);
-    const item   = isCost || revenues.find(r => r.id === pickerTarget);
-    const sel    = isCost ? `[data-cost-id="${pickerTarget}"]` : `[data-rev-id="${pickerTarget}"]`;
+    const isRev  = revenues.find(r => r.id === pickerTarget);
+    const isPart = participants.find(p => p.id === pickerTarget);
+    const item   = isCost || isRev || isPart;
+    const sel    = isCost ? `[data-cost-id="${pickerTarget}"]`
+                 : isRev  ? `[data-rev-id="${pickerTarget}"]`
+                 :           `[data-part-id="${pickerTarget}"]`;
     if (item) {
         item.icon = safeIcon(icon);
         const btn = document.querySelector(`${sel} .btn-icon-pick`);
@@ -548,12 +636,13 @@ function showCookieSettingsBtn(){ document.getElementById('cookieSettingsBtn').s
 
 function saveValues() {
     if (!hasConsent()) return;
-    const data = {};
-    FIELDS.forEach(f => { data[f.id] = readVal(f.id); });
-    data._titol    = (document.getElementById('titolActivitat').innerText || '').trim();
-    data._costs    = costs.map(c => ({ icon: c.icon, name: c.name, amount: c.amount }));
-    data._revenues = revenues.map(r => ({ icon: r.icon, name: r.name, income: r.income, expense: r.expense }));
-    data._payments = payments.map(p => ({ name: p.name, amount: p.amount }));
+    const data = {
+        _titol:        (document.getElementById('titolActivitat').innerText || '').trim(),
+        _participants: participants.map(p => ({ icon: p.icon, name: p.name, count: p.count })),
+        _costs:        costs.map(c => ({ icon: c.icon, name: c.name, amount: c.amount })),
+        _revenues:     revenues.map(r => ({ icon: r.icon, name: r.name, income: r.income, expense: r.expense })),
+        _payments:     payments.map(p => ({ name: p.name, amount: p.amount })),
+    };
     setCookie(COOKIE_DATA_KEY, JSON.stringify(data), COOKIE_DAYS);
 }
 
@@ -562,11 +651,14 @@ function loadSavedValues() {
     if (!raw) return false;
     try {
         const d = JSON.parse(raw);
-        FIELDS.forEach(f => {
-            const v = d[f.id];
-            if (v !== undefined && v !== 0) { const el = document.getElementById(f.id); el.value = v; formatField(el, f.type); }
-        });
         if (d._titol) { document.getElementById('titolActivitat').textContent = d._titol; document.title = d._titol + ' - ComptesClars'; }
+        if (Array.isArray(d._participants) && d._participants.length > 0) {
+            document.getElementById('participantsRows').innerHTML = ''; participants = [];
+            d._participants.forEach(p => addParticipantRow(p, true));
+        } else if (d.numNinos && d.numNinos > 0) {
+            // Backwards compat: old cookie stored a single numNinos value
+            addParticipantRow({ icon: 'users', name: 'Alumnes', count: d.numNinos }, true);
+        }
         if (Array.isArray(d._costs)    && d._costs.length    > 0) { document.getElementById('costsRows').innerHTML    = ''; costs    = []; d._costs.forEach(c => addCostRow(c, true)); }
         if (Array.isArray(d._revenues) && d._revenues.length > 0) { document.getElementById('revenuesRows').innerHTML = ''; revenues = []; d._revenues.forEach(r => addRevenueRow(r, true)); }
         if (Array.isArray(d._payments) && d._payments.length > 0) { document.getElementById('paymentsRows').innerHTML = ''; payments = []; d._payments.forEach(p => addPaymentRow(p, true)); }
@@ -578,19 +670,17 @@ function loadSavedValues() {
 // CÀLCUL PRINCIPAL
 // ============================================================
 function updateAll() {
-    const n        = Math.max(1, Math.round(readVal('numNinos')) || 1);
+    const n        = Math.max(1, getParticipantTotal());
     const rec      = getRevenueNetTotal();
     const total    = getCostTotal();
     const net      = (total - rec) / n;
     const pagat    = getPaymentTotal();
     const pendent  = net - pagat;
 
-    const numNinosEl = document.getElementById('numNinos');
-    numNinosEl.classList.toggle('invalid', !!numNinosEl.dataset.dirty && readVal('numNinos') === 0);
-
-    document.getElementById('totalPagat').textContent    = fmt(pagat);
-    document.getElementById('totalBrut').textContent     = fmt(total);
-    document.getElementById('totalRecNet').textContent   = fmt(rec);
+    document.getElementById('totalParticipants').textContent = fmt(getParticipantTotal(), 0);
+    document.getElementById('totalPagat').textContent        = fmt(pagat);
+    document.getElementById('totalBrut').textContent         = fmt(total);
+    document.getElementById('totalRecNet').textContent       = fmt(rec);
 
     const hasData = total > 0 || rec > 0;
     const heroAPagarEuro  = document.getElementById('heroAPagarEuro');
@@ -657,7 +747,7 @@ function _copyToClipboard(text) {
 
 function copiarResum() {
     const titol   = (document.getElementById('titolActivitat').innerText || '').trim() || 'Activitat';
-    const n       = Math.max(1, Math.round(readVal('numNinos')) || 1);
+    const n       = Math.max(1, getParticipantTotal());
     const rec     = getRevenueNetTotal();
     const total   = getCostTotal();
     const net     = (total - rec) / n;
@@ -668,11 +758,11 @@ function copiarResum() {
 
     // Capçalera
     lines.push(`*${titol}*`);
-    lines.push(`👥 ${n} alumne${n !== 1 ? 's' : ''}`);
+    lines.push(`👥 ${n} participant${n !== 1 ? 's' : ''}`);
     lines.push('');
 
     // Preu principal
-    lines.push(`💶 *A pagar per alumne: ${fmt(net)} €*`);
+    lines.push(`💶 *A pagar per participant: ${fmt(net)} €*`);
     if (total > 0) lines.push(`▸ Cost real: ${fmt(total / n)} €`);
     if (rec > 0)   lines.push(`▸ Recaptació: ${fmt(rec / n)} €`);
     lines.push('');
@@ -726,7 +816,7 @@ function compartirLink() {
     const titol = (document.getElementById('titolActivitat').innerText || '').trim();
     const data  = {
         titol,
-        alumnes:    readVal('numNinos') || 0,
+        participants: participants.map(p => ({ icon: p.icon, name: p.name, count: p.count })),
         costos:     costs.map(c => ({ icon: c.icon, name: c.name, amount: c.amount })),
         recaptacio: revenues.map(r => ({ icon: r.icon, name: r.name, income: r.income, expense: r.expense })),
         pagaments:  payments.map(p => ({ name: p.name, amount: p.amount }))
@@ -766,13 +856,14 @@ document.addEventListener('click', function(e) {
     }
 });
 
+// ============================================================
 // EXPORTAR / IMPORTAR
 // ============================================================
 function exportarDades() {
     const titol = (document.getElementById('titolActivitat').innerText || '').trim();
     const data  = {
         titol,
-        alumnes:    readVal('numNinos') || 0,
+        participants: participants.map(p => ({ icon: p.icon, name: p.name, count: p.count })),
         costos:     costs.map(c => ({ icon: c.icon, name: c.name, amount: c.amount })),
         recaptacio: revenues.map(r => ({ icon: r.icon, name: r.name, income: r.income, expense: r.expense })),
         pagaments:  payments.map(p => ({ name: p.name, amount: p.amount }))
@@ -807,12 +898,17 @@ function importarDades(event) {
         event.target.value = '';
         try {
             const d = JSON.parse(e.target.result);
-            document.getElementById('costsRows').innerHTML    = ''; costs    = [];
-            document.getElementById('revenuesRows').innerHTML = ''; revenues = [];
-            document.getElementById('paymentsRows').innerHTML = ''; payments = [];
-            FIELDS.forEach(f => { document.getElementById(f.id).value = ''; });
-            if (d.titol)   { document.getElementById('titolActivitat').textContent = d.titol; document.title = d.titol + ' - ComptesClars'; }
-            if (d.alumnes) { const el = document.getElementById('numNinos'); el.value = d.alumnes; formatField(el, 'int'); }
+            document.getElementById('costsRows').innerHTML        = ''; costs        = [];
+            document.getElementById('revenuesRows').innerHTML     = ''; revenues     = [];
+            document.getElementById('paymentsRows').innerHTML     = ''; payments     = [];
+            document.getElementById('participantsRows').innerHTML = ''; participants = [];
+            if (d.titol) { document.getElementById('titolActivitat').textContent = d.titol; document.title = d.titol + ' - ComptesClars'; }
+            if (Array.isArray(d.participants) && d.participants.length > 0) {
+                d.participants.forEach(p => addParticipantRow(p, true));
+            } else if (d.alumnes && d.alumnes > 0) {
+                // Backwards compat: old JSON used a single alumnes value
+                addParticipantRow({ icon: 'users', name: 'Alumnes', count: d.alumnes }, true);
+            }
             if (Array.isArray(d.costos))     d.costos.forEach(c => addCostRow(c, true));
             if (Array.isArray(d.recaptacio)) d.recaptacio.forEach(r => addRevenueRow(r, true));
             if (Array.isArray(d.pagaments))  d.pagaments.forEach(p => addPaymentRow(p, true));
@@ -826,23 +922,24 @@ function importarDades(event) {
     reader.readAsText(file);
 }
 
+// ============================================================
 // REINICIAR
 // ============================================================
 function confirmReset() {
     closeHeaderMenu();
     _resetSnapshot = {
-        titol:      document.getElementById('titolActivitat').innerText,
-        alumnes:    readVal('numNinos'),
-        costos:     costs.map(c => ({ ...c })),
-        recaptacio: revenues.map(r => ({ ...r })),
-        pagaments:  payments.map(p => ({ ...p }))
+        titol:        document.getElementById('titolActivitat').innerText,
+        participants: participants.map(p => ({ ...p })),
+        costos:       costs.map(c => ({ ...c })),
+        recaptacio:   revenues.map(r => ({ ...r })),
+        pagaments:    payments.map(p => ({ ...p }))
     };
-    FIELDS.forEach(f => { document.getElementById(f.id).value = ''; });
     document.getElementById('titolActivitat').textContent = '';
     document.title = 'ComptesClars';
-    document.getElementById('costsRows').innerHTML    = ''; costs    = [];
-    document.getElementById('revenuesRows').innerHTML = ''; revenues = [];
-    document.getElementById('paymentsRows').innerHTML = ''; payments = [];
+    document.getElementById('participantsRows').innerHTML = ''; participants = [];
+    document.getElementById('costsRows').innerHTML        = ''; costs        = [];
+    document.getElementById('revenuesRows').innerHTML     = ''; revenues     = [];
+    document.getElementById('paymentsRows').innerHTML     = ''; payments     = [];
     updateAll();
     _showToast('Dades reiniciades', true);
 }
@@ -863,14 +960,6 @@ window.addEventListener('DOMContentLoaded', () => {
     });
     lucide.createIcons();
 
-    FIELDS.forEach(f => {
-        const el = document.getElementById(f.id);
-        el.addEventListener('focus',   () => focusField(el));
-        el.addEventListener('input',   updateAll);
-        el.addEventListener('blur',    () => { el.dataset.dirty = 'true'; formatField(el, f.type); updateAll(); });
-        el.addEventListener('keydown', e => { if (e.key === 'Enter') el.blur(); });
-    });
-
     const titol = document.getElementById('titolActivitat');
     function syncTitol() {
         const text = (titol.innerText || '').trim();
@@ -887,11 +976,16 @@ window.addEventListener('DOMContentLoaded', () => {
             const d = JSON.parse(decodeURIComponent(escape(atob(urlParam))));
             history.replaceState(null, '', location.pathname);
             if (d.titol) document.getElementById('titolActivitat').innerText = d.titol;
-            if (d.alumnes) document.getElementById('numNinos').value = d.alumnes;
-            costs = []; revenues = []; payments = [];
-            document.getElementById('costsRows').innerHTML = '';
-            document.getElementById('revenuesRows').innerHTML = '';
-            document.getElementById('paymentsRows').innerHTML = '';
+            costs = []; revenues = []; payments = []; participants = [];
+            document.getElementById('costsRows').innerHTML        = '';
+            document.getElementById('revenuesRows').innerHTML     = '';
+            document.getElementById('paymentsRows').innerHTML     = '';
+            document.getElementById('participantsRows').innerHTML = '';
+            if (Array.isArray(d.participants) && d.participants.length > 0) {
+                d.participants.forEach(p => addParticipantRow(p, true));
+            } else if (d.alumnes && d.alumnes > 0) {
+                addParticipantRow({ icon: 'users', name: 'Alumnes', count: d.alumnes }, true);
+            }
             if (Array.isArray(d.costos))     d.costos.forEach(c => addCostRow(c, true));
             if (Array.isArray(d.recaptacio)) d.recaptacio.forEach(r => addRevenueRow(r, true));
             if (Array.isArray(d.pagaments))  d.pagaments.forEach(p => addPaymentRow(p, true));
@@ -906,6 +1000,8 @@ window.addEventListener('DOMContentLoaded', () => {
             if (consent === 'yes') loadSavedValues();
         }
     }
+
+    if (participants.length === 0) addParticipantRow({ icon: 'users', name: '' }, true);
 
     updateAll();
 });
