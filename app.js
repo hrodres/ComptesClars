@@ -764,6 +764,7 @@ function _copyToClipboard(text) {
 }
 
 function copiarResum() {
+    if (!costs.length && !revenues.length && !payments.length && !participants.length) return;
     const titol   = (document.getElementById('titolActivitat').innerText || '').trim() || 'Activitat';
     const n       = Math.max(1, getParticipantTotal());
     const rec     = getRevenueNetTotal();
@@ -842,6 +843,7 @@ function copiarResum() {
 }
 
 function compartirLink() {
+    if (!costs.length && !revenues.length && !payments.length && !participants.length) return;
     const titol = (document.getElementById('titolActivitat').innerText || '').trim();
     const data  = {
         titol,
@@ -892,6 +894,7 @@ document.addEventListener('click', function(e) {
 // EXPORTAR / IMPORTAR
 // ============================================================
 function exportarDades() {
+    if (!costs.length && !revenues.length && !payments.length && !participants.length) return;
     const titol = (document.getElementById('titolActivitat').innerText || '').trim();
     const data  = {
         titol,
