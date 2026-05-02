@@ -602,6 +602,15 @@ function selectIcon(icon) {
     saveValues();
 }
 
+function openAbout() {
+    document.getElementById('aboutBackdrop').style.display = 'block';
+    document.getElementById('aboutModal').style.display    = 'block';
+}
+function closeAbout() {
+    document.getElementById('aboutBackdrop').style.display = 'none';
+    document.getElementById('aboutModal').style.display    = 'none';
+}
+
 function closeIconPicker() {
     document.getElementById('iconPickerBackdrop').style.display = 'none';
     document.getElementById('iconPicker').style.display         = 'none';

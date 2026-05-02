@@ -7,7 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800;900&family=DM+Mono:wght@500&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css?v=62">
+    <link rel="stylesheet" href="style.css?v=63">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/lz-string@1.5.0/libs/lz-string.min.js"></script>
@@ -228,9 +228,20 @@
                 <i data-lucide="cookie" style="width:14px;height:14px;"></i>
             </button>
             <span style="font-size:13px;font-weight:600;color:var(--text-secondary);flex:1;text-align:center;">ComptesClars · by hrodres · 2026</span>
+            <button onclick="openAbout()" aria-label="Sobre ComptesClars" class="btn-header-icon">
+                <i data-lucide="info" style="width:14px;height:14px;"></i>
+            </button>
         </div>
 
     </main>
+</div>
+
+<!-- ABOUT -->
+<div id="aboutBackdrop" onclick="closeAbout()"></div>
+<div id="aboutModal" role="dialog" aria-label="Sobre ComptesClars">
+    <p style="font-size:17px;font-weight:800;color:var(--text);margin-bottom:8px;">ComptesClars</p>
+    <p style="font-size:13px;font-weight:500;color:var(--text-secondary);line-height:1.5;margin-bottom:16px;">Eina per repartir costos d'activitats col·lectives entre participants.</p>
+    <p style="font-size:12px;font-weight:600;color:var(--text-secondary);">by hrodres · 2026</p>
 </div>
 
 <!-- SELECTOR D'ICONES -->
@@ -259,6 +270,6 @@
 </div>
 
 
-<script src="app.js?v=62" defer></script>
+<script src="app.js?v=63" defer></script>
 </body>
 </html>

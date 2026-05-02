@@ -383,6 +383,22 @@ body {
     font-family: 'DM Sans', sans-serif;
 }
 
+/* === ABOUT MODAL === */
+#aboutBackdrop {
+    display: none; position: fixed; inset: 0; z-index: 499;
+    background: rgba(0,0,0,0.15);
+}
+#aboutModal {
+    display: none; position: fixed; z-index: 500;
+    top: 50%; left: 50%; transform: translate(-50%, -50%);
+    background: #fff; border-radius: 20px;
+    border: 1px solid var(--border);
+    box-shadow: 0 8px 40px rgba(0,0,0,0.16);
+    padding: 24px 24px 20px;
+    width: min(280px, calc(100vw - 40px));
+    text-align: center;
+}
+
 /* === SELECTOR D'ICONES === */
 #iconPickerBackdrop {
     display: none; position: fixed; inset: 0; z-index: 499;
