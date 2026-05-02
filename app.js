@@ -770,11 +770,16 @@ function importarDades(event) {
 }
 
 function _showImportToast(ok) {
-    const toast = document.getElementById('undoToast');
-    const label = document.getElementById('undoToastLabel');
-    label.textContent = ok ? 'Dades carregades correctament' : 'Error: fitxer no vàlid';
+    const toast  = document.getElementById('undoToast');
+    const label  = document.getElementById('undoToastLabel');
+    const btnDes = toast.querySelector('.btn-undo');
+    label.textContent   = ok ? '✓ Importat correctament' : 'Error: fitxer no vàlid';
+    btnDes.style.display = 'none';
     toast.classList.add('show');
-    setTimeout(() => toast.classList.remove('show'), 3000);
+    setTimeout(() => {
+        toast.classList.remove('show');
+        btnDes.style.display = '';
+    }, 3000);
 }
 
 // REINICIAR
