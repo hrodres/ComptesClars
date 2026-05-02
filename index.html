@@ -7,7 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800;900&family=DM+Mono:wght@500&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css?v=24">
+    <link rel="stylesheet" href="style.css?v=28">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
 </head>
@@ -27,14 +27,14 @@
             </button>
             <div id="headerMenu" class="header-dropdown">
                 <button class="header-dropdown-item" onclick="document.getElementById('importFile').click(); closeHeaderMenu()">
-                    <i data-lucide="file-up" style="width:15px;height:15px;"></i> Importar
+                    <i data-lucide="file-up" style="width:15px;height:15px;"></i> Importar arxiu
                 </button>
                 <button class="header-dropdown-item" onclick="exportarDades(); closeHeaderMenu()">
-                    <i data-lucide="file-down" style="width:15px;height:15px;"></i> Exportar
+                    <i data-lucide="file-down" style="width:15px;height:15px;"></i> Exportar arxiu
                 </button>
                 <div class="header-dropdown-sep"></div>
-                <button id="btnReiniciar" class="header-dropdown-item" onclick="confirmReset()">
-                    <i data-lucide="rotate-ccw" style="width:15px;height:15px;"></i> Reiniciar
+                <button id="btnReiniciar" class="header-dropdown-item danger" onclick="confirmReset()">
+                    <i data-lucide="rotate-ccw" style="width:15px;height:15px;"></i> Reiniciar dades
                 </button>
             </div>
         </div>
@@ -234,6 +234,6 @@
 </div>
 
 
-<script src="app.js?v=27" defer></script>
+<script src="app.js?v=28" defer></script>
 </body>
 </html>
