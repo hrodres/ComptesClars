@@ -482,8 +482,8 @@ function updateHeroBar(total, rec, pagat, pendent, n) {
     const pPendent = Math.max(0, Math.min(100, Math.max(0, pendent) / preuReal * 100));
     const pEstalvi = Math.max(0, Math.min(100, (rec / n) / preuReal * 100));
     bar.innerHTML =
-        `<div class="dist-seg" style="width:${pPagat}%;background:var(--text-secondary);"></div>` +
-        `<div class="dist-seg" style="width:${pPendent}%;background:var(--blue);"></div>` +
+        `<div class="dist-seg" style="width:${pPagat}%;background:var(--blue);"></div>` +
+        `<div class="dist-seg" style="width:${pPendent}%;background:repeating-linear-gradient(45deg,#007AFF,#007AFF 3px,#fff 3px,#fff 7px);"></div>` +
         `<div class="dist-seg" style="width:${pEstalvi}%;background:var(--green);"></div>`;
 }
 
