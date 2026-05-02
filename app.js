@@ -683,12 +683,12 @@ function updateAll() {
     document.getElementById('totalBrut').textContent         = fmt(total);
     document.getElementById('totalRecNet').textContent       = fmt(rec);
 
-    const totalPagatProjecteEl = document.getElementById('totalPagatProjecte');
+    const totalPagatProjecteRow = document.getElementById('totalPagatProjecteRow');
     if (n > 1 && pagat > 0) {
-        totalPagatProjecteEl.textContent = fmt(pagat * n) + ' € total projecte';
-        totalPagatProjecteEl.style.display = '';
+        document.getElementById('totalPagatProjecte').textContent = fmt(pagat * n);
+        totalPagatProjecteRow.style.display = '';
     } else {
-        totalPagatProjecteEl.style.display = 'none';
+        totalPagatProjecteRow.style.display = 'none';
     }
 
     const hasData = total > 0 || rec > 0;

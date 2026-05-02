@@ -7,7 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800;900&family=DM+Mono:wght@500&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css?v=57">
+    <link rel="stylesheet" href="style.css?v=58">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
 </head>
@@ -144,17 +144,24 @@
             </div>
             <div class="card">
                 <div id="paymentsRows"></div>
-                <div class="input-row" style="background: rgba(0,122,255,0.03); border-top: 0.5px solid var(--separator);">
+                <div class="input-row" style="background: rgba(0,122,255,0.03); border-top: 0.5px solid var(--separator); border-bottom: none;">
                     <div class="row-label" style="font-size: 13px;">
                         <i data-lucide="sigma" style="width:15px;height:15px;color:var(--blue);"></i>
                         <span style="font-weight: 700; color:var(--blue);">Total planificat</span>
                     </div>
-                    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px;">
-                        <div class="field-wrap">
-                            <span id="totalPagat" style="font-family:'DM Mono',monospace; font-size:16px; font-weight:700; color:var(--blue);">0,00</span>
-                            <span class="euro" style="color:var(--blue);">€</span>
-                        </div>
-                        <span id="totalPagatProjecte" style="font-family:'DM Mono',monospace; font-size:11px; font-weight:600; color:var(--text-secondary); display:none;"></span>
+                    <div class="field-wrap">
+                        <span id="totalPagat" style="font-family:'DM Mono',monospace; font-size:16px; font-weight:700; color:var(--blue);">0,00</span>
+                        <span class="euro" style="color:var(--blue);">€</span>
+                    </div>
+                </div>
+                <div id="totalPagatProjecteRow" class="input-row" style="display:none; border-top: 0.5px solid var(--separator);">
+                    <div class="row-label" style="font-size: 13px;">
+                        <i data-lucide="sigma" style="width:15px;height:15px;color:var(--text-secondary);"></i>
+                        <span style="font-weight: 700; color:var(--text-secondary);">Total projecte</span>
+                    </div>
+                    <div class="field-wrap">
+                        <span id="totalPagatProjecte" style="font-family:'DM Mono',monospace; font-size:16px; font-weight:700; color:var(--text-secondary);">0,00</span>
+                        <span class="euro" style="color:var(--text-secondary);">€</span>
                     </div>
                 </div>
             </div>
@@ -251,6 +258,6 @@
 </div>
 
 
-<script src="app.js?v=57" defer></script>
+<script src="app.js?v=58" defer></script>
 </body>
 </html>
