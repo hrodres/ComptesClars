@@ -7,7 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800;900&family=DM+Mono:wght@500&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css?v=48">
+    <link rel="stylesheet" href="style.css?v=49">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
 </head>
@@ -100,7 +100,10 @@
 
         <!-- DISTRIBUCIÓ DE COSTOS -->
         <section class="card" style="padding: 18px 20px;">
-            <p class="section-label" style="display:block;text-align:center;margin-bottom:12px;">Distribució dels costos</p>
+            <div style="display:flex;align-items:center;gap:6px;margin-bottom:12px;">
+                <i data-lucide="bar-chart-2" style="width:13px;height:13px;color:var(--text-secondary);"></i>
+                <p class="section-label">Distribució dels costos</p>
+            </div>
             <div class="dist-bar" id="distBar"></div>
             <div id="distLegend" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 10px;"></div>
         </section>
@@ -235,6 +238,6 @@
 </div>
 
 
-<script src="app.js?v=48" defer></script>
+<script src="app.js?v=49" defer></script>
 </body>
 </html>
