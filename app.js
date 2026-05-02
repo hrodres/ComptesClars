@@ -1012,7 +1012,5 @@ window.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    if (participants.length === 0) addParticipantRow({ icon: 'users', name: '' }, true);
-
     updateAll();
 });
