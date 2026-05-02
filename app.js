@@ -765,7 +765,7 @@ function exportarDades() {
     a.download = (titol || 'comptesclars').toLowerCase().replace(/\s+/g, '-') + '.json';
     document.body.appendChild(a); a.click();
     document.body.removeChild(a); URL.revokeObjectURL(url);
-    _showToast('✓ Exportat');
+    _showToast('✓ Dades exportades');
 }
 
 function importarDades(event) {
@@ -786,7 +786,7 @@ function importarDades(event) {
             if (Array.isArray(d.recaptacio)) d.recaptacio.forEach(r => addRevenueRow(r, true));
             if (Array.isArray(d.pagaments))  d.pagaments.forEach(p => addPaymentRow(p, true));
             updateAll(); saveValues();
-            _showToast('✓ Importat');
+            _showToast('✓ Dades importades');
         } catch(err) {
             _showToast('Error: fitxer no vàlid');
         }
@@ -813,7 +813,7 @@ function confirmReset() {
     document.getElementById('revenuesRows').innerHTML = ''; revenues = [];
     document.getElementById('paymentsRows').innerHTML = ''; payments = [];
     updateAll();
-    _showToast('Reiniciat', true);
+    _showToast('Dades reiniciades', true);
 }
 
 // ============================================================
