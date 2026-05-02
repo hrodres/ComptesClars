@@ -673,7 +673,8 @@ function copiarResum() {
 
     // Preu principal
     lines.push(`💶 *A pagar per alumne: ${fmt(net)} €*`);
-    if (rec > 0) lines.push(`Cost brut ${fmt(total / n)} € − ${fmt(rec / n)} € de recaptació`);
+    if (total > 0) lines.push(`▸ Cost real: ${fmt(total / n)} €`);
+    if (rec > 0)   lines.push(`▸ Recaptació: ${fmt(rec / n)} €`);
     lines.push('');
 
     // Pagaments
@@ -700,6 +701,10 @@ function copiarResum() {
         costsNamed.forEach(c => lines.push(`▸ ${c.name || '—'}: ${fmt(c.amount)} €`));
         lines.push(`Total: ${fmt(total)} €`);
     }
+
+    lines.push('');
+    lines.push('—');
+    lines.push('_ComptesClars_');
 
     _copyToClipboard(lines.join('\n')).then(() => {
         _showToast('✓ Resum copiat');
