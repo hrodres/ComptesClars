@@ -776,19 +776,19 @@ function exportarDades() {
     const url  = URL.createObjectURL(blob);
     const a    = document.createElement('a');
     a.href     = url;
-    const ara   = new Date();
-    const data  = ara.getFullYear().toString() +
-                  String(ara.getMonth()+1).padStart(2,'0') +
-                  String(ara.getDate()).padStart(2,'0') + '-' +
-                  String(ara.getHours()).padStart(2,'0') +
-                  String(ara.getMinutes()).padStart(2,'0');
-    const slug  = (titol || '')
+    const ara  = new Date();
+    const ts   = ara.getFullYear().toString() +
+                 String(ara.getMonth()+1).padStart(2,'0') +
+                 String(ara.getDate()).padStart(2,'0') + '-' +
+                 String(ara.getHours()).padStart(2,'0') +
+                 String(ara.getMinutes()).padStart(2,'0');
+    const slug = (titol || '')
         .toLowerCase()
         .replace(/[àáâä]/g,'a').replace(/[èéêë]/g,'e').replace(/[ìíîï]/g,'i')
         .replace(/[òóôö]/g,'o').replace(/[ùúûü]/g,'u').replace(/[ç]/g,'c')
         .replace(/[ñ]/g,'n').replace(/·l/g,'l').replace(/[^a-z0-9]+/g,'-')
         .replace(/^-+|-+$/g,'');
-    a.download = 'comptesclars' + (slug ? '_' + slug : '') + '_' + data + '.json';
+    a.download = 'comptesclars' + (slug ? '_' + slug : '') + '_' + ts + '.json';
     document.body.appendChild(a); a.click();
     document.body.removeChild(a); URL.revokeObjectURL(url);
     _showToast('✓ Dades exportades');
