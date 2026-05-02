@@ -758,9 +758,17 @@ function copiarResum() {
 
     // Capçalera
     lines.push(`*${titol}*`);
-    lines.push(`👥 ${n} participant${n !== 1 ? 's' : ''}`);
+    lines.push('');
+
+    // Participants
     const namedParts = participants.filter(p => p.name.trim() && p.count > 0);
-    if (namedParts.length > 0) namedParts.forEach(p => lines.push(`▸ ${p.name}: ${fmt(p.count, 0)}`));
+    if (namedParts.length > 0) {
+        lines.push('👥 *Participants*');
+        namedParts.forEach(p => lines.push(`▸ ${p.name}: ${fmt(p.count, 0)}`));
+        lines.push(`Total: ${fmt(n, 0)}`);
+    } else {
+        lines.push(`👥 ${n} participant${n !== 1 ? 's' : ''}`);
+    }
     lines.push('');
 
     // Preu principal
@@ -774,6 +782,7 @@ function copiarResum() {
         lines.push('📅 *Pagaments planificats:*');
         payments.forEach(p => lines.push(`▸ ${p.name || 'Pagament'}: ${fmt(p.amount)} €`));
         if (pendent > 0) lines.push(`▸ Pendent: ${fmt(pendent)} €`);
+        lines.push(`Total: ${fmt(net)} €`);
     }
 
     // Recaptació (només si hi ha conceptes amb nom)
