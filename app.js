@@ -992,17 +992,19 @@ window.addEventListener('DOMContentLoaded', () => {
 
     const urlParam = new URLSearchParams(location.search).get('d');
     if (urlParam) {
+        let urlLoaded = false;
         try {
-            let jsonStr = LZString.decompressFromEncodedURIComponent(urlParam);
-        if (!jsonStr) jsonStr = decodeURIComponent(escape(atob(urlParam)));
-        const d = JSON.parse(jsonStr);
-            history.replaceState(null, '', location.pathname);
-            if (d.titol) document.getElementById('titolActivitat').innerText = d.titol;
+            let jsonStr = typeof LZString !== 'undefined'
+                ? LZString.decompressFromEncodedURIComponent(urlParam)
+                : null;
+            if (!jsonStr) jsonStr = decodeURIComponent(escape(atob(urlParam)));
+            const d = JSON.parse(jsonStr);
             costs = []; revenues = []; payments = []; participants = [];
             document.getElementById('costsRows').innerHTML        = '';
             document.getElementById('revenuesRows').innerHTML     = '';
             document.getElementById('paymentsRows').innerHTML     = '';
             document.getElementById('participantsRows').innerHTML = '';
+            if (d.titol) document.getElementById('titolActivitat').innerText = d.titol;
             if (Array.isArray(d.participants) && d.participants.length > 0) {
                 d.participants.forEach(p => addParticipantRow(p, true));
             } else if (d.alumnes && d.alumnes > 0) {
@@ -1011,8 +1013,14 @@ window.addEventListener('DOMContentLoaded', () => {
             if (Array.isArray(d.costos))     d.costos.forEach(c => addCostRow(c, true));
             if (Array.isArray(d.recaptacio)) d.recaptacio.forEach(r => addRevenueRow(r, true));
             if (Array.isArray(d.pagaments))  d.pagaments.forEach(p => addPaymentRow(p, true));
+            urlLoaded = true;
         } catch(_) {}
-        saveValues();
+        if (urlLoaded) {
+            history.replaceState(null, '', location.pathname);
+            saveValues();
+        } else {
+            loadSavedValues();
+        }
     } else {
         loadSavedValues();
     }
