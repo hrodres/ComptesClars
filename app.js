@@ -483,7 +483,7 @@ function updateHeroBar(total, rec, pagat, pendent, n) {
     const pEstalvi = Math.max(0, Math.min(100, (rec / n) / preuReal * 100));
     bar.innerHTML =
         `<div class="dist-seg" style="width:${pPagat}%;background:var(--blue);"></div>` +
-        `<div class="dist-seg" style="width:${pPendent}%;background:repeating-linear-gradient(45deg,rgba(0,122,255,0.35),rgba(0,122,255,0.35) 3px,#fff 3px,#fff 7px);"></div>` +
+        `<div class="dist-seg" style="width:${pPendent}%;background:var(--text-secondary);"></div>` +
         `<div class="dist-seg" style="width:${pEstalvi}%;background:var(--green);"></div>`;
 }
 
@@ -615,7 +615,7 @@ function updateAll() {
         document.getElementById('heroPagat').textContent      = fmt(pagat) + ' €';
         document.getElementById('heroPendentLeg').textContent = fmt(Math.max(0, pendent)) + ' €';
         heroAPagarEuro.style.visibility  = 'visible';
-        const pendentColor = (pendent <= 0 && net > 0) ? 'var(--green)' : 'var(--blue)';
+        const pendentColor = (pendent <= 0 && net > 0) ? 'var(--green)' : 'var(--text-secondary)';
         heroPendentEl.textContent        = fmt(Math.max(0, pendent));
         heroPendentEl.style.color        = pendentColor;
         heroPendentEuro.style.visibility = 'visible';
