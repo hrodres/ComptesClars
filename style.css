@@ -243,7 +243,7 @@ body {
     background: #fff; border: 1px solid rgba(0,0,0,0.08);
     border-radius: 16px; padding: 6px;
     box-shadow: 0 8px 32px rgba(0,0,0,0.12);
-    min-width: 160px; z-index: 200;
+    min-width: 175px; z-index: 200;
 }
 .header-dropdown.open { display: flex; }
 .header-dropdown-item {
