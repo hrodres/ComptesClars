@@ -7,7 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800;900&family=DM+Mono:wght@500&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css?v=38">
+    <link rel="stylesheet" href="style.css?v=39">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
 </head>
@@ -46,20 +46,20 @@
         <section class="card" style="padding: 22px 22px 20px;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
                 <div style="display: flex; align-items: center; gap: 8px;">
-                    <i data-lucide="wallet" style="width:18px;height:18px;color:var(--blue);opacity:0.7;"></i>
+                    <i data-lucide="wallet" style="width:18px;height:18px;color:var(--text-secondary);"></i>
                     <span class="badge">Per alumne</span>
                 </div>
                 <div style="display:flex;gap:6px;">
                 <button id="btnCopiar" onclick="copiarResum()" aria-label="Copiar resum"
-                    style="width:30px;height:30px;border:none;background:rgba(0,122,255,0.08);border-radius:8px;
+                    style="width:30px;height:30px;border:none;background:rgba(0,0,0,0.05);border-radius:8px;
                            cursor:pointer;display:flex;align-items:center;justify-content:center;
-                           color:var(--blue);transition:background 0.15s,color 0.15s;padding:0;flex-shrink:0;">
+                           color:var(--text-secondary);transition:background 0.15s,color 0.15s;padding:0;flex-shrink:0;">
                     <i data-lucide="copy" style="width:15px;height:15px;"></i>
                 </button>
                 <button id="btnCompartirLink" onclick="compartirLink()" aria-label="Compartir link"
-                    style="width:30px;height:30px;border:none;background:rgba(0,122,255,0.08);border-radius:8px;
+                    style="width:30px;height:30px;border:none;background:rgba(0,0,0,0.05);border-radius:8px;
                            cursor:pointer;display:flex;align-items:center;justify-content:center;
-                           color:var(--blue);transition:background 0.15s,color 0.15s;padding:0;flex-shrink:0;">
+                           color:var(--text-secondary);transition:background 0.15s,color 0.15s;padding:0;flex-shrink:0;">
                     <i data-lucide="link" style="width:15px;height:15px;"></i>
                 </button>
                 </div>
@@ -234,6 +234,6 @@
 </div>
 
 
-<script src="app.js?v=36" defer></script>
+<script src="app.js?v=39" defer></script>
 </body>
 </html>

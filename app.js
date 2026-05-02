@@ -710,8 +710,8 @@ function copiarResum() {
         lucide.createIcons();
         setTimeout(() => {
             btn.innerHTML = '<i data-lucide="copy" style="width:15px;height:15px;"></i>';
-            btn.style.background = 'rgba(0,122,255,0.08)';
-            btn.style.color = 'var(--blue)';
+            btn.style.background = 'rgba(0,0,0,0.05)';
+            btn.style.color = 'var(--text-secondary)';
             lucide.createIcons();
         }, 2000);
     });
@@ -737,8 +737,8 @@ function compartirLink() {
         lucide.createIcons();
         setTimeout(() => {
             btn.innerHTML = '<i data-lucide="link" style="width:15px;height:15px;"></i>';
-            btn.style.background = 'rgba(0,122,255,0.08)';
-            btn.style.color = 'var(--blue)';
+            btn.style.background = 'rgba(0,0,0,0.05)';
+            btn.style.color = 'var(--text-secondary)';
             lucide.createIcons();
         }, 2000);
     });
