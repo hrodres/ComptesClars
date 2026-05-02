@@ -1,6 +1,8 @@
 # ComptesClars
 
-Eina web per calcular i repartir els costos d'activitats escolars (excursions, colònies, sortides) entre els participants. Càlcul en temps real, sense registre, sense servidor.
+Eina web per calcular i repartir els costos d'una activitat col·lectiva entre els seus participants. Càlcul en temps real, sense registre, sense servidor.
+
+Útil per a excursions, colònies, viatges de grup, esdeveniments, sopars col·lectius o qualsevol activitat on calgui dividir costos.
 
 🔗 **[comptesclars.pages.dev](https://comptesclars.pages.dev)**
 
@@ -8,7 +10,7 @@ Eina web per calcular i repartir els costos d'activitats escolars (excursions, c
 
 ## Funcionalitats
 
-- **Participants** — grups configurables (ex: Alumnes 6è A, Alumnes 6è B) amb total automàtic
+- **Participants** — un o més grups amb nom i nombre (ex: Adults, Nens, Professors)
 - **Costos** — conceptes amb icona, import i distribució visual proporcional
 - **Recaptació** — ingressos i despeses per concepte, amb resultat net per fila
 - **Pagaments** — planificació per participant, amb total de projecte calculat automàticament
