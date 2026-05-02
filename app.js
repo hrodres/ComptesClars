@@ -622,13 +622,6 @@ function closeIconPicker() {
 // ============================================================
 const STORAGE_KEY = 'comptesclars_data';
 
-function getCookie(name) {
-    return document.cookie.split('; ').reduce((acc, c) => {
-        const [k, v] = c.split('=');
-        return k === name ? decodeURIComponent(v) : acc;
-    }, null);
-}
-
 function saveValues() {
     const data = {
         _titol:        (document.getElementById('titolActivitat').innerText || '').trim(),
@@ -641,8 +634,7 @@ function saveValues() {
 }
 
 function loadSavedValues() {
-    let raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) raw = getCookie('excursio6_data') || localStorage.getItem('excursio6_data'); // migració clau antiga
+    const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return false;
     try {
         const d = JSON.parse(raw);
@@ -650,9 +642,6 @@ function loadSavedValues() {
         if (Array.isArray(d._participants) && d._participants.length > 0) {
             document.getElementById('participantsRows').innerHTML = ''; participants = [];
             d._participants.forEach(p => addParticipantRow(p, true));
-        } else if (d.numNinos && d.numNinos > 0) {
-            // Backwards compat: old cookie stored a single numNinos value
-            addParticipantRow({ icon: 'users', name: 'Participants', count: d.numNinos }, true);
         }
         if (Array.isArray(d._costs)    && d._costs.length    > 0) { document.getElementById('costsRows').innerHTML    = ''; costs    = []; d._costs.forEach(c => addCostRow(c, true)); }
         if (Array.isArray(d._revenues) && d._revenues.length > 0) { document.getElementById('revenuesRows').innerHTML = ''; revenues = []; d._revenues.forEach(r => addRevenueRow(r, true)); }
@@ -925,9 +914,6 @@ function importarDades(event) {
             if (d.titol) { document.getElementById('titolActivitat').textContent = d.titol; document.title = d.titol + ' - ComptesClars'; }
             if (Array.isArray(d.participants) && d.participants.length > 0) {
                 d.participants.forEach(p => addParticipantRow(p, true));
-            } else if (d.alumnes && d.alumnes > 0) {
-                // Backwards compat: old JSON used a single alumnes value
-                addParticipantRow({ icon: 'users', name: 'Participants', count: d.alumnes }, true);
             }
             if (Array.isArray(d.costos))     d.costos.forEach(c => addCostRow(c, true));
             if (Array.isArray(d.recaptacio)) d.recaptacio.forEach(r => addRevenueRow(r, true));
@@ -1007,8 +993,6 @@ window.addEventListener('DOMContentLoaded', () => {
             if (d.titol) document.getElementById('titolActivitat').innerText = d.titol;
             if (Array.isArray(d.participants) && d.participants.length > 0) {
                 d.participants.forEach(p => addParticipantRow(p, true));
-            } else if (d.alumnes && d.alumnes > 0) {
-                addParticipantRow({ icon: 'users', name: 'Participants', count: d.alumnes }, true);
             }
             if (Array.isArray(d.costos))     d.costos.forEach(c => addCostRow(c, true));
             if (Array.isArray(d.recaptacio)) d.recaptacio.forEach(r => addRevenueRow(r, true));
