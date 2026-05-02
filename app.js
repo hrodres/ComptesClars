@@ -671,7 +671,33 @@ function copiarResum() {
         btn.style.color = 'var(--green)';
         lucide.createIcons();
         setTimeout(() => {
-            btn.innerHTML = '<i data-lucide="share-2" style="width:15px;height:15px;"></i>';
+            btn.innerHTML = '<i data-lucide="copy" style="width:15px;height:15px;"></i>';
+            btn.style.background = 'rgba(0,122,255,0.08)';
+            btn.style.color = 'var(--blue)';
+            lucide.createIcons();
+        }, 2000);
+    });
+}
+
+function compartirLink() {
+    const titol = (document.getElementById('titolActivitat').innerText || '').trim();
+    const data  = {
+        titol,
+        alumnes:    readVal('numNinos') || 0,
+        costos:     costs.map(c => ({ icon: c.icon, name: c.name, amount: c.amount })),
+        recaptacio: revenues.map(r => ({ icon: r.icon, name: r.name, income: r.income, expense: r.expense })),
+        pagaments:  payments.map(p => ({ name: p.name, amount: p.amount }))
+    };
+    const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(data))));
+    const url = location.origin + location.pathname + '?d=' + encoded;
+    _copyToClipboard(url).then(() => {
+        const btn = document.getElementById('btnCompartirLink');
+        btn.innerHTML = '<i data-lucide="check" style="width:15px;height:15px;"></i>';
+        btn.style.background = 'rgba(52,199,89,0.12)';
+        btn.style.color = 'var(--green)';
+        lucide.createIcons();
+        setTimeout(() => {
+            btn.innerHTML = '<i data-lucide="link" style="width:15px;height:15px;"></i>';
             btn.style.background = 'rgba(0,122,255,0.08)';
             btn.style.color = 'var(--blue)';
             lucide.createIcons();
@@ -818,11 +844,30 @@ window.addEventListener('DOMContentLoaded', () => {
     titol.addEventListener('blur',    syncTitol);
     titol.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); titol.blur(); } });
 
-    const consent = getCookie(COOKIE_CONSENT_KEY);
-    if (consent !== null) {
+    const urlParam = new URLSearchParams(location.search).get('d');
+    if (urlParam) {
+        try {
+            const d = JSON.parse(decodeURIComponent(escape(atob(urlParam))));
+            history.replaceState(null, '', location.pathname);
+            if (d.titol) document.getElementById('titolActivitat').innerText = d.titol;
+            if (d.alumnes) document.getElementById('numNinos').value = d.alumnes;
+            costs = []; revenues = []; payments = [];
+            document.getElementById('costsRows').innerHTML = '';
+            document.getElementById('revenuesRows').innerHTML = '';
+            document.getElementById('paymentsRows').innerHTML = '';
+            if (Array.isArray(d.costos))     d.costos.forEach(c => addCostRow(c, true));
+            if (Array.isArray(d.recaptacio)) d.recaptacio.forEach(r => addRevenueRow(r, true));
+            if (Array.isArray(d.pagaments))  d.pagaments.forEach(p => addPaymentRow(p, true));
+        } catch(_) {}
         hideCookieBanner();
         showCookieSettingsBtn();
-        if (consent === 'yes') loadSavedValues();
+    } else {
+        const consent = getCookie(COOKIE_CONSENT_KEY);
+        if (consent !== null) {
+            hideCookieBanner();
+            showCookieSettingsBtn();
+            if (consent === 'yes') loadSavedValues();
+        }
     }
 
     updateAll();
