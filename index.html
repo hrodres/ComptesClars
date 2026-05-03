@@ -119,9 +119,12 @@
         <section>
             <div class="section-header">
                 <p class="section-label">Participants</p>
-                <button class="btn-section-add" onclick="addParticipantRow()" aria-label="Afegir participants">
-                    <i data-lucide="plus" style="width:14px;height:14px;"></i>
-                </button>
+                <div style="display:flex;align-items:center;gap:6px;">
+                    <span class="badge">per projecte</span>
+                    <button class="btn-section-add" onclick="addParticipantRow()" aria-label="Afegir participants">
+                        <i data-lucide="plus" style="width:14px;height:14px;"></i>
+                    </button>
+                </div>
             </div>
             <div class="card">
                 <div id="participantsRows"></div>
@@ -141,13 +144,13 @@
         <!-- PAGAMENTS -->
         <section>
             <div class="section-header">
-                <div style="display:flex;align-items:center;gap:8px;">
-                    <p class="section-label">Quotes</p>
+                <p class="section-label">Quotes</p>
+                <div style="display:flex;align-items:center;gap:6px;">
                     <span class="badge">per participant</span>
+                    <button class="btn-section-add" onclick="addPaymentRow()" aria-label="Afegir pagament">
+                        <i data-lucide="plus" style="width:14px;height:14px;"></i>
+                    </button>
                 </div>
-                <button class="btn-section-add" onclick="addPaymentRow()" aria-label="Afegir pagament">
-                    <i data-lucide="plus" style="width:14px;height:14px;"></i>
-                </button>
             </div>
             <div class="card">
                 <div id="paymentsRows"></div>
@@ -179,9 +182,12 @@
         <section>
             <div class="section-header">
                 <p class="section-label">Recaptació</p>
-                <button class="btn-section-add" onclick="addRevenueRow()" aria-label="Afegir recaptació">
-                    <i data-lucide="plus" style="width:14px;height:14px;"></i>
-                </button>
+                <div style="display:flex;align-items:center;gap:6px;">
+                    <span class="badge">per projecte</span>
+                    <button class="btn-section-add" onclick="addRevenueRow()" aria-label="Afegir recaptació">
+                        <i data-lucide="plus" style="width:14px;height:14px;"></i>
+                    </button>
+                </div>
             </div>
             <div class="card">
                 <div id="revenuesRows"></div>
@@ -202,9 +208,12 @@
         <section>
             <div class="section-header">
                 <p class="section-label">Costos</p>
-                <button class="btn-section-add" onclick="addCostRow()" aria-label="Afegir cost">
-                    <i data-lucide="plus" style="width:14px;height:14px;"></i>
-                </button>
+                <div style="display:flex;align-items:center;gap:6px;">
+                    <span class="badge">per projecte</span>
+                    <button class="btn-section-add" onclick="addCostRow()" aria-label="Afegir cost">
+                        <i data-lucide="plus" style="width:14px;height:14px;"></i>
+                    </button>
+                </div>
             </div>
             <div class="card">
                 <div id="costsRows"></div>
