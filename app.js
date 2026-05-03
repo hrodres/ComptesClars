@@ -786,12 +786,12 @@ function copiarResum() {
         lines.push('📅 *Pagaments planificats:*');
         payments.forEach(p => lines.push(`▸ ${p.name || 'Pagament'}: ${fmt(p.amount)} €`));
         if (pendentEfectiu > 0) lines.push(`▸ Pendent: ${fmt(pendentEfectiu)} €`);
-        lines.push(`Total per participant: ${fmt(pagat)} €`);
-        if (n > 1) lines.push(`Total projecte: ${fmt(pagat * n)} €`);
         if (excesPayment > 0) {
             lines.push(`▸ A favor per participant: ${fmt(excesPayment)} €`);
             lines.push(`▸ A favor del projecte: ${fmt(excesPayment * n)} €`);
         }
+        lines.push(`Total per participant: ${fmt(pagat)} €`);
+        if (n > 1) lines.push(`Total projecte: ${fmt(pagat * n)} €`);
     }
 
     // Recaptació (només si hi ha conceptes amb nom)
