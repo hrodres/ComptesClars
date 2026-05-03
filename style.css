@@ -266,7 +266,7 @@ body {
 #titolActivitat:hover { background: rgba(0,0,0,0.04); }
 #titolActivitat:focus { background: rgba(0,122,255,0.06); box-shadow: 0 0 0 3px rgba(0,122,255,0.18); }
 #titolActivitat:empty::before {
-    content: "Nom de l'activitat";
+    content: "Nom del projecte";
     color: rgba(28,28,30,0.25); pointer-events: none;
 }
 
