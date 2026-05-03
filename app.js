@@ -664,7 +664,9 @@ function updateAll() {
     const net            = (total - rec) / n;
     const pagat          = getPaymentTotal();
     const netEfectiu     = Math.max(0, net);
-    const excesPayment   = pagat > 0 ? Math.max(0, pagat - netEfectiu) : 0;
+    const surplusRec     = Math.max(0, -net);
+    const surplusPag     = pagat > 0 ? Math.max(0, pagat - netEfectiu) : 0;
+    const totalSurplus   = surplusRec + surplusPag;
     const pendentEfectiu = Math.max(0, netEfectiu - pagat);
 
     document.getElementById('totalParticipants').textContent = fmt(getParticipantTotal(), 0);
@@ -703,13 +705,13 @@ function updateAll() {
         document.getElementById('heroPagat').textContent      = fmt(pagat) + ' €';
         document.getElementById('heroPendentLeg').textContent = fmt(pendentEfectiu) + ' €';
         heroAPagarEuro.style.visibility  = 'visible';
-        const isSurplus    = excesPayment > 0;
-        const pendentColor = pendentEfectiu > 0 ? 'var(--text-secondary)' : 'var(--green)';
+        const isSurplus = totalSurplus > 0;
+        const heroColor = (isSurplus || pendentEfectiu === 0) ? 'var(--green)' : 'var(--text-secondary)';
         document.getElementById('heroPendentLabel').textContent = isSurplus ? 'A favor' : 'Pendent';
-        heroPendentEl.textContent        = fmt(isSurplus ? excesPayment : pendentEfectiu);
-        heroPendentEl.style.color        = pendentColor;
+        heroPendentEl.textContent        = fmt(isSurplus ? totalSurplus : pendentEfectiu);
+        heroPendentEl.style.color        = heroColor;
         heroPendentEuro.style.visibility = 'visible';
-        heroPendentEuro.style.color      = pendentColor;
+        heroPendentEuro.style.color      = heroColor;
         document.getElementById('heroPlanificat').textContent = fmt(pagat) + ' €';
     }
 
@@ -717,10 +719,27 @@ function updateAll() {
     updateHeroBar(total, rec, pagat, n);
 
     const aviso = document.getElementById('avisoExcedente');
-    if (excesPayment > 0) {
+    if (totalSurplus > 0) {
         aviso.classList.add('show');
-        document.getElementById('excedentPerFamilia').textContent = fmt(excesPayment) + ' €';
-        document.getElementById('excedentProjecte').textContent   = fmt(excesPayment * n) + ' €';
+        const bothSurplus = surplusRec > 0 && surplusPag > 0;
+        let html;
+        if (bothSurplus) {
+            html = `<p class="alert-title">Costos coberts i pagaments a favor 🎉</p>` +
+                   `<p class="alert-body">Superàvit de recaptació per participant: <strong>${fmt(surplusRec)} €</strong></p>` +
+                   `<p class="alert-body">Pagament a favor per participant: <strong>${fmt(surplusPag)} €</strong></p>` +
+                   `<p class="alert-body">Total a favor per participant: <strong>${fmt(totalSurplus)} €</strong></p>` +
+                   `<p class="alert-body">Total a favor del projecte: <strong>${fmt(totalSurplus * n)} €</strong></p>`;
+        } else if (surplusRec > 0) {
+            html = `<p class="alert-title">La recaptació supera els costos 🎉</p>` +
+                   `<p class="alert-body">Superàvit de recaptació per participant: <strong>${fmt(surplusRec)} €</strong></p>` +
+                   `<p class="alert-body">Superàvit de recaptació del projecte: <strong>${fmt(surplusRec * n)} €</strong></p>`;
+        } else {
+            html = `<p class="alert-title">Pagaments coberts 🎉</p>` +
+                   `<p class="alert-body">Els pagaments planificats cobreixen el cost.</p>` +
+                   `<p class="alert-body">A favor per participant: <strong>${fmt(surplusPag)} €</strong></p>` +
+                   `<p class="alert-body">A favor del projecte: <strong>${fmt(surplusPag * n)} €</strong></p>`;
+        }
+        document.getElementById('avisoContent').innerHTML = html;
     } else {
         aviso.classList.remove('show');
     }
@@ -755,7 +774,9 @@ function copiarResum() {
     const net            = (total - rec) / n;
     const pagat          = getPaymentTotal();
     const netEfectiu     = Math.max(0, net);
-    const excesPayment   = pagat > 0 ? Math.max(0, pagat - netEfectiu) : 0;
+    const surplusRec     = Math.max(0, -net);
+    const surplusPag     = pagat > 0 ? Math.max(0, pagat - netEfectiu) : 0;
+    const totalSurplus   = surplusRec + surplusPag;
     const pendentEfectiu = Math.max(0, netEfectiu - pagat);
 
     const lines = [];
@@ -779,6 +800,7 @@ function copiarResum() {
     lines.push(`💶 *A pagar per participant: ${fmt(netEfectiu)} €*`);
     if (total > 0) lines.push(`▸ Cost real: ${fmt(total / n)} €`);
     if (rec > 0)   lines.push(`▸ Recaptació: ${fmt(rec / n)} €`);
+    if (surplusRec > 0 && pagat === 0) lines.push(`▸ Superàvit de recaptació: ${fmt(surplusRec)} €`);
     lines.push('');
 
     // Pagaments
@@ -786,9 +808,14 @@ function copiarResum() {
         lines.push('📅 *Pagaments planificats:*');
         payments.forEach(p => lines.push(`▸ ${p.name || 'Pagament'}: ${fmt(p.amount)} €`));
         if (pendentEfectiu > 0) lines.push(`▸ Pendent: ${fmt(pendentEfectiu)} €`);
-        if (excesPayment > 0) {
-            lines.push(`▸ A favor per participant: ${fmt(excesPayment)} €`);
-            lines.push(`▸ A favor del projecte: ${fmt(excesPayment * n)} €`);
+        if (surplusRec > 0 && surplusPag > 0) {
+            lines.push(`▸ Superàvit de recaptació: ${fmt(surplusRec)} €`);
+            lines.push(`▸ Pagament a favor: ${fmt(surplusPag)} €`);
+            lines.push(`▸ Total a favor per participant: ${fmt(totalSurplus)} €`);
+            lines.push(`▸ Total a favor del projecte: ${fmt(totalSurplus * n)} €`);
+        } else if (totalSurplus > 0) {
+            lines.push(`▸ A favor per participant: ${fmt(totalSurplus)} €`);
+            lines.push(`▸ A favor del projecte: ${fmt(totalSurplus * n)} €`);
         }
         lines.push(`Total per participant: ${fmt(pagat)} €`);
         if (n > 1) lines.push(`Total projecte: ${fmt(pagat * n)} €`);
