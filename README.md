@@ -13,8 +13,8 @@ Eina web per calcular i repartir els costos d'una activitat col·lectiva entre e
 - **Participants** — un o més grups amb nom i nombre (ex: Adults, Nens, Professors)
 - **Costos** — conceptes amb icona, import i distribució visual proporcional
 - **Recaptació** — ingressos i despeses per concepte, amb resultat net per fila
-- **Pagaments** — planificació per participant, amb total de projecte calculat automàticament
-- **Hero** — preu per participant, pendent, planificat i estalvi d'un cop d'ull
+- **Pagaments** — planificació per participant, saldo a favor desglossat per origen (recaptació / pagaments)
+- **Hero** — preu per participant, saldo pendent o a favor, planificat i estalvi d'un cop d'ull
 - **Compartir** — URL comprimit amb totes les dades per enviar per WhatsApp o email
 - **Exportar / Importar** — fitxer `.json` amb nom normalitzat i timestamp automàtics
 - **Desfer** — eliminacions i reinici desables durant 5 segons
