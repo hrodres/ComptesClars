@@ -134,6 +134,33 @@ body {
     user-select: none;
 }
 
+/* === SEGMENTED TOGGLE === */
+.seg-toggle {
+    display: inline-flex;
+    background: rgba(0,0,0,0.06);
+    border-radius: 20px;
+    padding: 2px;
+    gap: 1px;
+    user-select: none;
+}
+.seg-opt {
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 2px 8px;
+    border-radius: 18px;
+    border: none;
+    background: transparent;
+    color: var(--text-secondary);
+    cursor: pointer;
+}
+.seg-opt.active {
+    background: #fff;
+    color: var(--blue);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+}
+
 /* === PROGRESS BAR === */
 .progress-bar {
     width: 100%; height: 8px;

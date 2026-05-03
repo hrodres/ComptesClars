@@ -460,22 +460,25 @@ function undoDelete() {
 // ============================================================
 // PAGAMENTS DINÀMICS
 // ============================================================
-function toggleQuotesMode() {
-    quotesMode = quotesMode === 'participant' ? 'projecte' : 'participant';
+function setQuotesMode(mode) {
+    if (quotesMode === mode) return;
+    quotesMode = mode;
     _applyQuotesModeToggleUI();
     rerenderPaymentRows();
     updateAll();
     saveValues();
 }
 
+function toggleQuotesMode() {
+    setQuotesMode(quotesMode === 'participant' ? 'projecte' : 'participant');
+}
+
 function _applyQuotesModeToggleUI() {
-    const toggle = document.getElementById('quotesModeToggle');
-    if (!toggle) return;
-    const isProj = quotesMode === 'projecte';
-    toggle.textContent = isProj ? 'Projecte' : 'Participant';
-    toggle.style.background    = isProj ? 'rgba(0,122,255,0.15)' : '';
-    toggle.style.color         = isProj ? 'var(--blue)' : '';
-    toggle.style.borderColor   = isProj ? 'rgba(0,122,255,0.3)' : '';
+    const btnP = document.getElementById('quotesModeBtn_participant');
+    const btnPr = document.getElementById('quotesModeBtn_projecte');
+    if (!btnP || !btnPr) return;
+    btnP.classList.toggle('active', quotesMode === 'participant');
+    btnPr.classList.toggle('active', quotesMode === 'projecte');
 }
 
 function getPaymentTotal() { return payments.reduce((s, p) => s + p.amount, 0); }

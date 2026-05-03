@@ -182,7 +182,10 @@
             <div class="section-header">
                 <p class="section-label">Quotes</p>
                 <div style="display:flex;align-items:center;gap:6px;">
-                    <button id="quotesModeToggle" class="badge" onclick="toggleQuotesMode()" style="cursor:pointer;">Participant</button>
+                    <div class="seg-toggle">
+                        <button id="quotesModeBtn_participant" class="seg-opt active" onclick="setQuotesMode('participant')">Participant</button>
+                        <button id="quotesModeBtn_projecte" class="seg-opt" onclick="setQuotesMode('projecte')">Projecte</button>
+                    </div>
                     <button class="btn-section-add" onclick="addPaymentRow()" aria-label="Afegir pagament">
                         <i data-lucide="plus" style="width:14px;height:14px;"></i>
                     </button>
