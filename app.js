@@ -563,6 +563,10 @@ function updateHeroBar(total, rec, pagat, pendent, n) {
     const bar    = document.getElementById('heroSegBar');
     const preuReal = total / n;
     if (preuReal <= 0) { bar.innerHTML = ''; return; }
+    if (rec >= total) {
+        bar.innerHTML = `<div class="dist-seg" style="width:100%;background:var(--green);"></div>`;
+        return;
+    }
     const pPagat   = Math.max(0, Math.min(100, pagat / preuReal * 100));
     const pPendent = Math.max(0, Math.min(100, Math.max(0, pendent) / preuReal * 100));
     const pEstalvi = Math.max(0, Math.min(100, (rec / n) / preuReal * 100));
