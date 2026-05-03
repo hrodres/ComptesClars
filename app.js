@@ -674,14 +674,6 @@ function updateAll() {
     document.getElementById('totalBrut').textContent         = fmt(total);
     document.getElementById('totalRecNet').textContent       = fmt(rec);
 
-    const totalPagatProjecteRow = document.getElementById('totalPagatProjecteRow');
-    if (n > 1 && pagat > 0) {
-        document.getElementById('totalPagatProjecte').textContent = fmt(pagat * n);
-        totalPagatProjecteRow.style.display = '';
-    } else {
-        totalPagatProjecteRow.style.display = 'none';
-    }
-
     const hasData = total > 0 || rec > 0;
     const heroAPagarEuro  = document.getElementById('heroAPagarEuro');
     const heroPendentEl   = document.getElementById('heroPendent');
@@ -714,6 +706,24 @@ function updateAll() {
         heroPendentEuro.style.color      = heroColor;
         document.getElementById('heroPlanificat').textContent = fmt(pagat) + ' €';
     }
+
+    // Hero projecte
+    document.getElementById('projCostos').textContent         = total > 0 ? fmt(total) : '—';
+    document.getElementById('projCostosEuro').style.visibility = total > 0 ? 'visible' : 'hidden';
+    document.getElementById('projRec').textContent            = rec > 0 ? fmt(rec) : '—';
+    document.getElementById('projRecEuro').style.visibility   = rec > 0 ? 'visible' : 'hidden';
+    document.getElementById('projQuotes').textContent         = pagat > 0 ? fmt(pagat * n) : '—';
+    document.getElementById('projQuotesEuro').style.visibility = pagat > 0 ? 'visible' : 'hidden';
+    const projSurplus = totalSurplus * n;
+    const projPendent = pendentEfectiu * n;
+    const projIsSurplus = projSurplus > 0;
+    const projColor = (projIsSurplus || projPendent === 0) && hasData ? 'var(--green)' : 'var(--text-secondary)';
+    document.getElementById('projSaldoLabel').textContent  = projIsSurplus ? 'A favor' : 'Pendent';
+    document.getElementById('projSaldoLabel').style.color  = projColor;
+    document.getElementById('projSaldo').textContent       = hasData ? fmt(projIsSurplus ? projSurplus : projPendent) : '—';
+    document.getElementById('projSaldo').style.color       = projColor;
+    document.getElementById('projSaldoEuro').style.visibility = hasData ? 'visible' : 'hidden';
+    document.getElementById('projSaldoEuro').style.color   = projColor;
 
     updateDistBar();
     updateHeroBar(total, rec, pagat, n);

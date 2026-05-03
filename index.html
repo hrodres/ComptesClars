@@ -7,7 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800;900&family=DM+Mono:wght@500&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css?v=71">
+    <link rel="stylesheet" href="style.css?v=72">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/lz-string@1.5.0/libs/lz-string.min.js"></script>
@@ -105,6 +105,42 @@
             <div id="avisoContent"></div>
         </div>
 
+        <!-- HERO PROJECTE -->
+        <section class="card" style="padding: 16px 22px;">
+            <div style="display:flex;align-items:center;gap:6px;margin-bottom:12px;">
+                <i data-lucide="layers" style="width:13px;height:13px;color:var(--text-secondary);"></i>
+                <span class="badge">Projecte</span>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:14px;">
+                <div>
+                    <p style="font-size:10px;font-weight:800;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:5px;">Costos</p>
+                    <div style="display:flex;align-items:baseline;gap:3px;">
+                        <span id="projCostos" style="font-family:'DM Mono',monospace;font-size:16px;font-weight:700;color:var(--red);">—</span>
+                        <span id="projCostosEuro" style="font-size:12px;font-weight:700;color:var(--red);visibility:hidden;">€</span>
+                    </div>
+                </div>
+                <div>
+                    <p style="font-size:10px;font-weight:800;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:5px;">Recaptació</p>
+                    <div style="display:flex;align-items:baseline;gap:3px;">
+                        <span id="projRec" style="font-family:'DM Mono',monospace;font-size:16px;font-weight:700;color:var(--green);">—</span>
+                        <span id="projRecEuro" style="font-size:12px;font-weight:700;color:var(--green);visibility:hidden;">€</span>
+                    </div>
+                </div>
+                <div>
+                    <p style="font-size:10px;font-weight:800;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:5px;">Quotes</p>
+                    <div style="display:flex;align-items:baseline;gap:3px;">
+                        <span id="projQuotes" style="font-family:'DM Mono',monospace;font-size:16px;font-weight:700;color:var(--blue);">—</span>
+                        <span id="projQuotesEuro" style="font-size:12px;font-weight:700;color:var(--blue);visibility:hidden;">€</span>
+                    </div>
+                </div>
+            </div>
+            <div style="border-top:0.5px solid var(--separator);padding-top:12px;display:flex;align-items:baseline;gap:8px;">
+                <p id="projSaldoLabel" style="font-size:10px;font-weight:800;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.08em;">Pendent</p>
+                <span id="projSaldo" style="font-family:'DM Mono',monospace;font-size:18px;font-weight:700;color:var(--text-secondary);">—</span>
+                <span id="projSaldoEuro" style="font-size:13px;font-weight:700;color:var(--text-secondary);visibility:hidden;">€</span>
+            </div>
+        </section>
+
         <!-- DISTRIBUCIÓ DE COSTOS -->
         <section class="card" style="padding: 18px 20px;">
             <div style="display:flex;align-items:center;gap:6px;margin-bottom:12px;">
@@ -162,16 +198,6 @@
                     <div class="field-wrap">
                         <span id="totalPagat" style="font-family:'DM Mono',monospace; font-size:16px; font-weight:700; color:var(--blue);">0,00</span>
                         <span class="euro" style="color:var(--blue);">€</span>
-                    </div>
-                </div>
-                <div id="totalPagatProjecteRow" class="input-row" style="display:none; background:rgba(0,122,255,0.03); border-top: 0.5px solid var(--separator);">
-                    <div class="row-label" style="font-size: 13px;">
-                        <i data-lucide="sigma" style="width:15px;height:15px;color:rgba(0,122,255,0.45);"></i>
-                        <span style="font-weight: 700; color:rgba(0,122,255,0.45);">Total planificat projecte</span>
-                    </div>
-                    <div class="field-wrap">
-                        <span id="totalPagatProjecte" style="font-family:'DM Mono',monospace; font-size:13px; font-weight:600; color:rgba(0,122,255,0.45);">0,00</span>
-                        <span class="euro" style="color:rgba(0,122,255,0.45);">€</span>
                     </div>
                 </div>
             </div>
@@ -265,6 +291,6 @@
 </div>
 
 
-<script src="app.js?v=71" defer></script>
+<script src="app.js?v=72" defer></script>
 </body>
 </html>
