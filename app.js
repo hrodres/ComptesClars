@@ -674,6 +674,14 @@ function updateAll() {
     document.getElementById('totalBrut').textContent         = fmt(total);
     document.getElementById('totalRecNet').textContent       = fmt(rec);
 
+    const totalPagatProjecteRow = document.getElementById('totalPagatProjecteRow');
+    if (n > 1 && pagat > 0) {
+        document.getElementById('totalPagatProjecte').textContent = fmt(pagat * n);
+        totalPagatProjecteRow.style.display = '';
+    } else {
+        totalPagatProjecteRow.style.display = 'none';
+    }
+
     const hasData = total > 0 || rec > 0;
     const heroAPagarEuro  = document.getElementById('heroAPagarEuro');
     const heroPendentEl   = document.getElementById('heroPendent');
