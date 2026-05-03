@@ -854,6 +854,20 @@ function copiarResum() {
         lines.push(`Total: ${fmt(total)} €`);
     }
 
+    // Resum projecte
+    if (total > 0 || rec > 0 || pagat > 0) {
+        const projSurplus = totalSurplus * n;
+        const projPendent = pendentEfectiu * n;
+        const projIsSurplus = projSurplus > 0;
+        lines.push('');
+        lines.push('🗂 *Projecte*');
+        if (total > 0)  lines.push(`▸ Costos: ${fmt(total)} €`);
+        if (rec > 0)    lines.push(`▸ Recaptació: ${fmt(rec)} €`);
+        if (pagat > 0)  lines.push(`▸ Quotes: ${fmt(pagat * n)} €`);
+        if (projIsSurplus) lines.push(`Saldo a favor: ${fmt(projSurplus)} €`);
+        else if (projPendent > 0) lines.push(`Pendent: ${fmt(projPendent)} €`);
+    }
+
     lines.push('');
     lines.push('—');
     lines.push('_ComptesClars_');
