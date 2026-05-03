@@ -707,10 +707,17 @@ function updateAll() {
     if (quotesMode === 'projecte') {
         document.getElementById('totalPagat').textContent = fmt(pagat * n);
         document.getElementById('totalQuotesLabel').textContent = 'Total quotes projecte';
-        totalPagatProjecteRow.style.display = 'none';
+        if (pagat > 0) {
+            document.getElementById('totalQuotesSecLabel').textContent = 'Total quotes per participant';
+            document.getElementById('totalPagatProjecte').textContent = fmt(pagat);
+            totalPagatProjecteRow.style.display = '';
+        } else {
+            totalPagatProjecteRow.style.display = 'none';
+        }
     } else {
         document.getElementById('totalQuotesLabel').textContent = 'Total quotes';
         if (n > 1 && pagat > 0) {
+            document.getElementById('totalQuotesSecLabel').textContent = 'Total quotes projecte';
             document.getElementById('totalPagatProjecte').textContent = fmt(pagat * n);
             totalPagatProjecteRow.style.display = '';
         } else {
