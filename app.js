@@ -699,7 +699,7 @@ function updateAll() {
     } else {
         document.getElementById('totalFinal').textContent     = fmt(Math.max(0, net));
         document.getElementById('preuReal').textContent       = fmt(total / n) + ' €';
-        document.getElementById('estalviTotal').textContent   = fmt(rec / n) + ' €';
+        document.getElementById('estalviTotal').textContent   = fmt(Math.min(rec / n, total / n)) + ' €';
         document.getElementById('heroPagat').textContent      = fmt(pagat) + ' €';
         document.getElementById('heroPendentLeg').textContent = fmt(pendentEfectiu) + ' €';
         heroAPagarEuro.style.visibility  = 'visible';
