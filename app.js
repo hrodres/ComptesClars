@@ -708,7 +708,7 @@ function updateAll() {
         document.getElementById('totalPagat').textContent = fmt(pagat * n);
         document.getElementById('totalQuotesLabel').textContent = 'Total quotes';
         if (pagat > 0) {
-            document.getElementById('totalQuotesSecLabel').textContent = 'Total quotes per participant';
+            document.getElementById('totalQuotesSecLabel').textContent = 'Total quotes participant';
             document.getElementById('totalPagatProjecte').textContent = fmt(pagat);
             totalPagatProjecteRow.style.display = '';
         } else {
