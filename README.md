@@ -19,7 +19,7 @@ Eina web per calcular i repartir els costos d'una activitat col·lectiva entre e
 - **Exportar / Importar** — fitxer `.json` amb nom normalitzat i timestamp automàtics
 - **Desfer** — eliminacions i reinici desables durant 5 segons
 - **Reordenar** — drag & drop a totes les seccions
-- **Cookies opcionals** — desa les dades al navegador (RGPD compliant, consentiment explícit)
+- **Emmagatzematge local** — dades guardades automàticament al navegador (localStorage, sense cookies, sense registre)
 - **Format català** — punt de milers i coma decimal (3.125,48 €)
 
 ---
@@ -84,9 +84,9 @@ Cada `git push` a `main` redesplega automàticament.
 
 ## Privacitat
 
-- Les dades s'emmagatzemen **únicament al navegador** de l'usuari (cookies first-party)
+- Les dades s'emmagatzemen **únicament al navegador** de l'usuari (localStorage)
+- No s'usen cookies de seguiment ni de sessió
 - No es transmeten dades a cap servidor extern
-- L'usuari pot declinar les cookies; en aquest cas les dades no es guarden mai
 - L'URL de compartició conté les dades codificades al propi URL, sense cap servidor intermediari
 
 ---

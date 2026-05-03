@@ -712,6 +712,7 @@ function updateAll() {
     if (pendent < 0) {
         aviso.classList.add('show');
         document.getElementById('excedentPerFamilia').textContent = fmt(Math.abs(pendent)) + ' €';
+        document.getElementById('excedentProjecte').textContent   = fmt(Math.abs(pendent) * n) + ' €';
     } else {
         aviso.classList.remove('show');
     }
