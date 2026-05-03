@@ -697,8 +697,10 @@ function updateAll() {
         document.getElementById('heroPagat').textContent      = fmt(pagat) + ' €';
         document.getElementById('heroPendentLeg').textContent = fmt(Math.max(0, pendent)) + ' €';
         heroAPagarEuro.style.visibility  = 'visible';
+        const isSurplus = pendent < 0 && net > 0;
         const pendentColor = (pendent <= 0 && net > 0) ? 'var(--green)' : 'var(--text-secondary)';
-        heroPendentEl.textContent        = fmt(Math.max(0, pendent));
+        document.getElementById('heroPendentLabel').textContent = isSurplus ? 'A favor' : 'Pendent';
+        heroPendentEl.textContent        = fmt(Math.abs(isSurplus ? pendent : Math.max(0, pendent)));
         heroPendentEl.style.color        = pendentColor;
         heroPendentEuro.style.visibility = 'visible';
         heroPendentEuro.style.color      = pendentColor;
@@ -746,7 +748,7 @@ function copiarResum() {
     const total   = getCostTotal();
     const net     = (total - rec) / n;
     const pagat   = getPaymentTotal();
-    const pendent = Math.max(0, net - pagat);
+    const pendent = net - pagat;
 
     const lines = [];
 
@@ -775,8 +777,13 @@ function copiarResum() {
     if (payments.length > 0) {
         lines.push('📅 *Pagaments planificats:*');
         payments.forEach(p => lines.push(`▸ ${p.name || 'Pagament'}: ${fmt(p.amount)} €`));
-        if (pendent > 0) lines.push(`▸ Pendent: ${fmt(pendent)} €`);
-        lines.push(`Total: ${fmt(net)} €`);
+        if (pendent > 0)  lines.push(`▸ Pendent: ${fmt(pendent)} €`);
+        lines.push(`Total per participant: ${fmt(pagat)} €`);
+        if (n > 1) lines.push(`Total projecte: ${fmt(pagat * n)} €`);
+        if (pendent < 0) {
+            lines.push(`▸ A favor per participant: ${fmt(Math.abs(pendent))} €`);
+            lines.push(`▸ A favor del projecte: ${fmt(Math.abs(pendent) * n)} €`);
+        }
     }
 
     // Recaptació (només si hi ha conceptes amb nom)
