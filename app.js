@@ -564,7 +564,16 @@ function updateHeroBar(total, rec, pagat, pendent, n) {
     const preuReal = total / n;
     if (preuReal <= 0) { bar.innerHTML = ''; return; }
     if (rec >= total) {
-        bar.innerHTML = `<div class="dist-seg" style="width:100%;background:var(--green);"></div>`;
+        if (pagat > 0) {
+            const base   = rec / n + pagat;
+            const pBlue  = pagat / base * 100;
+            const pGreen = (rec / n) / base * 100;
+            bar.innerHTML =
+                `<div class="dist-seg" style="width:${pBlue}%;background:var(--blue);"></div>` +
+                `<div class="dist-seg" style="width:${pGreen}%;background:var(--green);"></div>`;
+        } else {
+            bar.innerHTML = `<div class="dist-seg" style="width:100%;background:var(--green);"></div>`;
+        }
         return;
     }
     const pPagat   = Math.max(0, Math.min(100, pagat / preuReal * 100));
