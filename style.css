@@ -131,6 +131,7 @@ body {
     border-radius: 20px;
     background: rgba(0,0,0,0.06);
     color: var(--text-secondary);
+    user-select: none;
 }
 
 /* === PROGRESS BAR === */
