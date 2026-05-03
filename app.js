@@ -800,23 +800,28 @@ function copiarResum() {
     lines.push(`💶 *A pagar per participant: ${fmt(netEfectiu)} €*`);
     if (total > 0) lines.push(`▸ Cost real: ${fmt(total / n)} €`);
     if (rec > 0)   lines.push(`▸ Recaptació: ${fmt(rec / n)} €`);
-    if (surplusRec > 0 && pagat === 0) lines.push(`▸ Superàvit de recaptació: ${fmt(surplusRec)} €`);
     lines.push('');
+
+    // Saldo a favor
+    if (totalSurplus > 0) {
+        const bothSurplus = surplusRec > 0 && surplusPag > 0;
+        if (bothSurplus) {
+            lines.push(`💚 *Saldo a favor: ${fmt(totalSurplus)} € per participant*`);
+            lines.push(`▸ De recaptació: ${fmt(surplusRec)} €`);
+            lines.push(`▸ De pagaments: ${fmt(surplusPag)} €`);
+            if (n > 1) lines.push(`Total a favor del projecte: ${fmt(totalSurplus * n)} €`);
+        } else {
+            const label = n > 1 ? `${fmt(totalSurplus)} € per participant (${fmt(totalSurplus * n)} € projecte)` : `${fmt(totalSurplus)} €`;
+            lines.push(`💚 *Saldo a favor: ${label}*`);
+        }
+        lines.push('');
+    }
 
     // Pagaments
     if (payments.length > 0) {
         lines.push('📅 *Pagaments planificats:*');
         payments.forEach(p => lines.push(`▸ ${p.name || 'Pagament'}: ${fmt(p.amount)} €`));
         if (pendentEfectiu > 0) lines.push(`▸ Pendent: ${fmt(pendentEfectiu)} €`);
-        if (surplusRec > 0 && surplusPag > 0) {
-            lines.push(`▸ Superàvit de recaptació: ${fmt(surplusRec)} €`);
-            lines.push(`▸ Pagament a favor: ${fmt(surplusPag)} €`);
-            lines.push(`▸ Total a favor per participant: ${fmt(totalSurplus)} €`);
-            lines.push(`▸ Total a favor del projecte: ${fmt(totalSurplus * n)} €`);
-        } else if (totalSurplus > 0) {
-            lines.push(`▸ A favor per participant: ${fmt(totalSurplus)} €`);
-            lines.push(`▸ A favor del projecte: ${fmt(totalSurplus * n)} €`);
-        }
         lines.push(`Total per participant: ${fmt(pagat)} €`);
         if (n > 1) lines.push(`Total projecte: ${fmt(pagat * n)} €`);
     }
