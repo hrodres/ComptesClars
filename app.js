@@ -472,7 +472,7 @@ function _applyQuotesModeToggleUI() {
     const toggle = document.getElementById('quotesModeToggle');
     if (!toggle) return;
     const isProj = quotesMode === 'projecte';
-    toggle.textContent = isProj ? 'per projecte' : 'per participant';
+    toggle.textContent = isProj ? 'Projecte' : 'Participant';
     toggle.style.background    = isProj ? 'rgba(0,122,255,0.15)' : '';
     toggle.style.color         = isProj ? 'var(--blue)' : '';
     toggle.style.borderColor   = isProj ? 'rgba(0,122,255,0.3)' : '';
