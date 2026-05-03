@@ -819,7 +819,7 @@ function copiarResum() {
 
     // Pagaments
     if (payments.length > 0) {
-        lines.push('📅 *Pagaments planificats:*');
+        lines.push('📅 *Quotes:*');
         payments.forEach(p => lines.push(`▸ ${p.name || 'Pagament'}: ${fmt(p.amount)} €`));
         if (pendentEfectiu > 0) lines.push(`▸ Pendent: ${fmt(pendentEfectiu)} €`);
         lines.push(`Total per participant: ${fmt(pagat)} €`);
