@@ -559,30 +559,21 @@ function updateDistBar() {
     }
 }
 
-function updateHeroBar(total, rec, pagat, pendent, n) {
-    const bar    = document.getElementById('heroSegBar');
+function updateHeroBar(total, rec, pagat, n) {
+    const bar      = document.getElementById('heroSegBar');
     const preuReal = total / n;
     if (preuReal <= 0) { bar.innerHTML = ''; return; }
-    if (rec >= total) {
-        if (pagat > 0) {
-            const base   = rec / n + pagat;
-            const pBlue  = pagat / base * 100;
-            const pGreen = (rec / n) / base * 100;
-            bar.innerHTML =
-                `<div class="dist-seg" style="width:${pBlue}%;background:var(--blue);"></div>` +
-                `<div class="dist-seg" style="width:${pGreen}%;background:var(--green);"></div>`;
-        } else {
-            bar.innerHTML = `<div class="dist-seg" style="width:100%;background:var(--green);"></div>`;
-        }
-        return;
-    }
-    const pPagat   = Math.max(0, Math.min(100, pagat / preuReal * 100));
-    const pPendent = Math.max(0, Math.min(100, Math.max(0, pendent) / preuReal * 100));
-    const pEstalvi = Math.max(0, Math.min(100, (rec / n) / preuReal * 100));
+    const recCov   = Math.min(rec / n, preuReal);
+    const afterRec = Math.max(0, preuReal - recCov);
+    const pagatCov = Math.min(pagat, afterRec);
+    const pendCov  = afterRec - pagatCov;
+    const pBlue  = pagatCov / preuReal * 100;
+    const pGrey  = pendCov  / preuReal * 100;
+    const pGreen = recCov   / preuReal * 100;
     bar.innerHTML =
-        `<div class="dist-seg" style="width:${pPagat}%;background:var(--blue);"></div>` +
-        `<div class="dist-seg" style="width:${pPendent}%;background:repeating-linear-gradient(45deg,var(--text-secondary),var(--text-secondary) 3px,#fff 3px,#fff 7px);"></div>` +
-        `<div class="dist-seg" style="width:${pEstalvi}%;background:var(--green);"></div>`;
+        `<div class="dist-seg" style="width:${pBlue}%;background:var(--blue);"></div>` +
+        `<div class="dist-seg" style="width:${pGrey}%;background:repeating-linear-gradient(45deg,var(--text-secondary),var(--text-secondary) 3px,#fff 3px,#fff 7px);"></div>` +
+        `<div class="dist-seg" style="width:${pGreen}%;background:var(--green);"></div>`;
 }
 
 // ============================================================
@@ -670,9 +661,11 @@ function updateAll() {
     const n        = Math.max(1, getParticipantTotal());
     const rec      = getRevenueNetTotal();
     const total    = getCostTotal();
-    const net      = (total - rec) / n;
-    const pagat    = getPaymentTotal();
-    const pendent  = net - pagat;
+    const net            = (total - rec) / n;
+    const pagat          = getPaymentTotal();
+    const netEfectiu     = Math.max(0, net);
+    const excesPayment   = pagat > 0 ? Math.max(0, pagat - netEfectiu) : 0;
+    const pendentEfectiu = Math.max(0, netEfectiu - pagat);
 
     document.getElementById('totalParticipants').textContent = fmt(getParticipantTotal(), 0);
     document.getElementById('totalPagat').textContent        = fmt(pagat);
@@ -708,12 +701,12 @@ function updateAll() {
         document.getElementById('preuReal').textContent       = fmt(total / n) + ' €';
         document.getElementById('estalviTotal').textContent   = fmt(rec / n) + ' €';
         document.getElementById('heroPagat').textContent      = fmt(pagat) + ' €';
-        document.getElementById('heroPendentLeg').textContent = fmt(Math.max(0, pendent)) + ' €';
+        document.getElementById('heroPendentLeg').textContent = fmt(pendentEfectiu) + ' €';
         heroAPagarEuro.style.visibility  = 'visible';
-        const isSurplus = pendent < 0 && net > 0;
-        const pendentColor = (pendent <= 0 && net > 0) ? 'var(--green)' : 'var(--text-secondary)';
+        const isSurplus    = excesPayment > 0;
+        const pendentColor = pendentEfectiu > 0 ? 'var(--text-secondary)' : 'var(--green)';
         document.getElementById('heroPendentLabel').textContent = isSurplus ? 'A favor' : 'Pendent';
-        heroPendentEl.textContent        = fmt(Math.abs(isSurplus ? pendent : Math.max(0, pendent)));
+        heroPendentEl.textContent        = fmt(isSurplus ? excesPayment : pendentEfectiu);
         heroPendentEl.style.color        = pendentColor;
         heroPendentEuro.style.visibility = 'visible';
         heroPendentEuro.style.color      = pendentColor;
@@ -721,13 +714,13 @@ function updateAll() {
     }
 
     updateDistBar();
-    updateHeroBar(total, rec, pagat, pendent, n);
+    updateHeroBar(total, rec, pagat, n);
 
     const aviso = document.getElementById('avisoExcedente');
-    if (pendent < 0) {
+    if (excesPayment > 0) {
         aviso.classList.add('show');
-        document.getElementById('excedentPerFamilia').textContent = fmt(Math.abs(pendent)) + ' €';
-        document.getElementById('excedentProjecte').textContent   = fmt(Math.abs(pendent) * n) + ' €';
+        document.getElementById('excedentPerFamilia').textContent = fmt(excesPayment) + ' €';
+        document.getElementById('excedentProjecte').textContent   = fmt(excesPayment * n) + ' €';
     } else {
         aviso.classList.remove('show');
     }
@@ -759,9 +752,11 @@ function copiarResum() {
     const n       = Math.max(1, getParticipantTotal());
     const rec     = getRevenueNetTotal();
     const total   = getCostTotal();
-    const net     = (total - rec) / n;
-    const pagat   = getPaymentTotal();
-    const pendent = net - pagat;
+    const net            = (total - rec) / n;
+    const pagat          = getPaymentTotal();
+    const netEfectiu     = Math.max(0, net);
+    const excesPayment   = pagat > 0 ? Math.max(0, pagat - netEfectiu) : 0;
+    const pendentEfectiu = Math.max(0, netEfectiu - pagat);
 
     const lines = [];
 
@@ -781,7 +776,7 @@ function copiarResum() {
     lines.push('');
 
     // Preu principal
-    lines.push(`💶 *A pagar per participant: ${fmt(net)} €*`);
+    lines.push(`💶 *A pagar per participant: ${fmt(netEfectiu)} €*`);
     if (total > 0) lines.push(`▸ Cost real: ${fmt(total / n)} €`);
     if (rec > 0)   lines.push(`▸ Recaptació: ${fmt(rec / n)} €`);
     lines.push('');
@@ -790,12 +785,12 @@ function copiarResum() {
     if (payments.length > 0) {
         lines.push('📅 *Pagaments planificats:*');
         payments.forEach(p => lines.push(`▸ ${p.name || 'Pagament'}: ${fmt(p.amount)} €`));
-        if (pendent > 0)  lines.push(`▸ Pendent: ${fmt(pendent)} €`);
+        if (pendentEfectiu > 0) lines.push(`▸ Pendent: ${fmt(pendentEfectiu)} €`);
         lines.push(`Total per participant: ${fmt(pagat)} €`);
         if (n > 1) lines.push(`Total projecte: ${fmt(pagat * n)} €`);
-        if (pendent < 0) {
-            lines.push(`▸ A favor per participant: ${fmt(Math.abs(pendent))} €`);
-            lines.push(`▸ A favor del projecte: ${fmt(Math.abs(pendent) * n)} €`);
+        if (excesPayment > 0) {
+            lines.push(`▸ A favor per participant: ${fmt(excesPayment)} €`);
+            lines.push(`▸ A favor del projecte: ${fmt(excesPayment * n)} €`);
         }
     }
 
