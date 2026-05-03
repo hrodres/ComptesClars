@@ -37,6 +37,7 @@ const COST_COLORS = ['#FF9500','#AF52DE','#007AFF','#FF3B30','#34C759','#FF6B35'
 /** @type {Revenue[]}     */ let revenues     = [];
 /** @type {Payment[]}     */ let payments     = [];
 /** @type {Participant[]} */ let participants = [];
+let quotesMode     = 'participant';
 let pickerTarget   = null;
 let _deletedEntry  = null;
 let _resetSnapshot = null;
@@ -433,6 +434,7 @@ function undoDelete() {
         const d = _resetSnapshot; _resetSnapshot = null;
         document.getElementById('titolActivitat').innerText = d.titol;
         document.title = d.titol ? d.titol + ' · ComptesClars' : 'ComptesClars';
+        quotesMode = d.quotesMode || 'participant'; _applyQuotesModeToggleUI();
         costs = []; revenues = []; payments = []; participants = [];
         document.getElementById('costsRows').innerHTML        = '';
         document.getElementById('revenuesRows').innerHTML     = '';
@@ -458,6 +460,24 @@ function undoDelete() {
 // ============================================================
 // PAGAMENTS DINÀMICS
 // ============================================================
+function toggleQuotesMode() {
+    quotesMode = quotesMode === 'participant' ? 'projecte' : 'participant';
+    _applyQuotesModeToggleUI();
+    rerenderPaymentRows();
+    updateAll();
+    saveValues();
+}
+
+function _applyQuotesModeToggleUI() {
+    const toggle = document.getElementById('quotesModeToggle');
+    if (!toggle) return;
+    const isProj = quotesMode === 'projecte';
+    toggle.textContent = isProj ? 'per projecte' : 'per participant';
+    toggle.style.background    = isProj ? 'rgba(0,122,255,0.15)' : '';
+    toggle.style.color         = isProj ? 'var(--blue)' : '';
+    toggle.style.borderColor   = isProj ? 'rgba(0,122,255,0.3)' : '';
+}
+
 function getPaymentTotal() { return payments.reduce((s, p) => s + p.amount, 0); }
 
 function addPaymentRow(data = {}, skipUpdate = false) {
@@ -491,7 +511,12 @@ function updatePaymentName(id, value) {
 
 function updatePaymentAmount(id, rawValue) {
     const item = payments.find(p => p.id === id);
-    if (item) { item.amount = parseInput(rawValue); updateAll(); }
+    if (item) {
+        const n = Math.max(1, getParticipantTotal());
+        const raw = parseInput(rawValue);
+        item.amount = quotesMode === 'projecte' ? raw / n : raw;
+        updateAll();
+    }
 }
 
 function blurPaymentAmount(input, id) {
@@ -505,6 +530,8 @@ function rerenderPaymentRows() {
 }
 
 function renderPaymentRow(item) {
+    const n = Math.max(1, getParticipantTotal());
+    const displayAmount = quotesMode === 'projecte' ? item.amount * n : item.amount;
     const div = document.createElement('div');
     div.className = 'input-row payment-row';
     div.dataset.payId = item.id;
@@ -519,7 +546,7 @@ function renderPaymentRow(item) {
                aria-label="Nom del pagament">
         <div class="field-wrap">
             <input type="text" class="num-input blue" placeholder="0,00"
-                   value="${item.amount ? fmt(item.amount,2) : ''}"
+                   value="${displayAmount ? fmt(displayAmount,2) : ''}"
                    inputmode="decimal" aria-label="Import"
                    onfocus="focusField(this)"
                    oninput="updatePaymentAmount('${item.id}',this.value)"
@@ -629,6 +656,7 @@ const STORAGE_KEY = 'comptesclars_data';
 function saveValues() {
     const data = {
         _titol:        (document.getElementById('titolActivitat').innerText || '').trim(),
+        _quotesMode:   quotesMode,
         _participants: participants.map(p => ({ icon: p.icon, name: p.name, count: p.count })),
         _costs:        costs.map(c => ({ icon: c.icon, name: c.name, amount: c.amount })),
         _revenues:     revenues.map(r => ({ icon: r.icon, name: r.name, income: r.income, expense: r.expense })),
@@ -643,6 +671,7 @@ function loadSavedValues() {
     try {
         const d = JSON.parse(raw);
         if (d._titol) { document.getElementById('titolActivitat').textContent = d._titol; document.title = d._titol + ' - ComptesClars'; }
+        if (d._quotesMode) { quotesMode = d._quotesMode; _applyQuotesModeToggleUI(); }
         if (Array.isArray(d._participants) && d._participants.length > 0) {
             document.getElementById('participantsRows').innerHTML = ''; participants = [];
             d._participants.forEach(p => addParticipantRow(p, true));
@@ -675,11 +704,18 @@ function updateAll() {
     document.getElementById('totalRecNet').textContent       = fmt(rec);
 
     const totalPagatProjecteRow = document.getElementById('totalPagatProjecteRow');
-    if (n > 1 && pagat > 0) {
-        document.getElementById('totalPagatProjecte').textContent = fmt(pagat * n);
-        totalPagatProjecteRow.style.display = '';
-    } else {
+    if (quotesMode === 'projecte') {
+        document.getElementById('totalPagat').textContent = fmt(pagat * n);
+        document.getElementById('totalQuotesLabel').textContent = 'Total quotes projecte';
         totalPagatProjecteRow.style.display = 'none';
+    } else {
+        document.getElementById('totalQuotesLabel').textContent = 'Total quotes';
+        if (n > 1 && pagat > 0) {
+            document.getElementById('totalPagatProjecte').textContent = fmt(pagat * n);
+            totalPagatProjecteRow.style.display = '';
+        } else {
+            totalPagatProjecteRow.style.display = 'none';
+        }
     }
 
     const hasData = total > 0 || rec > 0;
@@ -906,6 +942,7 @@ function compartirLink() {
         recaptacio: revenues.map(r => ({ icon: r.icon, name: r.name, income: r.income, expense: r.expense })),
         pagaments:  payments.map(p => ({ name: p.name, amount: p.amount }))
     };
+    if (quotesMode !== 'participant') data.quotesMode = quotesMode;
     const json = JSON.stringify(data);
     let encoded;
     try { encoded = LZString.compressToEncodedURIComponent(json); } catch(_) {}
@@ -992,6 +1029,8 @@ function importarDades(event) {
             document.getElementById('paymentsRows').innerHTML     = ''; payments     = [];
             document.getElementById('participantsRows').innerHTML = ''; participants = [];
             if (d.titol) { document.getElementById('titolActivitat').textContent = d.titol; document.title = d.titol + ' - ComptesClars'; }
+            if (d.quotesMode) { quotesMode = d.quotesMode; } else { quotesMode = 'participant'; }
+            _applyQuotesModeToggleUI();
             if (Array.isArray(d.participants) && d.participants.length > 0) {
                 d.participants.forEach(p => addParticipantRow(p, true));
             }
@@ -1015,6 +1054,7 @@ function confirmReset() {
     closeHeaderMenu();
     _resetSnapshot = {
         titol:        document.getElementById('titolActivitat').innerText,
+        quotesMode,
         participants: participants.map(p => ({ ...p })),
         costos:       costs.map(c => ({ ...c })),
         recaptacio:   revenues.map(r => ({ ...r })),
@@ -1022,6 +1062,7 @@ function confirmReset() {
     };
     document.getElementById('titolActivitat').textContent = '';
     document.title = 'ComptesClars';
+    quotesMode = 'participant'; _applyQuotesModeToggleUI();
     document.getElementById('participantsRows').innerHTML = ''; participants = [];
     document.getElementById('costsRows').innerHTML        = ''; costs        = [];
     document.getElementById('revenuesRows').innerHTML     = ''; revenues     = [];
@@ -1071,6 +1112,7 @@ window.addEventListener('DOMContentLoaded', () => {
             document.getElementById('paymentsRows').innerHTML     = '';
             document.getElementById('participantsRows').innerHTML = '';
             if (d.titol) document.getElementById('titolActivitat').innerText = d.titol;
+            if (d.quotesMode) { quotesMode = d.quotesMode; _applyQuotesModeToggleUI(); }
             if (Array.isArray(d.participants) && d.participants.length > 0) {
                 d.participants.forEach(p => addParticipantRow(p, true));
             }
