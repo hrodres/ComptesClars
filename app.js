@@ -1104,7 +1104,8 @@ window.addEventListener('DOMContentLoaded', () => {
     titol.addEventListener('blur',    syncTitol);
     titol.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); titol.blur(); } });
 
-    const urlParam = new URLSearchParams(location.search).get('d');
+    const _dMatch = location.search.match(/[?&]d=([^&]*)/);
+    const urlParam = _dMatch ? _dMatch[1] : null;
     if (urlParam) {
         let urlLoaded = false;
         try {
