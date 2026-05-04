@@ -869,15 +869,12 @@ function copiarResum() {
     // Saldo a favor
     if (totalSurplus > 0) {
         const bothSurplus = surplusRec > 0 && surplusPag > 0;
+        lines.push(`💚 *Saldo a favor: ${fmt(totalSurplus)} € per participant*`);
         if (bothSurplus) {
-            lines.push(`💚 *Saldo a favor: ${fmt(totalSurplus)} € per participant*`);
             lines.push(`▸ De recaptació: ${fmt(surplusRec)} €`);
             lines.push(`▸ De pagaments: ${fmt(surplusPag)} €`);
-            if (n > 1) lines.push(`Total a favor del projecte: ${fmt(totalSurplus * n)} €`);
-        } else {
-            const label = n > 1 ? `${fmt(totalSurplus)} € per participant (${fmt(totalSurplus * n)} € projecte)` : `${fmt(totalSurplus)} €`;
-            lines.push(`💚 *Saldo a favor: ${label}*`);
         }
+        if (n > 1) lines.push(`Total a favor del projecte: ${fmt(totalSurplus * n)} €`);
         lines.push('');
     }
 
