@@ -14,8 +14,8 @@ Eina web per calcular i repartir els costos d'una activitat col·lectiva entre e
 - **Costos** — conceptes amb icona, import i distribució visual proporcional
 - **Recaptació** — ingressos i despeses per concepte, amb resultat net per fila
 - **Quotes** — planificació amb toggle participant/projecte, saldo a favor desglossat per origen (recaptació / pagaments)
-- **Hero** — preu per participant, saldo pendent o a favor, planificat i estalvi d'un cop d'ull
-- **Compartir** — URL comprimit amb totes les dades per enviar per WhatsApp o email
+- **Hero** — preu per participant i totals del projecte, saldo pendent o a favor d'un cop d'ull
+- **Compartir** — URL curta (via Cloudflare KV, 30 dies) per enviar per WhatsApp, Telegram o email
 - **Exportar / Importar** — fitxer `.json` amb nom normalitzat i timestamp automàtics
 - **Desfer** — eliminacions i reinici desables durant 5 segons
 - **Reordenar** — drag & drop a totes les seccions
@@ -26,12 +26,10 @@ Eina web per calcular i repartir els costos d'una activitat col·lectiva entre e
 
 ## Ús
 
-És una web estàtica, no cal instal·lar res:
-
 1. Obre [comptesclars.pages.dev](https://comptesclars.pages.dev)
 2. Introdueix el nom de l'activitat, els participants, costos, recaptació i pagaments
 3. Els càlculs s'actualitzen en temps real
-4. Comparteix el resultat amb el botó d'enllaç o copia el resum formatat per WhatsApp
+4. Comparteix el resultat amb el botó d'enllaç (genera URL curta) o copia el resum formatat per WhatsApp
 
 ---
 
@@ -44,6 +42,7 @@ Eina web per calcular i repartir els costos d'una activitat col·lectiva entre e
 | Estils | [Tailwind CSS](https://tailwindcss.com/) (CDN) + CSS propi |
 | Tipografia | [DM Sans + DM Mono](https://fonts.google.com/) |
 | Compressió URL | [LZString](https://pieroxy.net/blog/pages/lz-string/index.html) |
+| URLs curtes | [Cloudflare Workers KV](https://developers.cloudflare.com/kv/) |
 | Desplegament | [Cloudflare Pages](https://pages.cloudflare.com/) |
 
 ---
@@ -52,18 +51,20 @@ Eina web per calcular i repartir els costos d'una activitat col·lectiva entre e
 
 ```
 ComptesClars/
-├── index.html      # Estructura HTML de l'app
-├── app.js          # Lògica, càlculs i gestió d'estat
-├── style.css       # Estils propis (variables, components, layout)
-├── _headers        # Capçaleres HTTP per Cloudflare Pages
-└── README.md       # Aquest fitxer
+├── index.html          # Estructura HTML de l'app
+├── app.js              # Lògica, càlculs i gestió d'estat
+├── style.css           # Estils propis (variables, components, layout)
+├── _headers            # Capçaleres HTTP per Cloudflare Pages
+├── functions/
+│   └── share/
+│       ├── index.js    # POST /share — desa dades al KV, retorna ID
+│       └── [id].js     # GET /share/:id — recupera dades del KV
+└── README.md           # Aquest fitxer
 ```
 
 ---
 
 ## Desplegament propi
-
-L'app és estàtica: cap backend, cap build step.
 
 ```bash
 git clone https://github.com/hrodres/ComptesClars.git
@@ -80,14 +81,24 @@ Per desplegar a **Cloudflare Pages**:
 
 Cada `git push` a `main` redesplega automàticament.
 
+### Configurar URLs curtes (Cloudflare KV)
+
+Per activar el botó de compartir amb URL curta:
+
+1. **Workers & Pages → KV** → crea un namespace anomenat `COMPTESCLARS_SHARE`
+2. **Workers & Pages → comptesclars → Settings → Functions → KV namespace bindings**
+   - Variable name: `SHARE_KV`
+   - KV namespace: `COMPTESCLARS_SHARE`
+
+Els enllaços caduquen als 30 dies. Les claus es poden consultar directament al dashboard de Cloudflare.
+
 ---
 
 ## Privacitat
 
 - Les dades s'emmagatzemen **únicament al navegador** de l'usuari (localStorage)
 - No s'usen cookies de seguiment ni de sessió
-- No es transmeten dades a cap servidor extern
-- L'URL de compartició conté les dades codificades al propi URL, sense cap servidor intermediari
+- Els enllaços de compartició emmagatzemen les dades temporalment a Cloudflare KV (30 dies), sense cap identificador d'usuari
 
 ---
 
