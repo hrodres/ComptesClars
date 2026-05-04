@@ -1179,7 +1179,6 @@ window.addEventListener('DOMContentLoaded', () => {
             .then(r => r.ok ? r.json() : Promise.reject(r.status))
             .then(d => {
                 _applySharedData(d);
-                history.replaceState(null, '', location.pathname);
                 saveValues();
                 updateAll();
             })
