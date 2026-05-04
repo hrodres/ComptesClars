@@ -995,7 +995,7 @@ async function compartirLinkCurt() {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data)
         });
-        if (!res.ok) throw new Error('Server error');
+        if (!res.ok) throw new Error('HTTP ' + res.status);
         const { id } = await res.json();
         const url = location.origin + location.pathname + '?s=' + id;
         await _copyToClipboard(url);
@@ -1011,7 +1011,7 @@ async function compartirLinkCurt() {
             lucide.createIcons();
         }, 2000);
     } catch (e) {
-        _showToast('✗ Error al crear l\'enllaç');
+        _showToast('✗ Error: ' + (e.message || 'desconegut'));
         btn.innerHTML = '<i data-lucide="link-2" style="width:15px;height:15px;"></i>';
         btn.style.background = 'rgba(0,0,0,0.05)';
         btn.style.color = 'var(--text-secondary)';
