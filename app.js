@@ -974,7 +974,7 @@ function compartirLink() {
 async function compartirLinkCurt() {
     if (!costs.length && !revenues.length && !payments.length && !participants.length) return;
     const btn = document.getElementById('btnCompartirLinkCurt');
-    btn.innerHTML = '<i data-lucide="loader" style="width:15px;height:15px;"></i>';
+    btn.innerHTML = '<i data-lucide="loader" style="width:15px;height:15px;"></i><span style="font-size:11px;font-weight:700;">Compartir</span>';
     btn.style.background = 'rgba(0,0,0,0.05)';
     btn.style.color = 'var(--text-secondary)';
     lucide.createIcons();
@@ -1000,19 +1000,20 @@ async function compartirLinkCurt() {
         const url = location.origin + location.pathname + '?s=' + id;
         await _copyToClipboard(url);
         _showToast('✓ Enllaç curt copiat');
-        btn.innerHTML = '<i data-lucide="check" style="width:15px;height:15px;"></i>';
+        const _btnNormal = '<i data-lucide="link-2" style="width:15px;height:15px;"></i><span style="font-size:11px;font-weight:700;">Compartir</span>';
+        btn.innerHTML = '<i data-lucide="check" style="width:15px;height:15px;"></i><span style="font-size:11px;font-weight:700;">Copiat</span>';
         btn.style.background = 'rgba(52,199,89,0.12)';
         btn.style.color = 'var(--green)';
         lucide.createIcons();
         setTimeout(() => {
-            btn.innerHTML = '<i data-lucide="link-2" style="width:15px;height:15px;"></i>';
+            btn.innerHTML = _btnNormal;
             btn.style.background = 'rgba(0,0,0,0.05)';
             btn.style.color = 'var(--text-secondary)';
             lucide.createIcons();
         }, 2000);
     } catch (e) {
         _showToast('✗ Error: ' + (e.message || 'desconegut'));
-        btn.innerHTML = '<i data-lucide="link-2" style="width:15px;height:15px;"></i>';
+        btn.innerHTML = '<i data-lucide="link-2" style="width:15px;height:15px;"></i><span style="font-size:11px;font-weight:700;">Compartir</span>';
         btn.style.background = 'rgba(0,0,0,0.05)';
         btn.style.color = 'var(--text-secondary)';
         lucide.createIcons();
