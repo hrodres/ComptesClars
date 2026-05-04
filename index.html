@@ -7,7 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800;900&family=DM+Mono:wght@500&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css?v=72">
+    <link rel="stylesheet" href="style.css?v=73">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/lz-string@1.5.0/libs/lz-string.min.js"></script>
@@ -62,6 +62,12 @@
                            cursor:pointer;display:flex;align-items:center;justify-content:center;
                            color:var(--text-secondary);transition:background 0.15s,color 0.15s;padding:0;flex-shrink:0;">
                     <i data-lucide="link" style="width:15px;height:15px;"></i>
+                </button>
+                <button id="btnCompartirLinkCurt" onclick="compartirLinkCurt()" aria-label="Compartir enllaç curt"
+                    style="width:30px;height:30px;border:none;background:rgba(0,0,0,0.05);border-radius:8px;
+                           cursor:pointer;display:flex;align-items:center;justify-content:center;
+                           color:var(--text-secondary);transition:background 0.15s,color 0.15s;padding:0;flex-shrink:0;">
+                    <i data-lucide="link-2" style="width:15px;height:15px;"></i>
                 </button>
                 </div>
             </div>
@@ -307,6 +313,6 @@
 </div>
 
 
-<script src="app.js?v=72" defer></script>
+<script src="app.js?v=73" defer></script>
 </body>
 </html>

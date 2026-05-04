@@ -971,6 +971,54 @@ function compartirLink() {
     });
 }
 
+async function compartirLinkCurt() {
+    if (!costs.length && !revenues.length && !payments.length && !participants.length) return;
+    const btn = document.getElementById('btnCompartirLinkCurt');
+    btn.innerHTML = '<i data-lucide="loader" style="width:15px;height:15px;"></i>';
+    btn.style.background = 'rgba(0,0,0,0.05)';
+    btn.style.color = 'var(--text-secondary)';
+    lucide.createIcons();
+
+    try {
+        const titol = (document.getElementById('titolActivitat').innerText || '').trim();
+        const data = {
+            titol,
+            participants: participants.map(p => ({ icon: p.icon, name: p.name, count: p.count })),
+            costos:     costs.map(c => ({ icon: c.icon, name: c.name, amount: c.amount })),
+            recaptacio: revenues.map(r => ({ icon: r.icon, name: r.name, income: r.income, expense: r.expense })),
+            pagaments:  payments.map(p => ({ name: p.name, amount: p.amount }))
+        };
+        if (quotesMode !== 'participant') data.quotesMode = quotesMode;
+
+        const res = await fetch('/share', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+        if (!res.ok) throw new Error('Server error');
+        const { id } = await res.json();
+        const url = location.origin + location.pathname + '?s=' + id;
+        await _copyToClipboard(url);
+        _showToast('✓ Enllaç curt copiat');
+        btn.innerHTML = '<i data-lucide="check" style="width:15px;height:15px;"></i>';
+        btn.style.background = 'rgba(52,199,89,0.12)';
+        btn.style.color = 'var(--green)';
+        lucide.createIcons();
+        setTimeout(() => {
+            btn.innerHTML = '<i data-lucide="link-2" style="width:15px;height:15px;"></i>';
+            btn.style.background = 'rgba(0,0,0,0.05)';
+            btn.style.color = 'var(--text-secondary)';
+            lucide.createIcons();
+        }, 2000);
+    } catch (e) {
+        _showToast('✗ Error al crear l\'enllaç');
+        btn.innerHTML = '<i data-lucide="link-2" style="width:15px;height:15px;"></i>';
+        btn.style.background = 'rgba(0,0,0,0.05)';
+        btn.style.color = 'var(--text-secondary)';
+        lucide.createIcons();
+    }
+}
+
 // ============================================================
 // MENÚ HEADER
 // ============================================================
@@ -1104,9 +1152,43 @@ window.addEventListener('DOMContentLoaded', () => {
     titol.addEventListener('blur',    syncTitol);
     titol.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); titol.blur(); } });
 
+    function _applySharedData(d) {
+        costs = []; revenues = []; payments = []; participants = [];
+        document.getElementById('costsRows').innerHTML        = '';
+        document.getElementById('revenuesRows').innerHTML     = '';
+        document.getElementById('paymentsRows').innerHTML     = '';
+        document.getElementById('participantsRows').innerHTML = '';
+        if (d.titol) document.getElementById('titolActivitat').innerText = d.titol;
+        if (d.quotesMode) { quotesMode = d.quotesMode; _applyQuotesModeToggleUI(); }
+        if (Array.isArray(d.participants) && d.participants.length > 0) {
+            d.participants.forEach(p => addParticipantRow(p, true));
+        }
+        if (Array.isArray(d.costos))     d.costos.forEach(c => addCostRow(c, true));
+        if (Array.isArray(d.recaptacio)) d.recaptacio.forEach(r => addRevenueRow(r, true));
+        if (Array.isArray(d.pagaments))  d.pagaments.forEach(p => addPaymentRow(p, true));
+    }
+
+    const _sMatch = location.search.match(/[?&]s=([^&]*)/);
+    const shortId = _sMatch ? _sMatch[1] : null;
+
     const _dMatch = location.search.match(/[?&]d=([^&]*)/);
     const urlParam = _dMatch ? _dMatch[1] : null;
-    if (urlParam) {
+
+    if (shortId) {
+        fetch('/share/' + shortId)
+            .then(r => r.ok ? r.json() : Promise.reject(r.status))
+            .then(d => {
+                _applySharedData(d);
+                history.replaceState(null, '', location.pathname);
+                saveValues();
+                updateAll();
+            })
+            .catch(() => {
+                _showToast('✗ Enllaç no trobat o caducat');
+                loadSavedValues();
+                updateAll();
+            });
+    } else if (urlParam) {
         let urlLoaded = false;
         try {
             let jsonStr = typeof LZString !== 'undefined'
@@ -1114,19 +1196,7 @@ window.addEventListener('DOMContentLoaded', () => {
                 : null;
             if (!jsonStr) jsonStr = decodeURIComponent(escape(atob(urlParam)));
             const d = JSON.parse(jsonStr);
-            costs = []; revenues = []; payments = []; participants = [];
-            document.getElementById('costsRows').innerHTML        = '';
-            document.getElementById('revenuesRows').innerHTML     = '';
-            document.getElementById('paymentsRows').innerHTML     = '';
-            document.getElementById('participantsRows').innerHTML = '';
-            if (d.titol) document.getElementById('titolActivitat').innerText = d.titol;
-            if (d.quotesMode) { quotesMode = d.quotesMode; _applyQuotesModeToggleUI(); }
-            if (Array.isArray(d.participants) && d.participants.length > 0) {
-                d.participants.forEach(p => addParticipantRow(p, true));
-            }
-            if (Array.isArray(d.costos))     d.costos.forEach(c => addCostRow(c, true));
-            if (Array.isArray(d.recaptacio)) d.recaptacio.forEach(r => addRevenueRow(r, true));
-            if (Array.isArray(d.pagaments))  d.pagaments.forEach(p => addPaymentRow(p, true));
+            _applySharedData(d);
             urlLoaded = true;
         } catch(_) {}
         if (urlLoaded) {
@@ -1135,9 +1205,9 @@ window.addEventListener('DOMContentLoaded', () => {
         } else {
             loadSavedValues();
         }
+        updateAll();
     } else {
         loadSavedValues();
+        updateAll();
     }
-
-    updateAll();
 });
