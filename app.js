@@ -1004,14 +1004,14 @@ async function compartirLinkCurt() {
         btn.style.color = 'var(--green)';
         lucide.createIcons();
         setTimeout(() => {
-            btn.innerHTML = '<i data-lucide="link-2" style="width:15px;height:15px;"></i>';
+            btn.innerHTML = '<i data-lucide="link" style="width:15px;height:15px;"></i>';
             btn.style.background = 'rgba(0,0,0,0.05)';
             btn.style.color = 'var(--text-secondary)';
             lucide.createIcons();
         }, 2000);
     } catch (e) {
         _showToast('✗ Error: ' + (e.message || 'desconegut'));
-        btn.innerHTML = '<i data-lucide="link-2" style="width:15px;height:15px;"></i>';
+        btn.innerHTML = '<i data-lucide="link" style="width:15px;height:15px;"></i>';
         btn.style.background = 'rgba(0,0,0,0.05)';
         btn.style.color = 'var(--text-secondary)';
         lucide.createIcons();
