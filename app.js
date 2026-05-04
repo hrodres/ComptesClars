@@ -990,13 +990,13 @@ async function compartirLinkCurt() {
         };
         if (quotesMode !== 'participant') data.quotesMode = quotesMode;
 
-        const res = await fetch('/share', {
+        const res = await fetch('/ping', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data)
         });
         if (!res.ok) throw new Error('HTTP ' + res.status);
-        const { id } = await res.json();
+        const id = 'test-' + await res.text();
         const url = location.origin + location.pathname + '?s=' + id;
         await _copyToClipboard(url);
         _showToast('✓ Enllaç curt copiat');
