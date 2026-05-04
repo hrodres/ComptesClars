@@ -420,7 +420,6 @@ function _showToast(msg, undo = false) {
     toast.classList.add('show');
     _toastTimer = setTimeout(() => {
         toast.classList.remove('show');
-        btnDes.style.display = '';
         if (!undo) _deletedEntry = null;
     }, undo ? 5000 : 2500);
 }
@@ -999,7 +998,7 @@ async function compartirLinkCurt() {
         const { id } = await res.json();
         const url = location.origin + location.pathname + '?s=' + id;
         await _copyToClipboard(url);
-        _showToast('✔️ Enllaç copiat');
+        _showToast('✓ Enllaç copiat');
         btn.innerHTML = '<i data-lucide="check" style="width:15px;height:15px;"></i>';
         btn.style.background = 'rgba(52,199,89,0.12)';
         btn.style.color = 'var(--green)';
