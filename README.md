@@ -19,6 +19,7 @@ Eina web per calcular i repartir els costos d'una activitat col·lectiva entre e
 - **Exportar / Importar** — fitxer `.json` amb nom normalitzat i timestamp automàtics
 - **Desfer** — eliminacions i reinici desables durant 5 segons
 - **Reordenar** — drag & drop a totes les seccions
+- **Mode fosc** — toggle manual al menú, respecta la preferència del sistema operatiu
 - **Emmagatzematge local** — dades guardades automàticament al navegador (localStorage, sense cookies, sense registre)
 - **Format català** — punt de milers i coma decimal (3.125,48 €)
 
