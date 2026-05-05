@@ -7,7 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800;900&family=DM+Mono:wght@500&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css?v=73">
+    <link rel="stylesheet" href="style.css?v=78">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/lz-string@1.5.0/libs/lz-string.min.js"></script>
@@ -27,6 +27,10 @@
                 <i data-lucide="ellipsis-vertical" style="width:16px;height:16px;"></i>
             </button>
             <div id="headerMenu" class="header-dropdown">
+                <button class="header-dropdown-item" id="menuDarkMode" onclick="toggleDarkMode(); closeHeaderMenu()">
+                    <span id="menuDarkModeIconWrap" style="display:inline-flex;width:15px;height:15px;"></span>
+                    <span id="menuDarkModeText"> Mode fosc</span>
+                </button>
                 <button class="header-dropdown-item" onclick="document.getElementById('importFile').click(); closeHeaderMenu()">
                     <i data-lucide="file-up" style="width:15px;height:15px;"></i> Importar arxiu
                 </button>
@@ -313,6 +317,6 @@
 </div>
 
 
-<script src="app.js?v=73" defer></script>
+<script src="app.js?v=78" defer></script>
 </body>
 </html>

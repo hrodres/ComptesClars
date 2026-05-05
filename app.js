@@ -1019,6 +1019,36 @@ async function compartirLinkCurt() {
 }
 
 // ============================================================
+// DARK MODE
+// ============================================================
+const DARK_KEY = 'comptesclars_dark';
+
+function toggleDarkMode() {
+    const isDark = document.body.classList.toggle('dark-mode');
+    document.body.classList.toggle('light-mode', !isDark);
+    try { localStorage.setItem(DARK_KEY, isDark ? 'dark' : 'light'); } catch(_) {}
+    const wrap = document.getElementById('menuDarkModeIconWrap');
+    const label = document.getElementById('menuDarkModeText');
+    if (wrap) {
+        wrap.innerHTML = `<i data-lucide="${isDark ? 'sun' : 'moon'}" style="width:15px;height:15px;"></i>`;
+        lucide.createIcons();
+    }
+    if (label) label.textContent = isDark ? ' Mode clar' : ' Mode fosc';
+}
+
+function initDarkMode() {
+    let mode = null;
+    try { mode = localStorage.getItem(DARK_KEY); } catch(_) {}
+    const isDark = mode === 'dark' || (mode === null && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    if (isDark) document.body.classList.add('dark-mode');
+    const wrap = document.getElementById('menuDarkModeIconWrap');
+    const label = document.getElementById('menuDarkModeText');
+    if (wrap) wrap.innerHTML = `<i data-lucide="${isDark ? 'sun' : 'moon'}" style="width:15px;height:15px;"></i>`;
+    if (label) label.textContent = isDark ? ' Mode clar' : ' Mode fosc';
+    lucide.createIcons();
+}
+
+// ============================================================
 // MENÚ HEADER
 // ============================================================
 function toggleHeaderMenu() {
@@ -1139,6 +1169,7 @@ window.addEventListener('DOMContentLoaded', () => {
         btn.innerHTML = `<i data-lucide="${icon}" style="width:18px;height:18px;"></i>`;
         grid.appendChild(btn);
     });
+    initDarkMode();
     lucide.createIcons();
 
     const titol = document.getElementById('titolActivitat');

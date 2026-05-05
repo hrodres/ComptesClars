@@ -12,6 +12,151 @@
     --text:           #1C1C1E;
     --text-secondary: #8E8E93;
     --separator:      rgba(60,60,67,0.12);
+    --input-row-bg:   #ffffff;
+    --input-row-active: #F5F5F5;
+    --btn-header-bg:  rgba(255,255,255,0.8);
+    --btn-header-border: rgba(0,0,0,0.08);
+    --btn-header-color: #555;
+    --btn-header-hover: rgba(255,255,255,1);
+    --dropdown-bg:    #fff;
+    --dropdown-border: rgba(0,0,0,0.08);
+    --dropdown-shadow: 0 8px 32px rgba(0,0,0,0.12);
+    --dropdown-hover: rgba(0,0,0,0.05);
+    --title-hover:    rgba(0,0,0,0.04);
+    --title-focus:    rgba(0,122,255,0.06);
+    --title-focus-shadow: 0 0 0 3px rgba(0,122,255,0.18);
+    --badge-bg:       rgba(0,0,0,0.06);
+    --seg-bg:         rgba(0,0,0,0.06);
+    --seg-active-bg:  #fff;
+    --seg-active-color: var(--blue);
+    --seg-active-shadow: 0 1px 3px rgba(0,0,0,0.12);
+    --dist-bg:        #E5E5EA;
+    --icon-pick-bg:   rgba(0,0,0,0.04);
+    --icon-pick-hover: rgba(0,122,255,0.08);
+    --icon-pick-hover-color: var(--blue);
+    --concept-placeholder: rgba(28,28,30,0.25);
+    --concept-focus:  rgba(0,122,255,0.05);
+    --modal-bg:       #fff;
+    --icon-opt-hover: rgba(0,122,255,0.08);
+    --icon-opt-selected: rgba(0,122,255,0.12);
+    --btn-add-bg:     rgba(0,0,0,0.05);
+    --btn-add-hover:  rgba(0,122,255,0.1);
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --bg:             #000000;
+        --card:           #1C1C1E;
+        --border:         rgba(255,255,255,0.08);
+        --text:           #F2F2F7;
+        --text-secondary: #98989D;
+        --separator:      rgba(84,84,88,0.45);
+        --input-row-bg:   #1C1C1E;
+        --input-row-active: #2C2C2E;
+        --btn-header-bg:  rgba(28,28,30,0.8);
+        --btn-header-border: rgba(255,255,255,0.08);
+        --btn-header-color: #98989D;
+        --btn-header-hover: rgba(28,28,30,1);
+        --dropdown-bg:    #2C2C2E;
+        --dropdown-border: rgba(255,255,255,0.1);
+        --dropdown-shadow: 0 8px 32px rgba(0,0,0,0.5);
+        --dropdown-hover: rgba(255,255,255,0.06);
+        --title-hover:    rgba(255,255,255,0.04);
+        --title-focus:    rgba(0,122,255,0.12);
+        --title-focus-shadow: 0 0 0 3px rgba(0,122,255,0.25);
+        --badge-bg:       rgba(255,255,255,0.08);
+        --seg-bg:         rgba(255,255,255,0.08);
+        --seg-active-bg:  #2C2C2E;
+        --seg-active-color: #0A84FF;
+        --seg-active-shadow: 0 1px 3px rgba(0,0,0,0.4);
+        --dist-bg:        #2C2C2E;
+        --icon-pick-bg:   rgba(255,255,255,0.06);
+        --icon-pick-hover: rgba(0,122,255,0.15);
+        --icon-pick-hover-color: var(--blue);
+        --concept-placeholder: rgba(242,242,247,0.2);
+        --concept-focus:  rgba(0,122,255,0.08);
+        --modal-bg:       #1C1C1E;
+        --icon-opt-hover: rgba(0,122,255,0.15);
+        --icon-opt-selected: rgba(0,122,255,0.2);
+        --btn-add-bg:     rgba(255,255,255,0.06);
+        --btn-add-hover:  rgba(0,122,255,0.15);
+    }
+}
+
+body.light-mode {
+    --bg:             #F2F2F7;
+    --card:           #ffffff;
+    --border:         rgba(0,0,0,0.06);
+    --text:           #1C1C1E;
+    --text-secondary: #8E8E93;
+    --separator:      rgba(60,60,67,0.12);
+    --input-row-bg:   #ffffff;
+    --input-row-active: #F5F5F5;
+    --btn-header-bg:  rgba(255,255,255,0.8);
+    --btn-header-border: rgba(0,0,0,0.08);
+    --btn-header-color: #555;
+    --btn-header-hover: rgba(255,255,255,1);
+    --dropdown-bg:    #fff;
+    --dropdown-border: rgba(0,0,0,0.08);
+    --dropdown-shadow: 0 8px 32px rgba(0,0,0,0.12);
+    --dropdown-hover: rgba(0,0,0,0.05);
+    --title-hover:    rgba(0,0,0,0.04);
+    --title-focus:    rgba(0,122,255,0.06);
+    --title-focus-shadow: 0 0 0 3px rgba(0,122,255,0.18);
+    --badge-bg:       rgba(0,0,0,0.06);
+    --seg-bg:         rgba(0,0,0,0.06);
+    --seg-active-bg:  #fff;
+    --seg-active-color: var(--blue);
+    --seg-active-shadow: 0 1px 3px rgba(0,0,0,0.12);
+    --dist-bg:        #E5E5EA;
+    --icon-pick-bg:   rgba(0,0,0,0.04);
+    --icon-pick-hover: rgba(0,122,255,0.08);
+    --icon-pick-hover-color: var(--blue);
+    --concept-placeholder: rgba(28,28,30,0.25);
+    --concept-focus:  rgba(0,122,255,0.05);
+    --modal-bg:       #fff;
+    --icon-opt-hover: rgba(0,122,255,0.08);
+    --icon-opt-selected: rgba(0,122,255,0.12);
+    --btn-add-bg:     rgba(0,0,0,0.05);
+    --btn-add-hover:  rgba(0,122,255,0.1);
+}
+
+body.dark-mode {
+    --bg:             #000000;
+    --card:           #1C1C1E;
+    --border:         rgba(255,255,255,0.08);
+    --text:           #F2F2F7;
+    --text-secondary: #98989D;
+    --separator:      rgba(84,84,88,0.45);
+    --input-row-bg:   #1C1C1E;
+    --input-row-active: #2C2C2E;
+    --btn-header-bg:  rgba(28,28,30,0.8);
+    --btn-header-border: rgba(255,255,255,0.08);
+    --btn-header-color: #98989D;
+    --btn-header-hover: rgba(28,28,30,1);
+    --dropdown-bg:    #2C2C2E;
+    --dropdown-border: rgba(255,255,255,0.1);
+    --dropdown-shadow: 0 8px 32px rgba(0,0,0,0.5);
+    --dropdown-hover: rgba(255,255,255,0.06);
+    --title-hover:    rgba(255,255,255,0.04);
+    --title-focus:    rgba(0,122,255,0.12);
+    --title-focus-shadow: 0 0 0 3px rgba(0,122,255,0.25);
+    --badge-bg:       rgba(255,255,255,0.08);
+    --seg-bg:         rgba(255,255,255,0.08);
+    --seg-active-bg:  #2C2C2E;
+    --seg-active-color: #0A84FF;
+    --seg-active-shadow: 0 1px 3px rgba(0,0,0,0.4);
+    --dist-bg:        #2C2C2E;
+    --icon-pick-bg:   rgba(255,255,255,0.06);
+    --icon-pick-hover: rgba(0,122,255,0.15);
+    --icon-pick-hover-color: var(--blue);
+    --concept-placeholder: rgba(242,242,247,0.2);
+    --concept-focus:  rgba(0,122,255,0.08);
+    --modal-bg:       #1C1C1E;
+    --icon-opt-hover: rgba(0,122,255,0.15);
+    --icon-opt-selected: rgba(0,122,255,0.2);
+    --btn-add-bg:     rgba(255,255,255,0.06);
+    --btn-add-hover:  rgba(0,122,255,0.15);
 }
 
 * { box-sizing: border-box; }
@@ -25,7 +170,6 @@ body {
     min-height: 100svh;
 }
 
-/* === CARDS === */
 .card {
     background: var(--card);
     border-radius: 18px;
@@ -41,12 +185,12 @@ body {
     justify-content: space-between;
     min-height: 52px;
     padding: 0 18px;
-    background: #fff;
+    background: var(--input-row-bg);
     border-bottom: 0.5px solid var(--separator);
     transition: background 0.15s;
 }
 .input-row:last-child { border-bottom: none; }
-.input-row:active     { background: #F5F5F5; }
+.input-row:active     { background: var(--input-row-active); }
 
 .row-label {
     display: flex;
@@ -129,7 +273,7 @@ body {
     letter-spacing: 0.08em;
     padding: 3px 9px;
     border-radius: 20px;
-    background: rgba(0,0,0,0.06);
+    background: var(--badge-bg);
     color: var(--text-secondary);
     user-select: none;
 }
@@ -137,7 +281,7 @@ body {
 /* === SEGMENTED TOGGLE === */
 .seg-toggle {
     display: inline-flex;
-    background: rgba(0,0,0,0.06);
+    background: var(--seg-bg);
     border-radius: 20px;
     padding: 2px;
     gap: 1px;
@@ -156,9 +300,9 @@ body {
     cursor: pointer;
 }
 .seg-opt.active {
-    background: #fff;
-    color: var(--blue);
-    box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+    background: var(--seg-active-bg);
+    color: var(--seg-active-color);
+    box-shadow: var(--seg-active-shadow);
 }
 
 /* === PROGRESS BAR === */
@@ -176,7 +320,7 @@ body {
 .dist-bar {
     height: 32px; width: 100%;
     display: flex; border-radius: 12px; overflow: hidden;
-    background: #E5E5EA;
+    background: var(--dist-bg);
 }
 .dist-seg { height: 100%; transition: width 0.5s cubic-bezier(0.4,0,0.2,1); }
 
@@ -256,21 +400,21 @@ body {
 
 /* === BOTONS HEADER === */
 .btn-header-icon {
-    background: rgba(255,255,255,0.8); backdrop-filter: blur(10px);
-    border: 1px solid rgba(0,0,0,0.08); border-radius: 20px;
+    background: var(--btn-header-bg); backdrop-filter: blur(10px);
+    border: 1px solid var(--btn-header-border); border-radius: 20px;
     width: 34px; height: 34px; padding: 0; cursor: pointer;
     display: flex; align-items: center; justify-content: center;
-    color: #555; transition: background 0.15s;
+    color: var(--btn-header-color); transition: background 0.15s;
     box-shadow: 0 1px 4px rgba(0,0,0,0.06); flex-shrink: 0;
 }
-.btn-header-icon:hover { background: rgba(255,255,255,1); }
+.btn-header-icon:hover { background: var(--btn-header-hover); }
 
 .header-dropdown {
     display: none; flex-direction: column;
     position: absolute; top: calc(100% + 8px); right: 0;
-    background: #fff; border: 1px solid rgba(0,0,0,0.08);
+    background: var(--dropdown-bg); border: 1px solid var(--dropdown-border);
     border-radius: 16px; padding: 6px;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+    box-shadow: var(--dropdown-shadow);
     min-width: 175px; z-index: 200;
 }
 .header-dropdown.open { display: flex; }
@@ -281,7 +425,7 @@ body {
     font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600;
     color: var(--text); transition: background 0.12s;
 }
-.header-dropdown-item:hover { background: rgba(0,0,0,0.05); }
+.header-dropdown-item:hover { background: var(--dropdown-hover); }
 .header-dropdown-item.danger { color: var(--red); }
 .header-dropdown-sep { height: 1px; background: var(--separator); margin: 4px 0; }
 
@@ -291,11 +435,11 @@ body {
     padding: 2px 4px; margin: -2px -4px;
     transition: background 0.15s; cursor: text; min-width: 40px;
 }
-#titolActivitat:hover { background: rgba(0,0,0,0.04); }
-#titolActivitat:focus { background: rgba(0,122,255,0.06); box-shadow: 0 0 0 3px rgba(0,122,255,0.18); }
+#titolActivitat:hover { background: var(--title-hover); }
+#titolActivitat:focus { background: var(--title-focus); box-shadow: var(--title-focus-shadow); }
 #titolActivitat:empty::before {
     content: "Nom del projecte";
-    color: rgba(28,28,30,0.25); pointer-events: none;
+    color: var(--concept-placeholder); pointer-events: none;
 }
 
 /* === FILES DE COST DINÀMIQUES === */
@@ -419,7 +563,7 @@ body {
 #aboutModal {
     display: none; position: fixed; z-index: 500;
     top: 50%; left: 50%; transform: translate(-50%, -50%);
-    background: #fff; border-radius: 20px;
+    background: var(--modal-bg); border-radius: 20px;
     border: 1px solid var(--border);
     box-shadow: 0 8px 40px rgba(0,0,0,0.16);
     padding: 24px 24px 20px;
@@ -435,7 +579,7 @@ body {
 #iconPicker {
     display: none; position: fixed; z-index: 500;
     top: 50%; left: 50%; transform: translate(-50%, -50%);
-    background: #fff; border-radius: 20px;
+    background: var(--modal-bg); border-radius: 20px;
     border: 1px solid var(--border);
     box-shadow: 0 8px 40px rgba(0,0,0,0.16);
     padding: 16px; width: min(276px, calc(100vw - 40px));
