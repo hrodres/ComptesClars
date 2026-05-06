@@ -1137,8 +1137,8 @@ function exportarPDF() {
     const doc  = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
     const PW   = 210;   // page width
     const PH   = 297;   // page height
-    const CW   = 110;   // content width (centered, ~mobile width)
-    const ML   = (PW - CW) / 2;  // left margin (~50mm)
+    const CW   = 95;    // content width (centered, ~mobile width)
+    const ML   = (PW - CW) / 2;  // left margin (~57.5mm)
     const XR   = ML + CW;        // right edge x
     let y      = 0;
 
@@ -1181,7 +1181,8 @@ function exportarPDF() {
     function rowTotal(label, value, vColor) {
         doc.setDrawColor(...LINE);
         doc.setLineWidth(0.2);
-        doc.line(ML, y - 1, XR, y - 1);
+        doc.line(ML, y, XR, y);
+        y += 3;
         rowLR(label, value, vColor, 8.5);
     }
 
