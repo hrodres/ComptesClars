@@ -1100,7 +1100,37 @@ function exportarDades() {
     _showToast('✓ Dades exportades');
 }
 
-function exportarPDF() {
+const _iconPngCache = {};
+async function _iconPng(iconName, color) {
+    const key = iconName + color;
+    if (_iconPngCache[key]) return _iconPngCache[key];
+    const div = document.createElement('div');
+    div.style.cssText = 'position:absolute;visibility:hidden;width:24px;height:24px;overflow:hidden;';
+    div.innerHTML = `<i data-lucide="${iconName}" style="width:24px;height:24px;color:${color}"></i>`;
+    document.body.appendChild(div);
+    lucide.createIcons({ nodes: [div.querySelector('i')] });
+    const svg = div.querySelector('svg');
+    if (!svg) { document.body.removeChild(div); return null; }
+    svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+    const svgStr = new XMLSerializer().serializeToString(svg);
+    document.body.removeChild(div);
+    const url = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgStr)));
+    return new Promise(resolve => {
+        const img = new Image();
+        img.onload = () => {
+            const c = document.createElement('canvas');
+            c.width = 24; c.height = 24;
+            c.getContext('2d').drawImage(img, 0, 0, 24, 24);
+            const dataUrl = c.toDataURL('image/png');
+            _iconPngCache[key] = dataUrl;
+            resolve(dataUrl);
+        };
+        img.onerror = () => resolve(null);
+        img.src = url;
+    });
+}
+
+async function exportarPDF() {
     if (!costs.length && !revenues.length && !payments.length && !participants.length) return;
     if (!window.jspdf) { _showToast('Error: jsPDF no disponible'); return; }
 
@@ -1169,11 +1199,11 @@ function exportarPDF() {
         doc.text(text.toUpperCase(), ML, y);
         nl(6);
     }
-    function rowLR(label, value, vColor, size = 9) {
+    function rowLR(label, value, vColor, size = 9, xOffset = 0) {
         doc.setFontSize(size);
         doc.setFont('helvetica', 'normal');
         doc.setTextColor(...GREY);
-        doc.text(label, ML, y, { maxWidth: CW * 0.6 });
+        doc.text(label, ML + xOffset, y, { maxWidth: CW * 0.6 - xOffset });
         doc.setFont('helvetica', 'bold');
         doc.setTextColor(...(vColor || TEXT));
         doc.text(value, XR, y, { align: 'right' });
@@ -1257,21 +1287,19 @@ function exportarPDF() {
     hr();
     sectionTitle('Projecte');
 
-    const col3 = CW / 3;
     [
-        { label: 'Costos',     val: total > 0 ? fmt(total) + ' €' : '—', color: RED   },
-        { label: 'Recaptació', val: rec > 0 ? fmt(rec) + ' €' : '—',   color: GREEN },
-        { label: 'Quotes',     val: pagat > 0 ? fmt(pagat * n) + ' €' : '—', color: BLUE },
-    ].forEach((c, i) => {
-        const cx = ML + i * col3;
+        { label: 'Costos',     val: total > 0 ? fmt(total) + ' €' : '—', color: RED,   x: ML,        align: 'left'   },
+        { label: 'Recaptació', val: rec > 0   ? fmt(rec)   + ' €' : '—', color: GREEN, x: ML + CW/2, align: 'center' },
+        { label: 'Quotes',     val: pagat > 0 ? fmt(pagat * n) + ' €' : '—', color: BLUE, x: XR,     align: 'right'  },
+    ].forEach(c => {
         doc.setFontSize(7);
         doc.setFont('helvetica', 'normal');
         doc.setTextColor(...GREY);
-        doc.text(c.label.toUpperCase(), cx, y);
+        doc.text(c.label.toUpperCase(), c.x, y, { align: c.align });
         doc.setFontSize(11);
         doc.setFont('helvetica', 'bold');
         doc.setTextColor(...c.color);
-        doc.text(c.val, cx, y + 6);
+        doc.text(c.val, c.x, y + 6, { align: c.align });
     });
     nl(12);
 
@@ -1289,10 +1317,12 @@ function exportarPDF() {
     if (participants.length > 0) {
         hr();
         sectionTitle('Participants');
-        participants.forEach(p => {
-            rowLR(p.name || '—', fmt(p.count, 0) + ' persones', TEXT);
+        for (const p of participants) {
+            const ico = await _iconPng(p.icon, '#8E8E93');
+            if (ico) doc.addImage(ico, 'PNG', ML, y - 3.5, 3.5, 3.5);
+            rowLR(p.name || '—', fmt(p.count, 0) + ' persones', TEXT, 9, ico ? 5 : 0);
             nl(6);
-        });
+        }
         rowTotal('Total', fmt(n, 0) + ' persones', TEXT);
         nl(8);
     }
@@ -1315,11 +1345,13 @@ function exportarPDF() {
     if (recRows.length > 0) {
         hr();
         sectionTitle('Recaptació');
-        recRows.forEach(r => {
+        for (const r of recRows) {
             const netR = r.income - r.expense;
-            rowLR(r.name, fmt(netR) + ' €', netR < 0 ? RED : GREEN);
+            const ico = await _iconPng(r.icon, '#8E8E93');
+            if (ico) doc.addImage(ico, 'PNG', ML, y - 3.5, 3.5, 3.5);
+            rowLR(r.name, fmt(netR) + ' €', netR < 0 ? RED : GREEN, 9, ico ? 5 : 0);
             nl(6);
-        });
+        }
         rowTotal('Total net recaptat', fmt(rec) + ' €', GREEN);
         nl(8);
     }
@@ -1329,20 +1361,12 @@ function exportarPDF() {
     if (costRows.length > 0) {
         hr();
         sectionTitle('Costos');
-        costRows.forEach((c, i) => {
-            const hex = COST_COLORS[i % COST_COLORS.length];
-            const cr = parseInt(hex.slice(1,3),16), cg = parseInt(hex.slice(3,5),16), cb = parseInt(hex.slice(5,7),16);
-            doc.setFillColor(cr, cg, cb);
-            doc.circle(ML + 1.5, y - 1.5, 1.2, 'F');
-            doc.setFontSize(9);
-            doc.setFont('helvetica', 'normal');
-            doc.setTextColor(...TEXT);
-            doc.text(c.name || '—', ML + 5, y);
-            doc.setFont('helvetica', 'bold');
-            doc.setTextColor(...RED);
-            doc.text(fmt(c.amount) + ' €', XR, y, { align: 'right' });
+        for (const c of costRows) {
+            const ico = await _iconPng(c.icon, '#8E8E93');
+            if (ico) doc.addImage(ico, 'PNG', ML, y - 3.5, 3.5, 3.5);
+            rowLR(c.name || '—', fmt(c.amount) + ' €', RED, 9, ico ? 5 : 0);
             nl(6);
-        });
+        }
         rowTotal('Total costos', fmt(total) + ' €', RED);
         nl(8);
     }
