@@ -11,6 +11,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/lz-string@1.5.0/libs/lz-string.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
 </head>
 <body>
 
@@ -36,6 +38,9 @@
                 </button>
                 <button class="header-dropdown-item" onclick="exportarDades(); closeHeaderMenu()">
                     <i data-lucide="file-down" style="width:15px;height:15px;"></i> Exportar arxiu
+                </button>
+                <button class="header-dropdown-item" onclick="exportarPDF(); closeHeaderMenu()">
+                    <i data-lucide="file-text" style="width:15px;height:15px;"></i> Exportar PDF
                 </button>
                 <div class="header-dropdown-sep"></div>
                 <button id="btnReiniciar" class="header-dropdown-item danger" onclick="confirmReset()">

@@ -1100,6 +1100,89 @@ function exportarDades() {
     _showToast('✓ Dades exportades');
 }
 
+async function exportarPDF() {
+    if (!costs.length && !revenues.length && !payments.length && !participants.length) return;
+    if (!window.html2canvas || !window.jspdf) { _showToast('Error: llibreries no disponibles'); return; }
+
+    const titol = (document.getElementById('titolActivitat').innerText || '').trim();
+    const ara   = new Date();
+    const ts    = ara.getFullYear().toString() +
+                  String(ara.getMonth()+1).padStart(2,'0') +
+                  String(ara.getDate()).padStart(2,'0') + '-' +
+                  String(ara.getHours()).padStart(2,'0') +
+                  String(ara.getMinutes()).padStart(2,'0');
+    const slug  = (titol || '')
+        .toLowerCase()
+        .replace(/[àáâä]/g,'a').replace(/[èéêë]/g,'e').replace(/[ìíîï]/g,'i')
+        .replace(/[òóôö]/g,'o').replace(/[ùúûü]/g,'u').replace(/[ç]/g,'c')
+        .replace(/[ñ]/g,'n').replace(/·l/g,'l').replace(/[^a-z0-9]+/g,'-')
+        .replace(/^-+|-+$/g,'');
+    const filename = 'comptesclars' + (slug ? '_' + slug : '') + '_' + ts + '.pdf';
+
+    const hideEls = document.querySelectorAll(
+        '#btnCopiar, #btnCompartirLinkCurt, button[onclick*="toggleHeaderMenu"], ' +
+        '#undoToast, #headerMenu, #aboutModal, #aboutBackdrop, #iconPicker, #iconPickerBackdrop'
+    );
+    hideEls.forEach(el => el.style.visibility = 'hidden');
+
+    let canvas;
+    try {
+        const target = document.querySelector('.max-w-lg');
+        canvas = await window.html2canvas(target, { scale: 2, useCORS: true, backgroundColor: null });
+    } finally {
+        hideEls.forEach(el => el.style.visibility = '');
+    }
+
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
+    const PAGE_W = 210;
+    const PAGE_H = 297;
+    const pxPerMm = canvas.width / PAGE_W;
+    const oneColH = Math.round(PAGE_H * pxPerMm);
+
+    function getSlice(srcCanvas, startY, sliceH) {
+        const h = Math.min(sliceH, srcCanvas.height - startY);
+        if (h <= 0) return null;
+        const sl = document.createElement('canvas');
+        sl.width  = srcCanvas.width;
+        sl.height = h;
+        sl.getContext('2d').drawImage(srcCanvas, 0, startY, srcCanvas.width, h, 0, 0, srcCanvas.width, h);
+        return { dataUrl: sl.toDataURL('image/png'), hMm: h / pxPerMm };
+    }
+
+    const totalH = canvas.height;
+
+    if (totalH <= oneColH) {
+        // Tot cap en 1 columna
+        const s = getSlice(canvas, 0, totalH);
+        doc.addImage(s.dataUrl, 'PNG', 0, 0, PAGE_W, s.hMm);
+    } else {
+        // 2 columnes per pàgina: esquerra = primera meitat, dreta = segona meitat
+        const COL_W   = 100;
+        const COL_GAP = 10;
+        let pos       = 0;
+        let firstPage = true;
+
+        while (pos < totalH) {
+            if (!firstPage) doc.addPage();
+            firstPage = false;
+
+            const left = getSlice(canvas, pos, oneColH);
+            if (left) doc.addImage(left.dataUrl, 'PNG', 0, 0, COL_W, Math.min(left.hMm, PAGE_H));
+            pos += oneColH;
+
+            if (pos < totalH) {
+                const right = getSlice(canvas, pos, oneColH);
+                if (right) doc.addImage(right.dataUrl, 'PNG', COL_W + COL_GAP, 0, COL_W, Math.min(right.hMm, PAGE_H));
+                pos += oneColH;
+            }
+        }
+    }
+
+    doc.save(filename);
+    _showToast('✓ PDF exportat');
+}
+
 function importarDades(event) {
     const file = event.target.files[0];
     if (!file) return;
