@@ -814,7 +814,7 @@ function updateAll() {
 // COPIAR RESUM
 // ============================================================
 function _copyToClipboard(text) {
-    if (navigator.vibrate) navigator.vibrate(30);
+    if (navigator.vibrate) navigator.vibrate(50);
     if (navigator.clipboard && window.isSecureContext) {
         return navigator.clipboard.writeText(text);
     }
