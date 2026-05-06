@@ -1100,18 +1100,31 @@ function exportarDades() {
     _showToast('✓ Dades exportades');
 }
 
-async function exportarPDF() {
+function exportarPDF() {
     if (!costs.length && !revenues.length && !payments.length && !participants.length) return;
-    if (!window.html2canvas || !window.jspdf) { _showToast('Error: llibreries no disponibles'); return; }
+    if (!window.jspdf) { _showToast('Error: jsPDF no disponible'); return; }
 
-    const titol = (document.getElementById('titolActivitat').innerText || '').trim();
-    const ara   = new Date();
-    const ts    = ara.getFullYear().toString() +
-                  String(ara.getMonth()+1).padStart(2,'0') +
-                  String(ara.getDate()).padStart(2,'0') + '-' +
-                  String(ara.getHours()).padStart(2,'0') +
-                  String(ara.getMinutes()).padStart(2,'0');
-    const slug  = (titol || '')
+    // ── Valors computats ──────────────────────────────────────────────────────
+    const titol        = (document.getElementById('titolActivitat').innerText || '').trim() || 'Activitat';
+    const n            = Math.max(1, getParticipantTotal());
+    const rec          = getRevenueNetTotal();
+    const total        = getCostTotal();
+    const net          = (total - rec) / n;
+    const pagat        = getPaymentTotal();
+    const netEfectiu   = Math.max(0, net);
+    const surplusRec   = Math.max(0, -net);
+    const surplusPag   = pagat > 0 ? Math.max(0, pagat - netEfectiu) : 0;
+    const totalSurplus = surplusRec + surplusPag;
+    const pendentEfectiu = Math.max(0, netEfectiu - pagat);
+
+    // ── Filename ──────────────────────────────────────────────────────────────
+    const ara  = new Date();
+    const ts   = ara.getFullYear().toString() +
+                 String(ara.getMonth()+1).padStart(2,'0') +
+                 String(ara.getDate()).padStart(2,'0') + '-' +
+                 String(ara.getHours()).padStart(2,'0') +
+                 String(ara.getMinutes()).padStart(2,'0');
+    const slug = (titol === 'Activitat' ? '' : titol)
         .toLowerCase()
         .replace(/[àáâä]/g,'a').replace(/[èéêë]/g,'e').replace(/[ìíîï]/g,'i')
         .replace(/[òóôö]/g,'o').replace(/[ùúûü]/g,'u').replace(/[ç]/g,'c')
@@ -1119,65 +1132,226 @@ async function exportarPDF() {
         .replace(/^-+|-+$/g,'');
     const filename = 'comptesclars' + (slug ? '_' + slug : '') + '_' + ts + '.pdf';
 
-    const hideEls = document.querySelectorAll(
-        '#btnCopiar, #btnCompartirLinkCurt, button[onclick*="toggleHeaderMenu"], ' +
-        '#undoToast, #headerMenu, #aboutModal, #aboutBackdrop, #iconPicker, #iconPickerBackdrop'
-    );
-    hideEls.forEach(el => el.style.visibility = 'hidden');
-
-    let canvas;
-    try {
-        const target = document.querySelector('.max-w-lg');
-        canvas = await window.html2canvas(target, { scale: 2, useCORS: true, backgroundColor: null });
-    } finally {
-        hideEls.forEach(el => el.style.visibility = '');
-    }
-
+    // ── jsPDF setup ───────────────────────────────────────────────────────────
     const { jsPDF } = window.jspdf;
-    const doc = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
-    const PAGE_W = 210;
-    const PAGE_H = 297;
-    const pxPerMm = canvas.width / PAGE_W;
-    const oneColH = Math.round(PAGE_H * pxPerMm);
+    const doc  = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
+    const PW   = 210;   // page width
+    const PH   = 297;   // page height
+    const ML   = 18;    // left margin
+    const MR   = 18;    // right margin
+    const CW   = PW - ML - MR;  // content width (174mm)
+    const XR   = PW - MR;       // right edge x
+    let y      = 0;
 
-    function getSlice(srcCanvas, startY, sliceH) {
-        const h = Math.min(sliceH, srcCanvas.height - startY);
-        if (h <= 0) return null;
-        const sl = document.createElement('canvas');
-        sl.width  = srcCanvas.width;
-        sl.height = h;
-        sl.getContext('2d').drawImage(srcCanvas, 0, startY, srcCanvas.width, h, 0, 0, srcCanvas.width, h);
-        return { dataUrl: sl.toDataURL('image/png'), hMm: h / pxPerMm };
+    // Colors
+    const BLUE  = [0,   122, 255];
+    const GREEN = [52,  199, 89];
+    const RED   = [255, 59,  48];
+    const TEXT  = [28,  28,  30];
+    const GREY  = [142, 142, 147];
+    const LINE  = [220, 220, 225];
+
+    // ── Helpers ───────────────────────────────────────────────────────────────
+    function nl(h) {
+        y += h;
+        if (y > PH - 16) { doc.addPage(); y = 16; }
+    }
+    function hr(before = 3, after = 4) {
+        y += before;
+        doc.setDrawColor(...LINE);
+        doc.setLineWidth(0.25);
+        doc.line(ML, y, XR, y);
+        y += after;
+    }
+    function sectionTitle(text) {
+        doc.setFontSize(7.5);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(...GREY);
+        doc.text(text.toUpperCase(), ML, y);
+        nl(6);
+    }
+    function rowLR(label, value, vColor, size = 9) {
+        doc.setFontSize(size);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(...GREY);
+        doc.text(label, ML, y);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(...(vColor || TEXT));
+        doc.text(value, XR, y, { align: 'right' });
+    }
+    function rowTotal(label, value, vColor) {
+        doc.setDrawColor(...LINE);
+        doc.setLineWidth(0.2);
+        doc.line(ML, y - 1, XR, y - 1);
+        rowLR(label, value, vColor, 8.5);
     }
 
-    const totalH = canvas.height;
+    // ── HEADER ────────────────────────────────────────────────────────────────
+    y = 15;
+    doc.setFontSize(7);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(...GREY);
+    doc.text('ComptesClars', ML, y);
+    doc.text(ara.toLocaleDateString('ca-ES', { day:'2-digit', month:'long', year:'numeric' }), XR, y, { align:'right' });
+    nl(10);
 
-    if (totalH <= oneColH) {
-        // Tot cap en 1 columna
-        const s = getSlice(canvas, 0, totalH);
-        doc.addImage(s.dataUrl, 'PNG', 0, 0, PAGE_W, s.hMm);
-    } else {
-        // 2 columnes per pàgina: esquerra = primera meitat, dreta = segona meitat
-        const COL_W   = 100;
-        const COL_GAP = 10;
-        let pos       = 0;
-        let firstPage = true;
+    doc.setFontSize(20);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(...TEXT);
+    doc.text(titol, ML, y);
+    nl(10);
 
-        while (pos < totalH) {
-            if (!firstPage) doc.addPage();
-            firstPage = false;
+    // ── HERO PARTICIPANT ──────────────────────────────────────────────────────
+    doc.setFillColor(240, 247, 255);
+    doc.roundedRect(ML, y, CW, 30, 3, 3, 'F');
+    y += 8;
 
-            const left = getSlice(canvas, pos, oneColH);
-            if (left) doc.addImage(left.dataUrl, 'PNG', 0, 0, COL_W, Math.min(left.hMm, PAGE_H));
-            pos += oneColH;
+    doc.setFontSize(22);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(...TEXT);
+    doc.text(fmt(netEfectiu) + ' €', ML + 5, y);
 
-            if (pos < totalH) {
-                const right = getSlice(canvas, pos, oneColH);
-                if (right) doc.addImage(right.dataUrl, 'PNG', COL_W + COL_GAP, 0, COL_W, Math.min(right.hMm, PAGE_H));
-                pos += oneColH;
-            }
-        }
+    const isSurplus  = totalSurplus > 0;
+    const pendLabel  = isSurplus ? 'A favor' : 'Pendent';
+    const pendVal    = isSurplus ? totalSurplus : pendentEfectiu;
+    const pendColor  = (isSurplus || pendentEfectiu === 0) ? GREEN : GREY;
+    doc.setTextColor(...pendColor);
+    doc.text(fmt(pendVal) + ' €', XR - 5, y, { align: 'right' });
+    nl(6);
+
+    doc.setFontSize(7.5);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(...GREY);
+    doc.text('A PAGAR', ML + 5, y);
+    doc.text(pendLabel.toUpperCase(), XR - 5, y, { align: 'right' });
+    nl(5);
+
+    doc.setFontSize(8);
+    doc.setTextColor(...BLUE);
+    doc.text('Quotes: ' + fmt(pagat) + ' €', ML + 5, y);
+    doc.setTextColor(...GREY);
+    doc.text('Preu real: ' + fmt(total / n) + ' €', XR - 5, y, { align: 'right' });
+    nl(12);
+
+    // ── ALERTA SURPLUS ────────────────────────────────────────────────────────
+    if (totalSurplus > 0) {
+        doc.setFillColor(240, 255, 244);
+        doc.roundedRect(ML, y, CW, 12, 2, 2, 'F');
+        doc.setDrawColor(...GREEN);
+        doc.setLineWidth(0.8);
+        doc.line(ML, y, ML, y + 12);
+        y += 4.5;
+        doc.setFontSize(8.5);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(26, 122, 58);
+        const txt = (surplusRec > 0 && surplusPag > 0)
+            ? 'Costos coberts i pagaments a favor · ' + fmt(totalSurplus) + ' € a favor'
+            : surplusRec > 0
+            ? 'La recaptació supera els costos · ' + fmt(totalSurplus) + ' € a favor'
+            : 'Pagaments coberts · ' + fmt(totalSurplus) + ' € a favor';
+        doc.text(txt, ML + 4, y);
+        nl(10);
     }
+
+    // ── TOTALS PROJECTE ───────────────────────────────────────────────────────
+    hr();
+    sectionTitle('Projecte');
+
+    const col3 = CW / 3;
+    [
+        { label: 'Costos',     val: total > 0 ? fmt(total) + ' €' : '—', color: RED   },
+        { label: 'Recaptació', val: rec > 0 ? fmt(rec) + ' €' : '—',   color: GREEN },
+        { label: 'Quotes',     val: pagat > 0 ? fmt(pagat * n) + ' €' : '—', color: BLUE },
+    ].forEach((c, i) => {
+        const cx = ML + i * col3;
+        doc.setFontSize(7);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(...GREY);
+        doc.text(c.label.toUpperCase(), cx, y);
+        doc.setFontSize(11);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(...c.color);
+        doc.text(c.val, cx, y + 6);
+    });
+    nl(12);
+
+    const projSurp   = totalSurplus * n;
+    const projPend   = pendentEfectiu * n;
+    const projIsSurp = projSurp > 0;
+    rowLR(
+        (projIsSurp ? 'A favor del projecte' : 'Pendent del projecte'),
+        fmt(projIsSurp ? projSurp : projPend) + ' €',
+        (projIsSurp || projPend === 0) && (total > 0 || rec > 0) ? GREEN : GREY
+    );
+    nl(8);
+
+    // ── PARTICIPANTS ──────────────────────────────────────────────────────────
+    if (participants.length > 0) {
+        hr();
+        sectionTitle('Participants');
+        participants.forEach(p => {
+            rowLR(p.name || '—', fmt(p.count, 0) + ' persones', TEXT);
+            nl(6);
+        });
+        rowTotal('Total', fmt(n, 0) + ' persones', TEXT);
+        nl(8);
+    }
+
+    // ── QUOTES ────────────────────────────────────────────────────────────────
+    if (payments.length > 0) {
+        hr();
+        sectionTitle('Quotes');
+        payments.forEach(p => {
+            const displayAmt = quotesMode === 'projecte' ? p.amount * n : p.amount;
+            rowLR(p.name || '—', fmt(displayAmt) + ' €', BLUE);
+            nl(6);
+        });
+        rowTotal('Total quotes', fmt(pagat * n) + ' €', BLUE);
+        nl(8);
+    }
+
+    // ── RECAPTACIÓ ────────────────────────────────────────────────────────────
+    const recRows = revenues.filter(r => r.name.trim() && (r.income > 0 || r.expense > 0));
+    if (recRows.length > 0) {
+        hr();
+        sectionTitle('Recaptació');
+        recRows.forEach(r => {
+            const netR = r.income - r.expense;
+            rowLR(r.name, fmt(netR) + ' €', netR < 0 ? RED : GREEN);
+            nl(6);
+        });
+        rowTotal('Total net recaptat', fmt(rec) + ' €', GREEN);
+        nl(8);
+    }
+
+    // ── COSTOS ────────────────────────────────────────────────────────────────
+    const costRows = costs.filter(c => c.amount > 0);
+    if (costRows.length > 0) {
+        hr();
+        sectionTitle('Costos');
+        costRows.forEach((c, i) => {
+            const hex = COST_COLORS[i % COST_COLORS.length];
+            const cr = parseInt(hex.slice(1,3),16), cg = parseInt(hex.slice(3,5),16), cb = parseInt(hex.slice(5,7),16);
+            doc.setFillColor(cr, cg, cb);
+            doc.circle(ML + 1.5, y - 1.5, 1.2, 'F');
+            doc.setFontSize(9);
+            doc.setFont('helvetica', 'normal');
+            doc.setTextColor(...TEXT);
+            doc.text(c.name || '—', ML + 5, y);
+            doc.setFont('helvetica', 'bold');
+            doc.setTextColor(...RED);
+            doc.text(fmt(c.amount) + ' €', XR, y, { align: 'right' });
+            nl(6);
+        });
+        rowTotal('Total costos', fmt(total) + ' €', RED);
+        nl(8);
+    }
+
+    // ── FOOTER ────────────────────────────────────────────────────────────────
+    doc.setFontSize(7);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(...GREY);
+    doc.text('ComptesClars · comptesclars.pages.dev', PW / 2, PH - 10, { align: 'center' });
 
     doc.save(filename);
     _showToast('✓ PDF exportat');
