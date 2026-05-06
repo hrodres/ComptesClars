@@ -1137,8 +1137,8 @@ function exportarPDF() {
     const doc  = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
     const PW   = 210;   // page width
     const PH   = 297;   // page height
-    const CW   = 130;   // content width (centered, ~mobile width)
-    const ML   = (PW - CW) / 2;  // left margin (~40mm)
+    const CW   = 110;   // content width (centered, ~mobile width)
+    const ML   = (PW - CW) / 2;  // left margin (~50mm)
     const XR   = ML + CW;        // right edge x
     let y      = 0;
 
@@ -1173,7 +1173,7 @@ function exportarPDF() {
         doc.setFontSize(size);
         doc.setFont('helvetica', 'normal');
         doc.setTextColor(...GREY);
-        doc.text(label, ML, y);
+        doc.text(label, ML, y, { maxWidth: CW * 0.6 });
         doc.setFont('helvetica', 'bold');
         doc.setTextColor(...(vColor || TEXT));
         doc.text(value, XR, y, { align: 'right' });
