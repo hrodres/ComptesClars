@@ -1137,10 +1137,9 @@ function exportarPDF() {
     const doc  = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
     const PW   = 210;   // page width
     const PH   = 297;   // page height
-    const ML   = 18;    // left margin
-    const MR   = 18;    // right margin
-    const CW   = PW - ML - MR;  // content width (174mm)
-    const XR   = PW - MR;       // right edge x
+    const CW   = 130;   // content width (centered, ~mobile width)
+    const ML   = (PW - CW) / 2;  // left margin (~40mm)
+    const XR   = ML + CW;        // right edge x
     let y      = 0;
 
     // Colors
@@ -1351,7 +1350,7 @@ function exportarPDF() {
     doc.setFontSize(7);
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(...GREY);
-    doc.text('ComptesClars · comptesclars.pages.dev', PW / 2, PH - 10, { align: 'center' });
+    doc.text('ComptesClars · comptesclars.pages.dev · by hrodres', PW / 2, PH - 10, { align: 'center' });
 
     doc.save(filename);
     _showToast('✓ PDF exportat');
