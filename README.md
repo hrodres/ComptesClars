@@ -16,7 +16,7 @@ Eina web per calcular i repartir els costos d'una activitat col·lectiva entre e
 - **Quotes** — planificació amb toggle participant/projecte, saldo a favor desglossat per origen (recaptació / pagaments)
 - **Hero** — preu per participant i totals del projecte, saldo pendent o a favor d'un cop d'ull
 - **Compartir** — URL curta (via Cloudflare KV, 30 dies) per enviar per WhatsApp, Telegram o email
-- **Exportar / Importar** — fitxer `.json` amb nom normalitzat i timestamp automàtics
+- **Exportar / Importar** — fitxer `.json` o `.pdf` amb nom normalitzat i timestamp automàtics
 - **Desfer** — eliminacions i reinici desables durant 5 segons
 - **Reordenar** — drag & drop a totes les seccions
 - **Mode fosc** — toggle manual al menú, respecta la preferència del sistema operatiu
@@ -43,6 +43,7 @@ Eina web per calcular i repartir els costos d'una activitat col·lectiva entre e
 | Estils | [Tailwind CSS](https://tailwindcss.com/) (CDN) + CSS propi |
 | Tipografia | [DM Sans + DM Mono](https://fonts.google.com/) |
 | Compressió URL | [LZString](https://pieroxy.net/blog/pages/lz-string/index.html) |
+| Exportació PDF | [jsPDF](https://github.com/parallax/jsPDF) (CDN) |
 | URLs curtes | [Cloudflare Workers KV](https://developers.cloudflare.com/kv/) |
 | Desplegament | [Cloudflare Pages](https://pages.cloudflare.com/) |
 
